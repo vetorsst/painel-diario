@@ -153,6 +153,44 @@ body{
 .vazio{margin:6px 0 0;font-size:.8rem;color:var(--ink-3)}
 .rodape{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.7rem;color:var(--ink-3);letter-spacing:.04em}
 
+/* ---------- ritmos necessários ---------- */
+.ritmos{display:flex;flex-direction:column}
+.rl{display:grid;grid-template-columns:1fr auto;gap:2px 14px;align-items:baseline;padding:10px 0;border-top:1px solid rgba(255,255,255,.05)}
+.rl:first-child{border-top:0;padding-top:0}
+.rl-rot{font-size:.84rem;color:var(--ink-2)}
+.rl-val{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;text-align:right;white-space:nowrap}
+.rl-val.forte{color:var(--amarelo);font-size:1.4rem}
+.rl-val.ok{color:var(--ok)}
+.rl-val.ruim{color:var(--alerta)}
+.rl-nota{grid-column:1/-1;font-size:.72rem;color:var(--ink-3)}
+.ritmo-blocos{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px}
+.rb{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:9px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;font-size:.84rem;font-weight:700;font-variant-numeric:tabular-nums}
+.rb b{font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.rb.parcial{border-color:rgba(255,205,28,.32);background:rgba(255,205,28,.08)}
+.rb.parcial b{color:var(--amarelo)}
+
+/* ---------- metas ---------- */
+.metas-form .link{align-self:flex-start;padding:7px 14px}
+.meta-atual{margin:0;font-size:.72rem;color:var(--ink-3)}
+
+/* ---------- editar lançamento ---------- */
+.acoes{display:inline-flex;align-items:center;gap:1px;flex:none}
+.mini.editar:hover{color:var(--amarelo);background:rgba(255,205,28,.12)}
+.mini.manter:hover{color:var(--ink);background:rgba(255,255,255,.08)}
+.lista li.editando,.hist-edit{display:block;padding:12px 0;border-top:1px solid rgba(255,255,255,.05)}
+.lista li.editando:first-child,.hist-edit:first-child{border-top:0}
+.edicao{display:flex;flex-direction:column;gap:11px;background:rgba(255,255,255,.04);border:1px solid var(--line-forte);border-radius:12px;padding:14px}
+.edicao .rot{margin:0}
+.ed-grade{display:grid;grid-template-columns:auto 1fr;gap:9px 12px;align-items:center}
+.ed-grade input,.ed-grade select{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line-forte);border-radius:9px;color:var(--ink);font:inherit;font-size:.92rem;padding:9px 11px}
+.ed-grade input:focus,.ed-grade select:focus{outline:2px solid var(--amarelo);outline-offset:1px;border-color:transparent}
+.ed-grade input[type="time"]{color-scheme:dark}
+.ed-grade select{cursor:pointer}
+.ed-grade input#ed-valor{font-weight:700;font-variant-numeric:tabular-nums}
+.ed-botoes{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.ed-botoes .btn{padding:10px 16px;font-size:.85rem}
+.ed-botoes .link{padding:9px 15px}
+
 /* ---------- histórico ---------- */
 .acoes-topo{display:flex;align-items:center;gap:10px}
 .link{background:rgba(255,255,255,.05);border:1px solid var(--line-forte);color:var(--ink-2);border-radius:999px;padding:9px 16px;font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:.15s}
@@ -181,7 +219,7 @@ body{
 .dia.batido .db i{background:var(--amarelo)}
 .selo{font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#04151d;background:var(--amarelo);border-radius:999px;padding:3px 9px}
 .dia-corpo{padding:0 18px 8px}
-.hist-linha{display:grid;grid-template-columns:56px 1fr 120px 34px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid rgba(255,255,255,.05);font-size:.86rem}
+.hist-linha{display:grid;grid-template-columns:56px 1fr 120px 62px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid rgba(255,255,255,.05);font-size:.86rem}
 .hist-linha .hora{color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:.78rem}
 .hist-linha .quem{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hist-linha .quem b{color:var(--ink);font-weight:600}
@@ -224,7 +262,9 @@ body.festa #fx{display:block}
   .hero-dir{align-items:flex-start;text-align:left}
   .ticks span:nth-child(even){visibility:hidden}
   .resumo{grid-template-columns:1fr 1fr;gap:8px}
-  .hist-linha{grid-template-columns:48px 1fr 96px 30px;gap:8px}
+  .hist-linha{grid-template-columns:48px 1fr 96px 56px;gap:8px}
+  .ed-grade{grid-template-columns:1fr;gap:5px 0}
+  .ed-grade .rot{margin-top:6px}
 }
 </style>
 </head>
@@ -239,7 +279,8 @@ body.festa #fx{display:block}
   /* ============================================================
      CONFIGURAÇÃO
      ------------------------------------------------------------
-     META           meta do dia em reais
+     META           meta padrão do dia em reais (dá para trocar pelo painel,
+                    em "Metas" — o que for salvo ali manda nisto aqui)
      API_URL        (opcional) endpoint que guarda os lançamentos.
                     Vazio  -> cada navegador guarda os seus (localStorage)
                     Preenchido -> todo mundo vê o mesmo número
@@ -247,10 +288,12 @@ body.festa #fx{display:block}
      SYNC_SEGUNDOS  de quanto em quanto tempo busca o que os outros lançaram
 
      Contrato da API (dois métodos na mesma URL):
-       GET  -> {"meta":40000,"lancamentos":[ ... ]}   (ou só o array)
-       POST -> recebe {"meta":40000,"lancamentos":[ ... ]} e grava tudo
+       GET  -> {"meta":40000,"metas":{...},"lancamentos":[ ... ]}  (ou só o array)
+       POST -> recebe {"meta":40000,"metas":{...},"lancamentos":[ ... ]} e grava tudo
      Cada lançamento: {id, ts, dia:"AAAA-MM-DD", hora, min, valor, vendedor, cliente}
      (basta devolver id/ts/valor — dia, hora e min são deduzidos do ts)
+     "meta"  é a meta padrão, usada em todo dia que não tiver a sua própria.
+     "metas" guarda as metas de dias específicos: {"2026-08-31":45000}
      ============================================================ */
   var CONFIG = {
     META: 40000,
@@ -265,6 +308,7 @@ body.festa #fx{display:block}
   var estado = lerEstado();
   var somenteLeitura = false, semSalvar = false, vendedorSel = "", aviso = "", avisoOk = false, confirmarId = "", rascunho = null;
   var festaVista = false, tela = "painel", filtro = "", diasAbertos = {}, avisoHist = "";
+  var editandoId = "", avisoEd = "", avisoMeta = "", avisoMetaOk = false, focarEdicao = false, recarregarMetas = false;
   try { festaVista = sessionStorage.getItem("festa-vista") === hojeSP(); } catch(e){}
   try { tela = sessionStorage.getItem("tela") === "historico" ? "historico" : "painel"; } catch(e){}
 
@@ -274,8 +318,37 @@ body.festa #fx{display:block}
       if(!s || typeof s !== "object") throw 0;
       if(!Array.isArray(s.lancamentos)) s.lancamentos = [];
       if(typeof s.meta !== "number" || !(s.meta > 0)) s.meta = META_PADRAO;
+      s.metas = limparMetas(s.metas);
       return s;
-    } catch(e){ return { meta: META_PADRAO, lancamentos: [] }; }
+    } catch(e){ return { meta: META_PADRAO, metas: {}, lancamentos: [] }; }
+  }
+
+  /* ====== metas ======
+     estado.meta  -> meta padrão, vale para qualquer dia sem meta própria
+     estado.metas -> metas de dias específicos: {"2026-08-31": 45000}
+     Guardar a meta por dia é o que faz o histórico continuar certo depois de
+     trocar a meta: cada dia é julgado pela meta que valia nele. */
+  function limparMetas(m){
+    var out = {};
+    if(m && typeof m === "object"){
+      Object.keys(m).forEach(function(k){
+        var v = typeof m[k] === "number" ? m[k] : paraNumero(m[k]);
+        if(/^\d{4}-\d{2}-\d{2}$/.test(k) && isFinite(v) && v > 0) out[k] = Math.round(v*100)/100;
+      });
+    }
+    return out;
+  }
+  function metaDoDia(dia){
+    var m = estado.metas && estado.metas[dia];
+    return (typeof m === "number" && m > 0) ? m : estado.meta;
+  }
+  function temMetaPropria(dia){
+    return !!(estado.metas && estado.metas[dia] > 0);
+  }
+  function copiaMetas(){
+    var out = {};
+    Object.keys(estado.metas || {}).forEach(function(k){ out[k] = estado.metas[k]; });
+    return out;
   }
 
   /* ====== tempo (America/Sao_Paulo) ====== */
@@ -299,6 +372,8 @@ body.festa #fx{display:block}
   /* ====== formatos ====== */
   function brl(v){ return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
   function brlc(v){ return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+  /* número puro para dentro de campo editável: 40.000 / 1.870,79 */
+  function numeroBR(v){ return v.toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:2}); }
   function hhmm(min){
     var m = Math.max(0, Math.round(min));
     return Math.floor(m/60) + "h" + (m%60 < 10 ? "0" : "") + (m%60) + "min";
@@ -318,7 +393,7 @@ body.festa #fx{display:block}
     var ag = partesSP(), hoje = ag.dia;
     var doDia = estado.lancamentos.filter(function(l){ return l.dia === hoje; });
     var total = doDia.reduce(function(a,l){ return a + l.valor; }, 0);
-    var meta = estado.meta, metaHora = meta / BLOCOS;
+    var meta = metaDoDia(hoje), metaHora = meta / BLOCOS;
     var minAgora = ag.h*60 + ag.m;
     var decorrido = Math.min(Math.max(minAgora - H_INI*60, 0), BLOCOS*60);
     var restante = BLOCOS*60 - decorrido;
@@ -330,7 +405,11 @@ body.festa #fx{display:block}
       blocos.push({ h:h, valor:no, meta:metaHora });
     }
     var acc = 0;
-    blocos.forEach(function(b){ acc += b.valor; b.acum = acc; b.metaAcum = (b.h - H_INI + 1) * metaHora; b.delta = b.acum - b.metaAcum; });
+    blocos.forEach(function(b){
+      acc += b.valor; b.acum = acc; b.metaAcum = (b.h - H_INI + 1) * metaHora; b.delta = b.acum - b.metaAcum;
+      /* minutos do bloco que ainda não passaram — o bloco corrente entra pela metade */
+      b.faltaMin = Math.max(0, Math.min(b.h*60 + 60, H_FIM*60) - Math.max(b.h*60, minAgora));
+    });
     var situacao;
     if(total >= meta) situacao = { txt:"META BATIDA", cls:"ok" };
     else if(decorrido <= 0) situacao = { txt:"COMEÇA ÀS 9H", cls:"neutro" };
@@ -341,6 +420,7 @@ body.festa #fx{display:block}
     }
     return {
       hoje:hoje, ag:ag, doDia:doDia, total:total, meta:meta, metaHora:metaHora,
+      metaPropria: temMetaPropria(hoje),
       decorrido:decorrido, restante:restante, esperado:esperado, falta:falta, blocos:blocos, situacao:situacao,
       pct: meta > 0 ? total/meta : 0,
       ritmoNec: restante > 0 ? falta / (restante/60) : 0,
@@ -355,7 +435,10 @@ body.festa #fx{display:block}
     /* preserva o que a pessoa está digitando entre renders (o painel se redesenha sozinho) */
     var foco = document.activeElement && document.activeElement.id, sel = null, vals = {};
     try { if(foco) sel = document.activeElement.selectionStart; } catch(e){}
-    ["valor","cliente","filtro"].forEach(function(id){ var e = document.getElementById(id); if(e) vals[id] = e.value; });
+    ["valor","cliente","filtro","meta-hoje","meta-padrao","ed-valor","ed-hora","ed-vendedor","ed-cliente"]
+      .forEach(function(id){ var e = document.getElementById(id); if(e) vals[id] = e.value; });
+    /* depois de salvar uma meta os campos voltam a nascer do estado, já formatados */
+    if(recarregarMetas){ delete vals["meta-hoje"]; delete vals["meta-padrao"]; recarregarMetas = false; }
 
     var d = calcular();
     var comFesta = tela === "painel" && d.batida && !festaVista;
@@ -410,14 +493,18 @@ body.festa #fx{display:block}
       + kpi("Projeção 19h", brl(d.projecao), d.projecao >= d.meta ? "bate a meta no ritmo atual" : "faltariam " + brl(Math.max(d.meta-d.projecao,0)))
       + '</section>');
 
-    h.push('<div class="colunas"><div class="painel"><h3>Hora a hora</h3><p class="legenda">Cada bloco precisa de ' + brl(d.metaHora) + ' para a meta fechar às 19h.</p>'
+    h.push('<div class="colunas"><div style="display:flex;flex-direction:column;gap:12px">'
+      + '<div class="painel"><h3>Hora a hora</h3><p class="legenda">Cada bloco precisa de ' + brl(d.metaHora) + ' para a meta fechar às 19h.</p>'
       + '<div class="hlinha hcab"><span>Hora</span><span>Ritmo do bloco</span><span>Realizado</span><span>Acum. vs meta</span></div>'
-      + d.blocos.map(function(b){ return blocoHTML(b, d); }).join("") + '</div>');
+      + d.blocos.map(function(b){ return blocoHTML(b, d); }).join("") + '</div>'
+      + ritmosHTML(d) + '</div>');
 
-    h.push('<div style="display:flex;flex-direction:column;gap:12px">' + formHTML(d) + lancamentosHTML(d) + vendedoresHTML(d) + '</div>');
+    h.push('<div style="display:flex;flex-direction:column;gap:12px">'
+      + formHTML(d) + metasHTML(d) + lancamentosHTML(d) + vendedoresHTML(d) + '</div>');
     h.push('</div>');
 
-    h.push('<footer class="rodape"><span>Meta diária ' + brl(d.meta) + ' &middot; janela 9h–19h &middot; horário de Brasília</span>'
+    h.push('<footer class="rodape"><span>Meta de hoje ' + brl(d.meta)
+      + (d.metaPropria ? ' (só para hoje)' : ' (padrão)') + ' &middot; janela 9h–19h &middot; horário de Brasília</span>'
       + '<span>' + statusArmazenamento() + '</span></footer>');
     h.push('</div>');
     return h.join("");
@@ -451,6 +538,71 @@ body.festa #fx{display:block}
       + '<div class="hbar"><i style="width:' + pct.toFixed(1) + '%"></i></div>'
       + '<span class="hv tab">' + (b.valor ? brl(b.valor) : "—") + '</span>' + delta + '</div>';
   }
+  /* ---- ritmos necessários ---- */
+  function ritmoLinha(rot, val, nota, cls){
+    return '<div class="rl"><span class="rl-rot">' + rot + '</span>'
+      + '<span class="rl-val tab ' + (cls || "") + '">' + val + '</span>'
+      + '<span class="rl-nota">' + nota + '</span></div>';
+  }
+  function ritmosHTML(d){
+    var restantes = d.blocos.filter(function(b){ return b.faltaMin > 0; });
+    var emAndamento = !d.batida && d.restante > 0;
+    var linhas = [];
+
+    linhas.push(ritmoLinha("Ritmo ideal do dia", brl(d.metaHora) + "/h",
+      "a meta de " + brl(d.meta) + " dividida pelos " + BLOCOS + " blocos entre 9h e 19h"));
+
+    if(d.batida){
+      linhas.push(ritmoLinha("Ritmo necessário agora", "meta batida", brl(d.total - d.meta) + " acima do combinado", "ok"));
+    } else if(d.decorrido <= 0){
+      linhas.push(ritmoLinha("Ritmo necessário agora", brl(d.metaHora) + "/h", "o dia ainda não abriu — vale o ritmo ideal"));
+    } else if(d.restante <= 0){
+      linhas.push(ritmoLinha("Ritmo necessário agora", "—", "a janela das 19h já fechou"));
+    } else {
+      linhas.push(ritmoLinha("Ritmo necessário agora", brl(d.ritmoNec) + "/h",
+        "para fechar " + brl(d.falta) + " nas " + hhmm(d.restante) + " que sobram", "forte"));
+      linhas.push(ritmoLinha("A cada 30 minutos", brl(d.ritmoNec/2), "o mesmo ritmo, em pedaços menores"));
+      linhas.push(ritmoLinha("A cada 15 minutos", brl(d.ritmoNec/4), "para acompanhar de perto"));
+    }
+
+    linhas.push(ritmoLinha("Ritmo realizado", brl(d.ritmoReal) + "/h",
+      d.decorrido <= 0 ? "o relógio da meta ainda não começou"
+        : (d.ritmoReal >= d.metaHora ? "acima do ritmo ideal" : "abaixo do ritmo ideal"),
+      d.decorrido <= 0 ? "" : (d.ritmoReal >= d.metaHora ? "ok" : "ruim")));
+
+    var blocos = "";
+    if(emAndamento && restantes.length){
+      blocos = '<p class="legenda" style="margin:16px 0 8px">Quanto cada bloco que ainda vem precisa trazer</p>'
+        + '<div class="ritmo-blocos">' + restantes.map(function(b){
+            var parcial = b.faltaMin < 60;
+            return '<span class="rb' + (parcial ? " parcial" : "") + '">'
+              + '<b>' + pad(b.h) + '–' + pad(b.h+1) + (parcial ? " · " + b.faltaMin + "min" : "") + '</b>'
+              + brl(d.falta * b.faltaMin / d.restante) + '</span>';
+          }).join("") + '</div>';
+    }
+
+    return '<div class="painel"><h3>Ritmos necessários</h3>'
+      + '<p class="legenda">Recalculado a cada lançamento e a cada troca de meta.</p>'
+      + '<div class="ritmos">' + linhas.join("") + '</div>' + blocos + '</div>';
+  }
+
+  /* ---- metas editáveis ---- */
+  function metasHTML(d){
+    if(somenteLeitura) return "";
+    return '<div class="painel"><h3>Metas</h3>'
+      + '<p class="legenda">A meta de hoje vale só para hoje. A padrão vale para todo dia que não tiver a sua própria — inclusive os que ainda vêm.</p>'
+      + '<form class="lanc metas-form" id="form-metas">'
+      + '<div class="campo"><label class="rot" for="meta-hoje" style="display:block;margin-bottom:6px">Meta de hoje (R$)</label>'
+      + '<input id="meta-hoje" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(d.meta)) + '" aria-label="Meta de hoje em reais"></div>'
+      + '<div class="campo"><label class="rot" for="meta-padrao" style="display:block;margin-bottom:6px">Meta padrão dos outros dias (R$)</label>'
+      + '<input id="meta-padrao" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(estado.meta)) + '" aria-label="Meta padrão em reais"></div>'
+      + '<button class="btn" type="submit">Salvar metas</button>'
+      + (d.metaPropria ? '<button class="link" type="button" id="meta-reset">Voltar hoje para a padrão</button>' : '')
+      + '<p class="meta-atual">Hoje está valendo ' + brl(d.meta)
+      + (d.metaPropria ? ', uma meta só deste dia.' : ', que é a meta padrão.') + '</p>'
+      + '<p class="aviso' + (avisoMetaOk ? " ok" : "") + '" role="status">' + esc(avisoMeta) + '</p></form></div>';
+  }
+
   function formHTML(d){
     if(somenteLeitura) return '<div class="painel"><h3>Lançar venda</h3><p class="vazio">Este acesso é somente leitura. Peça o link de edição para lançar vendas.</p></div>';
     return '<div class="painel"><h3>Lançar venda</h3><p class="legenda">Some ao total do dia — todo mundo vê na hora.</p>'
@@ -463,17 +615,53 @@ body.festa #fx{display:block}
       + '<button class="btn" type="submit">Lançar venda</button>'
       + '<p class="aviso' + (avisoOk ? " ok" : "") + '" role="status">' + esc(aviso) + '</p></form></div>';
   }
+  /* ---- editar e remover um lançamento ---- */
+  function acoesHTML(l){
+    if(somenteLeitura) return "";
+    if(confirmarId === l.id){
+      return '<span class="acoes"><button class="mini confirma" data-del="' + esc(l.id) + '">apagar?</button>'
+        + '<button class="mini manter" data-mantem="1" aria-label="Manter o lançamento" title="Manter">✕</button></span>';
+    }
+    return '<span class="acoes">'
+      + '<button class="mini editar" data-edita="' + esc(l.id) + '" aria-label="Editar lançamento" title="Editar">✎</button>'
+      + '<button class="mini" data-pede="' + esc(l.id) + '" aria-label="Remover lançamento" title="Remover">×</button></span>';
+  }
+  function edicaoHTML(l){
+    var nomes = VENDEDORES.filter(function(v){ return v !== "Outro"; });
+    if(l.vendedor && nomes.indexOf(l.vendedor) < 0) nomes.push(l.vendedor);
+    return '<form class="edicao" id="form-edicao" data-id="' + esc(l.id) + '">'
+      + '<div class="ed-grade">'
+      + '<label class="rot" for="ed-valor">Valor</label>'
+      + '<input id="ed-valor" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(l.valor)) + '" aria-label="Valor da venda">'
+      + '<label class="rot" for="ed-hora">Hora</label>'
+      + '<input id="ed-hora" type="time" value="' + pad(l.hora) + ':' + pad(l.min) + '" aria-label="Hora da venda">'
+      + '<label class="rot" for="ed-vendedor">Vendedor</label>'
+      + '<select id="ed-vendedor" aria-label="Vendedor"><option value="">Sem vendedor</option>'
+      + nomes.map(function(v){
+          return '<option value="' + esc(v) + '"' + (l.vendedor === v ? ' selected' : '') + '>' + esc(v) + '</option>';
+        }).join("")
+      + '</select>'
+      + '<label class="rot" for="ed-cliente">Cliente</label>'
+      + '<input id="ed-cliente" autocomplete="off" value="' + esc(l.cliente || "") + '" placeholder="opcional" aria-label="Cliente">'
+      + '</div>'
+      + '<div class="ed-botoes"><button class="btn" type="submit">Salvar alteração</button>'
+      + '<button class="link" type="button" id="ed-cancela">Cancelar</button></div>'
+      + '<p class="aviso" role="status">' + esc(avisoEd) + '</p></form>';
+  }
+
   function lancamentosHTML(d){
     var itens = d.doDia.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,8);
-    return '<div class="painel"><h3>Últimos lançamentos</h3><p class="legenda">' + d.doDia.length + ' venda' + (d.doDia.length === 1 ? "" : "s") + ' hoje</p>'
+    var emEdicao = editandoId && !itens.some(function(l){ return l.id === editandoId; })
+      && d.doDia.some(function(l){ return l.id === editandoId; });
+    if(emEdicao) itens = itens.concat(d.doDia.filter(function(l){ return l.id === editandoId; }));
+    return '<div class="painel"><h3>Últimos lançamentos</h3><p class="legenda">' + d.doDia.length + ' venda' + (d.doDia.length === 1 ? "" : "s")
+      + ' hoje' + (somenteLeitura ? "" : " · ✎ corrige, × apaga") + '</p>'
       + (itens.length ? '<ul class="lista">' + itens.map(function(l){
+          if(editandoId === l.id) return '<li class="editando">' + edicaoHTML(l) + '</li>';
           var q = pad(l.hora) + ":" + pad(l.min);
           var quem = [l.vendedor, l.cliente].filter(Boolean).join(" · ") || "sem identificação";
           return '<li><span class="quando tab">' + q + '</span><span class="quem">' + esc(quem) + '</span>'
-            + '<span class="qtd tab">' + brlc(l.valor) + '</span>'
-            + (somenteLeitura ? "" : (confirmarId === l.id
-                ? '<button class="mini confirma" data-del="' + esc(l.id) + '">apagar?</button>'
-                : '<button class="mini" data-pede="' + esc(l.id) + '" aria-label="Remover lançamento">×</button>')) + '</li>';
+            + '<span class="qtd tab">' + brlc(l.valor) + '</span>' + acoesHTML(l) + '</li>';
         }).join("") + '</ul>' : '<p class="vazio">Nenhuma venda lançada hoje ainda.</p>') + '</div>';
   }
   function vendedoresHTML(d){
@@ -516,7 +704,7 @@ body.festa #fx{display:block}
 
     var totalGeral = filtrados.reduce(function(a,g){ return a + g.total; }, 0);
     var qtd = filtrados.reduce(function(a,g){ return a + g.itens.length; }, 0);
-    var batidos = filtrados.filter(function(g){ return g.totalDia >= d.meta; }).length;
+    var batidos = filtrados.filter(function(g){ return g.totalDia >= metaDoDia(g.dia); }).length;
     var melhor = filtrados.slice().sort(function(a,b){ return b.totalDia - a.totalDia; })[0];
     var media = filtrados.length ? totalGeral / filtrados.length : 0;
 
@@ -533,7 +721,7 @@ body.festa #fx{display:block}
 
     h.push('<section class="resumo">'
       + kpi("Total no período", brl(totalGeral), qtd + " venda" + (qtd === 1 ? "" : "s"), "acc")
-      + kpi("Dias com venda", String(filtrados.length), "meta de " + brl(d.meta) + "/dia")
+      + kpi("Dias com venda", String(filtrados.length), "meta padrão de " + brl(estado.meta) + "/dia")
       + kpi("Dias que bateram", String(batidos), filtrados.length ? (batidos/filtrados.length*100).toFixed(0) + "% dos dias" : "—")
       + kpi("Melhor dia", melhor ? brl(melhor.totalDia) : "—", melhor ? nomeDia(melhor.dia) : "sem dados")
       + kpi("Média por dia", brl(media), "considerando dias com venda")
@@ -547,24 +735,25 @@ body.festa #fx{display:block}
     } else {
       filtrados.forEach(function(g){
         var aberto = diasAbertos[g.dia] !== undefined ? diasAbertos[g.dia] : (g.dia === d.hoje || !!filtro);
-        var batido = g.totalDia >= d.meta;
+        var metaG = metaDoDia(g.dia);
+        var batido = g.totalDia >= metaG;
         h.push('<div class="dia' + (batido ? " batido" : "") + (aberto ? " aberto" : "") + '">'
           + '<button class="dia-cab" data-dia="' + esc(g.dia) + '" aria-expanded="' + aberto + '">'
           + '<span class="data"><span class="seta">▶</span>' + esc(nomeDia(g.dia)) + (batido ? ' <span class="selo">meta batida</span>' : '') + '</span>'
           + '<span class="tot tab">' + brl(g.totalDia) + '</span>'
           + '<span class="meta-info"><span>' + g.itens.length + ' venda' + (g.itens.length === 1 ? "" : "s")
           + (filtro ? ' de ' + brl(g.total) + ' no filtro' : '') + '</span>'
-          + '<span class="db"><i style="width:' + Math.min(g.totalDia/d.meta*100,100).toFixed(1) + '%"></i></span>'
-          + '<span class="tab">' + (g.totalDia/d.meta*100).toFixed(0) + '% da meta</span></span></button>');
+          + '<span class="db"><i style="width:' + Math.min(g.totalDia/metaG*100,100).toFixed(1) + '%"></i></span>'
+          + '<span class="tab">' + (g.totalDia/metaG*100).toFixed(0) + '% de ' + brl(metaG)
+          + (temMetaPropria(g.dia) ? '' : ' (padrão)') + '</span></span></button>');
         if(aberto){
           h.push('<div class="dia-corpo">' + g.itens.map(function(l){
+            if(editandoId === l.id) return '<div class="hist-edit">' + edicaoHTML(l) + '</div>';
             var quem = l.cliente ? '<b>' + esc(l.cliente) + '</b>' + (l.vendedor ? ' · ' + esc(l.vendedor) : '') : (l.vendedor ? esc(l.vendedor) : '<span style="color:var(--ink-3)">sem identificação</span>');
             return '<div class="hist-linha"><span class="hora tab">' + pad(l.hora) + ':' + pad(l.min) + '</span>'
               + '<span class="quem">' + quem + '</span>'
               + '<span class="val tab">' + brlc(l.valor) + '</span>'
-              + '<span class="acao">' + (somenteLeitura ? "" : (confirmarId === l.id
-                  ? '<button class="mini confirma" data-del="' + esc(l.id) + '">apagar?</button>'
-                  : '<button class="mini" data-pede="' + esc(l.id) + '" aria-label="Remover lançamento">×</button>')) + '</span></div>';
+              + '<span class="acao">' + acoesHTML(l) + '</span></div>';
           }).join("") + '</div>');
         }
         h.push('</div>');
@@ -629,14 +818,82 @@ body.festa #fx{display:block}
       });
     }
     Array.prototype.forEach.call(document.querySelectorAll("[data-pede]"), function(b){
-      b.addEventListener("click", function(){ confirmarId = b.dataset.pede; render(); });
+      b.addEventListener("click", function(){ confirmarId = b.dataset.pede; editandoId = ""; render(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-mantem]"), function(b){
+      b.addEventListener("click", function(){ confirmarId = ""; render(); });
     });
     Array.prototype.forEach.call(document.querySelectorAll("[data-del]"), function(b){
       b.addEventListener("click", function(){
-        var id = b.dataset.del; confirmarId = "";
+        var id = b.dataset.del; confirmarId = ""; editandoId = "";
         salvar(estado.lancamentos.filter(function(l){ return l.id !== id; }));
       });
     });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-edita]"), function(b){
+      b.addEventListener("click", function(){
+        editandoId = b.dataset.edita; confirmarId = ""; avisoEd = ""; focarEdicao = true;
+        render();
+      });
+    });
+
+    /* ---- edição de um lançamento ---- */
+    var fe = document.getElementById("form-edicao");
+    if(fe){
+      fe.addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var id = fe.getAttribute("data-id");
+        var v = paraNumero(document.getElementById("ed-valor").value);
+        if(!isFinite(v) || v <= 0){ avisoEd = "Informe um valor maior que zero."; render(); return; }
+        var hm = String(document.getElementById("ed-hora").value || "").split(":");
+        var hh = parseInt(hm[0], 10), mm = parseInt(hm[1], 10);
+        if(!isFinite(hh) || !isFinite(mm) || hh < 0 || hh > 23 || mm < 0 || mm > 59){
+          avisoEd = "Informe a hora no formato 00:00."; render(); return;
+        }
+        var vend = document.getElementById("ed-vendedor").value;
+        var cli = document.getElementById("ed-cliente").value.trim().slice(0,60);
+        avisoEd = ""; editandoId = ""; confirmarId = "";
+        salvar(estado.lancamentos.map(function(l){
+          if(l.id !== id) return l;
+          /* move o ts o mesmo tanto que a hora andou: o dia continua o mesmo
+             e a ordem de chegada segue coerente com o relógio */
+          var novoTs = l.ts + ((hh*60 + mm) - (l.hora*60 + l.min)) * 60000;
+          return { id:l.id, ts:novoTs, dia:l.dia, hora:hh, min:mm,
+                   valor:Math.round(v*100)/100, vendedor:vend, cliente:cli };
+        }));
+      });
+      var ec = document.getElementById("ed-cancela");
+      if(ec) ec.addEventListener("click", function(){ editandoId = ""; avisoEd = ""; render(); });
+      if(focarEdicao){
+        focarEdicao = false;
+        var ev0 = document.getElementById("ed-valor");
+        if(ev0){ ev0.focus(); try { ev0.select(); } catch(e){} }
+      }
+    }
+
+    /* ---- metas ---- */
+    var fm = document.getElementById("form-metas");
+    if(fm){
+      fm.addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var mh = paraNumero(document.getElementById("meta-hoje").value);
+        var mp = paraNumero(document.getElementById("meta-padrao").value);
+        if(!isFinite(mh) || mh <= 0 || !isFinite(mp) || mp <= 0){
+          avisoMeta = "As duas metas precisam ser maiores que zero."; avisoMetaOk = false; render(); return;
+        }
+        var novas = copiaMetas();
+        novas[d.hoje] = Math.round(mh*100)/100;
+        /* meta nova: a festa pode valer de novo se o dia passar a estar batido */
+        festaVista = false;
+        try { sessionStorage.removeItem("festa-vista"); } catch(e){}
+        salvarMetas(Math.round(mp*100)/100, novas, "Metas salvas.");
+      });
+      var mr = document.getElementById("meta-reset");
+      if(mr) mr.addEventListener("click", function(){
+        var novas = copiaMetas();
+        delete novas[d.hoje];
+        salvarMetas(estado.meta, novas, "Hoje voltou para a meta padrão.");
+      });
+    }
     var ih = document.getElementById("ir-historico");
     if(ih) ih.addEventListener("click", function(){ irPara("historico"); });
     var ip = document.getElementById("ir-painel");
@@ -742,6 +999,10 @@ body.festa #fx{display:block}
         if(!novos.length && estado.lancamentos.length){ ultimaSync = Date.now(); syncOk = true; return enviarAPI(); }
         var mudou = JSON.stringify(novos) !== JSON.stringify(estado.lancamentos);
         if(j && typeof j.meta === "number" && j.meta > 0 && j.meta !== estado.meta){ estado.meta = j.meta; mudou = true; }
+        if(j && j.metas){
+          var ms = limparMetas(j.metas);
+          if(JSON.stringify(ms) !== JSON.stringify(estado.metas)){ estado.metas = ms; mudou = true; }
+        }
         if(mudou){ estado.lancamentos = novos; gravarLocal(); render(); }
         ultimaSync = Date.now(); syncOk = true;
       })
@@ -751,7 +1012,7 @@ body.festa #fx{display:block}
     return fetch(CONFIG.API_URL, {
       method: "POST",
       headers: cabecalhos(),
-      body: JSON.stringify({ meta: estado.meta, lancamentos: estado.lancamentos })
+      body: JSON.stringify({ meta: estado.meta, metas: estado.metas || {}, lancamentos: estado.lancamentos })
     }).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
       ultimaSync = Date.now(); syncOk = true;
@@ -761,6 +1022,34 @@ body.festa #fx{display:block}
     if(!CONFIG.API_URL) return "os lançamentos ficam salvos neste navegador";
     if(!syncOk) return "sem conexão com o servidor — salvo só neste navegador";
     return "sincronizado com o servidor · todo mundo vê o mesmo número";
+  }
+
+  /* metas mudam sem tocar nos lançamentos, então têm o seu próprio caminho de
+     gravação — com o mesmo cuidado de desfazer se o navegador recusar salvar */
+  var limpezaAviso = 0;
+  function agendarLimpeza(){
+    clearTimeout(limpezaAviso);
+    limpezaAviso = setTimeout(function(){
+      if(avisoMeta || avisoEd){ avisoMeta = ""; avisoEd = ""; render(); }
+    }, 5000);
+  }
+  function salvarMetas(meta, metas, ok){
+    var antMeta = estado.meta, antMetas = estado.metas;
+    estado.meta = meta; estado.metas = metas;
+    if(!gravarLocal() && !CONFIG.API_URL){
+      estado.meta = antMeta; estado.metas = antMetas;
+      avisoMeta = "Não deu para salvar neste navegador."; avisoMetaOk = false; render();
+      return;
+    }
+    avisoMeta = ok; avisoMetaOk = true;
+    recarregarMetas = true;
+    agendarLimpeza();
+    render();
+    if(!CONFIG.API_URL) return;
+    enviarAPI().catch(function(){
+      avisoMeta = "Sem conexão com o servidor. A meta ficou salva neste navegador e vai junto na próxima tentativa.";
+      avisoMetaOk = false; render();
+    });
   }
 
   function salvar(lancamentos){
@@ -868,6 +1157,7 @@ body.festa #fx{display:block}
   if(salvo){
     estado.lancamentos = salvo.lancamentos.map(normalizar).filter(Boolean);
     if(typeof salvo.meta === "number" && salvo.meta > 0) estado.meta = salvo.meta;
+    if(salvo.metas) estado.metas = limparMetas(salvo.metas);
   }
   render();
   iniciarSync();
