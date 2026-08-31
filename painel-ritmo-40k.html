@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#092737">
+<title>Ritmo 40K · Vetor SST</title>
+<!--
+  Painel de ritmo comercial — Vetor SST
+  Meta do dia, ritmo necessário por hora (9h–19h), histórico completo
+  e comemoração ao bater a meta.
+
+  Arquivo único: abra direto no navegador ou suba em qualquer hospedagem
+  estática (Netlify, Vercel, GitHub Pages, Hostinger, um /public do seu servidor).
+  Configuração no início da tag <script> lá embaixo: procure por "var CONFIG".
+-->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap">
+<style id="app-style">
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+:root{
+  --ground:#041720;
+  --navy:#092737;
+  --card:#0b2b3b;
+  --card-hi:#103a4f;
+  --line:rgba(255,255,255,.09);
+  --line-forte:rgba(255,255,255,.16);
+  --ink:#eaf3f7;
+  --ink-2:#a2bcc9;
+  --ink-3:#6f8d9c;
+  --amarelo:#FFCD1C;
+  --amarelo-esc:#c99e0f;
+  --ok:#3ad29b;
+  --alerta:#ff7d63;
+  --r:14px;
+}
+body{
+  background:
+    radial-gradient(1200px 700px at 78% -12%, #0e3a4e 0%, transparent 60%),
+    radial-gradient(900px 600px at 8% 0%, rgba(255,205,28,.07) 0%, transparent 55%),
+    var(--ground);
+  color:var(--ink);
+  font-family:Poppins,"Segoe UI",system-ui,-apple-system,sans-serif;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+.wrap{max-width:1520px;margin:0 auto;padding:clamp(14px,2.2vw,30px) clamp(14px,2.4vw,34px) 48px}
+.rot{margin:0;font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.tab{font-variant-numeric:tabular-nums}
+
+/* ---------- topo ---------- */
+.topo{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:11px}
+.logo svg{width:26px;height:26px;flex:none}
+.logo b{font-weight:800;letter-spacing:.2em;font-size:1.02rem;line-height:1}
+.logo b i{font-style:normal;color:var(--amarelo)}
+.logo span{display:block;font-size:.6rem;letter-spacing:.28em;color:var(--ink-3);font-weight:500;margin-top:3px}
+.relogio{display:flex;align-items:baseline;gap:14px}
+.relogio .hora{font-size:clamp(1.3rem,2.4vw,1.9rem);font-weight:700;letter-spacing:-.01em;line-height:1}
+.relogio .dia{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ---------- hero ---------- */
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:26px;flex-wrap:wrap;padding:clamp(20px,3vw,34px) 0 14px}
+.big{margin:2px 0 0;font-size:clamp(3.4rem,11.5vw,8.6rem);font-weight:900;letter-spacing:-.045em;line-height:.86;color:var(--amarelo);font-variant-numeric:tabular-nums}
+.big.zerado{color:var(--ink)}
+.sub{margin:10px 0 0;font-size:clamp(.85rem,1.5vw,1.05rem);color:var(--ink-2);font-weight:400}
+.sub b{color:var(--ink);font-weight:700}
+.hero-dir{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:10px;padding-bottom:6px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;font-size:.76rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:1px solid}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--ok);border-color:rgba(58,210,155,.35);background:rgba(58,210,155,.1)}
+.pill.at{color:var(--amarelo);border-color:rgba(255,205,28,.35);background:rgba(255,205,28,.1)}
+.pill.ruim{color:var(--alerta);border-color:rgba(255,125,99,.35);background:rgba(255,125,99,.1)}
+.pill.neutro{color:var(--ink-2);border-color:var(--line-forte);background:rgba(255,255,255,.04)}
+.hero-dir .nota{margin:0;font-size:.82rem;color:var(--ink-3)}
+.hero-dir .nota b{color:var(--ink-2);font-weight:600}
+
+/* ---------- barra ---------- */
+.barra{margin-top:6px}
+.track{position:relative;height:22px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid var(--line);overflow:visible}
+.fill{position:absolute;inset:1px auto 1px 1px;border-radius:10px;background:linear-gradient(90deg,var(--amarelo-esc),var(--amarelo));transition:width .6s cubic-bezier(.2,.7,.3,1);min-width:0}
+.marca{position:absolute;top:-7px;bottom:-7px;width:2px;background:var(--ink);border-radius:2px;transition:left .6s cubic-bezier(.2,.7,.3,1)}
+.marca span{position:absolute;top:-19px;left:50%;transform:translateX(-50%);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.ticks{display:flex;justify-content:space-between;margin-top:9px;font-size:.62rem;letter-spacing:.1em;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
+/* ---------- kpis ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px 15px}
+.kpi .val{margin:8px 0 0;font-size:clamp(1.35rem,2.6vw,2rem);font-weight:800;letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums}
+.kpi .val.acc{color:var(--amarelo)}
+.kpi .nota{margin:7px 0 0;font-size:.72rem;color:var(--ink-3)}
+.kpi.destaque{background:linear-gradient(160deg,rgba(255,205,28,.14),rgba(255,205,28,.03));border-color:rgba(255,205,28,.28)}
+
+/* ---------- grid principal ---------- */
+.colunas{display:grid;grid-template-columns:1.45fr 1fr;gap:12px;margin-top:12px;align-items:start}
+.painel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.painel h3{margin:0 0 2px;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.painel .legenda{margin:0 0 14px;font-size:.72rem;color:var(--ink-3)}
+
+/* horas */
+.hlinha{display:grid;grid-template-columns:58px 1fr 96px 84px;align-items:center;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.05)}
+.hlinha:first-of-type{border-top:0}
+.hcab{font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);padding-bottom:6px;border-top:0}
+.hcab span:nth-child(3),.hcab span:nth-child(4){text-align:right}
+.hl{font-size:.78rem;color:var(--ink-2);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.hbar{height:9px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden}
+.hbar i{display:block;height:100%;border-radius:5px;background:var(--amarelo-esc);transition:width .5s ease}
+.hlinha.cheio .hbar i{background:var(--amarelo)}
+.hv{text-align:right;font-size:.86rem;font-weight:600;font-variant-numeric:tabular-nums}
+.hd{text-align:right;font-size:.78rem;font-variant-numeric:tabular-nums;color:var(--ink-3)}
+.hd.pos{color:var(--ok)}
+.hd.neg{color:var(--alerta)}
+.hlinha.futuro .hl,.hlinha.futuro .hv{color:var(--ink-3);font-weight:400}
+.hlinha.agora{background:rgba(255,205,28,.07);border-radius:8px;box-shadow:inset 0 0 0 1px rgba(255,205,28,.22);padding-left:8px;padding-right:8px;margin:2px -8px}
+.hlinha.agora .hl{color:var(--amarelo);font-weight:700}
+
+/* form */
+.lanc{display:flex;flex-direction:column;gap:10px}
+.campo{position:relative}
+.campo input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line-forte);border-radius:10px;color:var(--ink);font:inherit;font-size:1rem;padding:12px 14px}
+.campo input#valor{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;padding:14px;font-variant-numeric:tabular-nums}
+.campo input::placeholder{color:var(--ink-3);font-weight:400;letter-spacing:0}
+.campo input:focus{outline:2px solid var(--amarelo);outline-offset:1px;border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:rgba(255,255,255,.05);border:1px solid var(--line-forte);color:var(--ink-2);border-radius:999px;padding:7px 13px;font:inherit;font-size:.76rem;font-weight:600;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--ink-3);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--amarelo);border-color:var(--amarelo);color:#04151d}
+.chip:focus-visible,.btn:focus-visible,.btn-ghost:focus-visible,.mini:focus-visible{outline:2px solid var(--amarelo);outline-offset:2px}
+.btn{background:var(--amarelo);color:#04151d;border:0;border-radius:10px;padding:13px 18px;font:inherit;font-size:.92rem;font-weight:800;letter-spacing:.02em;cursor:pointer;transition:.15s}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.aviso{margin:0;font-size:.74rem;color:var(--alerta);min-height:1em}
+.aviso.ok{color:var(--ok)}
+
+/* listas */
+.lista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.lista li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.05);font-size:.86rem}
+.lista li:first-child{border-top:0}
+.lista .qtd{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lista .quem{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lista .quando{color:var(--ink-3);font-size:.74rem;font-variant-numeric:tabular-nums;flex:none}
+.mini{background:none;border:0;color:var(--ink-3);cursor:pointer;font:inherit;font-size:.9rem;line-height:1;padding:4px 6px;border-radius:6px;flex:none}
+.mini:hover{color:var(--alerta);background:rgba(255,125,99,.12)}
+.mini.confirma{color:var(--alerta);font-size:.7rem;font-weight:700;letter-spacing:.08em}
+.vend{display:grid;grid-template-columns:1fr 92px;gap:4px 12px;align-items:center;padding:9px 0;border-top:1px solid rgba(255,255,255,.05)}
+.vend:first-child{border-top:0}
+.vend .nome{font-size:.86rem;color:var(--ink-2)}
+.vend .vl{text-align:right;font-size:.88rem;font-weight:700;font-variant-numeric:tabular-nums}
+.vend .vb{grid-column:1/-1;height:5px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden}
+.vend .vb i{display:block;height:100%;background:var(--amarelo);border-radius:3px}
+.vazio{margin:6px 0 0;font-size:.8rem;color:var(--ink-3)}
+.rodape{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.7rem;color:var(--ink-3);letter-spacing:.04em}
+
+/* ---------- histórico ---------- */
+.acoes-topo{display:flex;align-items:center;gap:10px}
+.link{background:rgba(255,255,255,.05);border:1px solid var(--line-forte);color:var(--ink-2);border-radius:999px;padding:9px 16px;font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:.15s}
+.link:hover{color:var(--ink);border-color:var(--ink-3)}
+.link.forte{background:var(--amarelo);border-color:var(--amarelo);color:#04151d}
+.hist-topo{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:26px 0 18px}
+.hist-topo h2{margin:0;font-size:clamp(1.6rem,3.4vw,2.4rem);font-weight:800;letter-spacing:-.03em}
+.hist-topo p{margin:6px 0 0;font-size:.84rem;color:var(--ink-3)}
+.resumo{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+.busca{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.busca input{flex:1;min-width:220px;background:rgba(255,255,255,.05);border:1px solid var(--line-forte);border-radius:10px;color:var(--ink);font:inherit;font-size:.9rem;padding:11px 14px}
+.busca input:focus{outline:2px solid var(--amarelo);outline-offset:1px;border-color:transparent}
+.busca input::placeholder{color:var(--ink-3)}
+.dia{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.dia.batido{border-color:rgba(255,205,28,.32)}
+.dia-cab{display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center;padding:15px 18px;cursor:pointer;background:none;border:0;width:100%;text-align:left;font:inherit;color:inherit}
+.dia-cab:hover{background:rgba(255,255,255,.03)}
+.dia-cab .data{font-size:.95rem;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:9px}
+.dia-cab .seta{color:var(--ink-3);font-size:.7rem;transition:transform .2s}
+.dia.aberto .seta{transform:rotate(90deg)}
+.dia-cab .tot{font-size:1.05rem;font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+.dia.batido .dia-cab .tot{color:var(--amarelo)}
+.dia-cab .meta-info{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:.72rem;color:var(--ink-3);margin-top:2px}
+.dia-cab .db{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;min-width:60px}
+.dia-cab .db i{display:block;height:100%;background:var(--amarelo-esc);border-radius:3px}
+.dia.batido .db i{background:var(--amarelo)}
+.selo{font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#04151d;background:var(--amarelo);border-radius:999px;padding:3px 9px}
+.dia-corpo{padding:0 18px 8px}
+.hist-linha{display:grid;grid-template-columns:56px 1fr 120px 34px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid rgba(255,255,255,.05);font-size:.86rem}
+.hist-linha .hora{color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:.78rem}
+.hist-linha .quem{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-linha .quem b{color:var(--ink);font-weight:600}
+.hist-linha .val{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.hist-linha .acao{text-align:right}
+.sem-resultado{margin:26px 0;text-align:center;color:var(--ink-3);font-size:.88rem}
+
+/* banner meta batida */
+.banner{width:100%;margin:0 0 14px;border:1px solid rgba(255,205,28,.4);background:linear-gradient(90deg,rgba(255,205,28,.2),rgba(255,205,28,.05));color:var(--amarelo);border-radius:12px;padding:13px 18px;font:inherit;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-align:left}
+.banner:hover{background:rgba(255,205,28,.24)}
+
+/* ---------- festa ---------- */
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:78;display:none}
+body.festa #fx{display:block}
+.party-bg{position:fixed;inset:0;z-index:75;
+  background:radial-gradient(circle at 50% 45%,rgba(9,39,55,.88) 0%,rgba(4,23,32,.97) 55%,rgba(4,23,32,.995) 100%)}
+.party{position:fixed;inset:0;z-index:85;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;pointer-events:none}
+.party>*{pointer-events:auto}
+.party-kicker{margin:0;font-size:clamp(.66rem,1.5vw,.82rem);letter-spacing:.3em;text-transform:uppercase;color:var(--ink-2)}
+.party-title{margin:0;font-size:clamp(2.6rem,11vw,8rem);font-weight:900;line-height:.86;letter-spacing:-.04em;color:var(--amarelo);
+  text-shadow:0 0 42px rgba(255,205,28,.45);animation:pulsa 1.15s ease-in-out infinite alternate}
+.party-sub{margin:2px 0 0;font-size:clamp(1rem,2.6vw,1.7rem);font-weight:700;color:var(--ink)}
+.party-sub span{color:var(--amarelo)}
+.btn-ghost{margin-top:12px;background:rgba(255,255,255,.06);border:1px solid var(--line-forte);color:var(--ink-2);border-radius:999px;padding:11px 22px;font:inherit;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.btn-ghost:hover{color:var(--ink);border-color:var(--ink-3)}
+@keyframes pulsa{from{transform:scale(1)}to{transform:scale(1.045)}}
+@media (prefers-reduced-motion:reduce){
+  .party-title{animation:none}
+  .fill,.marca,.hbar i{transition:none}
+}
+@media (max-width:1080px){
+  .colunas{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .resumo{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:560px){
+  .kpis{grid-template-columns:1fr 1fr;gap:8px}
+  .hlinha{grid-template-columns:52px 1fr 82px;gap:9px}
+  .hlinha .hd,.hcab span:nth-child(4){display:none}
+  .hero-dir{align-items:flex-start;text-align:left}
+  .ticks span:nth-child(even){visibility:hidden}
+  .resumo{grid-template-columns:1fr 1fr;gap:8px}
+  .hist-linha{grid-template-columns:48px 1fr 96px 30px;gap:8px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script type="application/json" id="estado">{"meta":40000,"lancamentos":[{"id":"mth8ekzy8ywf1","ts":1788180340174,"dia":"2026-08-31","hora":9,"min":45,"valor":1019,"vendedor":"","cliente":"LUMO SOLUTIONS"},{"id":"mth8ivpxmg3g6","ts":1788180540693,"dia":"2026-08-31","hora":9,"min":49,"valor":1870.79,"vendedor":"","cliente":"STK"},{"id":"mth8j89muoog1","ts":1788180556954,"dia":"2026-08-31","hora":9,"min":49,"valor":5714.05,"vendedor":"","cliente":"Asaas"},{"id":"mth8qnoel204f","ts":1788180903518,"dia":"2026-08-31","hora":9,"min":55,"valor":759.81,"vendedor":"","cliente":"AG FORROS"},{"id":"mth9ct436hdn2","ts":1788181936995,"dia":"2026-08-31","hora":10,"min":12,"valor":1235.28,"vendedor":"","cliente":"Edson Ramos"},{"id":"mthaqblt2wyjz","ts":1788184247105,"dia":"2026-08-31","hora":10,"min":50,"valor":60,"vendedor":"","cliente":"Exames"},{"id":"mthbgmd6q4inu","ts":1788185474106,"dia":"2026-08-31","hora":11,"min":11,"valor":999.8,"vendedor":"Felipe","cliente":"CIAA"},{"id":"mthcm2ivea5k6","ts":1788187407943,"dia":"2026-08-31","hora":11,"min":43,"valor":99.9,"vendedor":"","cliente":"GLIKO"},{"id":"mthe6znastjid","ts":1788190063606,"dia":"2026-08-31","hora":12,"min":27,"valor":300,"vendedor":"","cliente":"André aparecido"},{"id":"mthg6r1vuka1t","ts":1788193411699,"dia":"2026-08-31","hora":13,"min":23,"valor":500,"vendedor":"","cliente":"Robson godoy"},{"id":"mthj5v2l19km3","ts":1788198409101,"dia":"2026-08-31","hora":14,"min":46,"valor":360,"vendedor":"","cliente":"Jeferson Fernandes"},{"id":"mthkz7ryi66ey","ts":1788201458206,"dia":"2026-08-31","hora":15,"min":37,"valor":1060,"vendedor":"","cliente":"ghedini"},{"id":"mthl1f1i74z1b","ts":1788201560934,"dia":"2026-08-31","hora":15,"min":39,"valor":199,"vendedor":"","cliente":"S & R"},{"id":"mthltr02wbu3x","ts":1788202882802,"dia":"2026-08-31","hora":16,"min":1,"valor":649.95,"vendedor":"","cliente":"J camargo"}]}</script>
+<script id="app-script">
+(function(){
+  "use strict";
+
+  /* ============================================================
+     CONFIGURAÇÃO
+     ------------------------------------------------------------
+     META           meta do dia em reais
+     API_URL        (opcional) endpoint que guarda os lançamentos.
+                    Vazio  -> cada navegador guarda os seus (localStorage)
+                    Preenchido -> todo mundo vê o mesmo número
+     API_TOKEN      (opcional) enviado como "Authorization: Bearer ..."
+     SYNC_SEGUNDOS  de quanto em quanto tempo busca o que os outros lançaram
+
+     Contrato da API (dois métodos na mesma URL):
+       GET  -> {"meta":40000,"lancamentos":[ ... ]}   (ou só o array)
+       POST -> recebe {"meta":40000,"lancamentos":[ ... ]} e grava tudo
+     Cada lançamento: {id, ts, dia:"AAAA-MM-DD", hora, min, valor, vendedor, cliente}
+     (basta devolver id/ts/valor — dia, hora e min são deduzidos do ts)
+     ============================================================ */
+  var CONFIG = {
+    META: 40000,
+    API_URL: "",
+    API_TOKEN: "",
+    SYNC_SEGUNDOS: 15
+  };
+
+  /* ====== estado ====== */
+  var META_PADRAO = CONFIG.META || 40000, H_INI = 9, H_FIM = 19, BLOCOS = H_FIM - H_INI;
+  var VENDEDORES = ["Felipe","Fran","Glauber","Outro"];
+  var estado = lerEstado();
+  var somenteLeitura = false, semSalvar = false, vendedorSel = "", aviso = "", avisoOk = false, confirmarId = "", rascunho = null;
+  var festaVista = false, tela = "painel", filtro = "", diasAbertos = {}, avisoHist = "";
+  try { festaVista = sessionStorage.getItem("festa-vista") === hojeSP(); } catch(e){}
+  try { tela = sessionStorage.getItem("tela") === "historico" ? "historico" : "painel"; } catch(e){}
+
+  function lerEstado(){
+    try {
+      var s = JSON.parse(document.getElementById("estado").textContent);
+      if(!s || typeof s !== "object") throw 0;
+      if(!Array.isArray(s.lancamentos)) s.lancamentos = [];
+      if(typeof s.meta !== "number" || !(s.meta > 0)) s.meta = META_PADRAO;
+      return s;
+    } catch(e){ return { meta: META_PADRAO, lancamentos: [] }; }
+  }
+
+  /* ====== tempo (America/Sao_Paulo) ====== */
+  var FMT = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+  function partesSP(d){
+    var p = {}, ps = FMT.formatToParts(d || new Date());
+    for(var i=0;i<ps.length;i++) p[ps[i].type] = ps[i].value;
+    return { dia:p.year+"-"+p.month+"-"+p.day, h:(+p.hour)%24, m:+p.minute, s:+p.second };
+  }
+  function hojeSP(){ return partesSP().dia; }
+  function dataExtenso(){
+    return new Intl.DateTimeFormat("pt-BR",{timeZone:"America/Sao_Paulo",weekday:"short",day:"2-digit",month:"short"}).format(new Date()).replace(/\./g,"");
+  }
+  function nomeDia(dia){
+    var p = String(dia).split("-");
+    if(p.length !== 3) return dia;
+    var d = new Date(Date.UTC(+p[0], +p[1]-1, +p[2], 12));
+    return new Intl.DateTimeFormat("pt-BR",{timeZone:"UTC",weekday:"long",day:"2-digit",month:"long",year:"numeric"}).format(d).replace(/-feira/,"");
+  }
+
+  /* ====== formatos ====== */
+  function brl(v){ return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
+  function brlc(v){ return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+  function hhmm(min){
+    var m = Math.max(0, Math.round(min));
+    return Math.floor(m/60) + "h" + (m%60 < 10 ? "0" : "") + (m%60) + "min";
+  }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function paraNumero(txt){
+    var t = String(txt).replace(/[^0-9.,]/g,"");
+    if(!t) return NaN;
+    if(t.indexOf(",") > -1) t = t.replace(/\./g,"").replace(",",".");
+    else if(/\.\d{3}(\.|$)/.test(t)) t = t.replace(/\./g,"");
+    var n = parseFloat(t);
+    return isFinite(n) ? n : NaN;
+  }
+
+  /* ====== cálculo ====== */
+  function calcular(){
+    var ag = partesSP(), hoje = ag.dia;
+    var doDia = estado.lancamentos.filter(function(l){ return l.dia === hoje; });
+    var total = doDia.reduce(function(a,l){ return a + l.valor; }, 0);
+    var meta = estado.meta, metaHora = meta / BLOCOS;
+    var minAgora = ag.h*60 + ag.m;
+    var decorrido = Math.min(Math.max(minAgora - H_INI*60, 0), BLOCOS*60);
+    var restante = BLOCOS*60 - decorrido;
+    var esperado = meta * (decorrido / (BLOCOS*60));
+    var falta = Math.max(meta - total, 0);
+    var blocos = [];
+    for(var h = H_INI; h < H_FIM; h++){
+      var no = doDia.filter(function(l){ return l.hora === h; }).reduce(function(a,l){ return a + l.valor; }, 0);
+      blocos.push({ h:h, valor:no, meta:metaHora });
+    }
+    var acc = 0;
+    blocos.forEach(function(b){ acc += b.valor; b.acum = acc; b.metaAcum = (b.h - H_INI + 1) * metaHora; b.delta = b.acum - b.metaAcum; });
+    var situacao;
+    if(total >= meta) situacao = { txt:"META BATIDA", cls:"ok" };
+    else if(decorrido <= 0) situacao = { txt:"COMEÇA ÀS 9H", cls:"neutro" };
+    else if(restante <= 0) situacao = { txt:"DIA ENCERRADO", cls:"ruim" };
+    else {
+      var r = esperado > 0 ? total / esperado : 1;
+      situacao = r >= 1.02 ? { txt:"ADIANTADO", cls:"ok" } : (r >= 0.9 ? { txt:"NO RITMO", cls:"at" } : { txt:"ATRASADO", cls:"ruim" });
+    }
+    return {
+      hoje:hoje, ag:ag, doDia:doDia, total:total, meta:meta, metaHora:metaHora,
+      decorrido:decorrido, restante:restante, esperado:esperado, falta:falta, blocos:blocos, situacao:situacao,
+      pct: meta > 0 ? total/meta : 0,
+      ritmoNec: restante > 0 ? falta / (restante/60) : 0,
+      ritmoReal: decorrido > 0 ? total / (decorrido/60) : 0,
+      projecao: decorrido > 0 ? total * (BLOCOS*60) / decorrido : 0,
+      batida: total >= meta
+    };
+  }
+
+  /* ====== render ====== */
+  function render(){
+    /* preserva o que a pessoa está digitando entre renders (o painel se redesenha sozinho) */
+    var foco = document.activeElement && document.activeElement.id, sel = null, vals = {};
+    try { if(foco) sel = document.activeElement.selectionStart; } catch(e){}
+    ["valor","cliente","filtro"].forEach(function(id){ var e = document.getElementById(id); if(e) vals[id] = e.value; });
+
+    var d = calcular();
+    var comFesta = tela === "painel" && d.batida && !festaVista;
+    document.body.classList.toggle("festa", comFesta);
+    var app = document.getElementById("app");
+    app.innerHTML = tela === "historico" ? historicoHTML(d) : ((comFesta ? festaHTML(d) : "") + painelHTML(d));
+    ligarEventos(d);
+
+    Object.keys(vals).forEach(function(id){ var e = document.getElementById(id); if(e && e.value !== vals[id]) e.value = vals[id]; });
+    if(foco){ var f = document.getElementById(foco); if(f && f.focus){ f.focus(); try { if(sel != null && f.setSelectionRange) f.setSelectionRange(sel, sel); } catch(e){} } }
+
+    if(comFesta) iniciarFogos(); else pararFogos();
+  }
+  function irPara(t){
+    tela = t; filtro = t === "historico" ? filtro : "";
+    try { sessionStorage.setItem("tela", t); } catch(e){}
+    render();
+    if(t === "historico") window.scrollTo(0,0);
+  }
+
+  function painelHTML(d){
+    var h = [];
+    h.push('<div class="wrap">');
+    h.push('<header class="topo"><div class="logo">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 3.4h5.3L12 12.9l4.5-9.5h5.3L12 21.4z" fill="#FFCD1C"/></svg>'
+      + '<div><b>VETOR<i> SST</i></b><span>PAINEL COMERCIAL</span></div></div>'
+      + '<div class="acoes-topo"><button class="link" id="ir-historico">Histórico</button>'
+      + '<div class="relogio"><span class="dia">' + esc(dataExtenso()) + '</span>'
+      + '<span class="hora tab">' + pad(d.ag.h) + ':' + pad(d.ag.m) + '<span style="font-size:.55em;color:var(--ink-3)">:' + pad(d.ag.s) + '</span></span></div></div></header>');
+
+    if(d.batida && festaVista){
+      h.push('<button class="banner" id="revive" style="margin-top:16px">🎉 Meta batida — PIX maluco pra todo mundo · clique pra comemorar de novo</button>');
+    }
+
+    h.push('<section class="hero"><div><p class="rot">Realizado hoje</p>'
+      + '<p class="big' + (d.total ? "" : " zerado") + ' tab">' + brl(d.total) + '</p>'
+      + '<p class="sub">de ' + brl(d.meta) + ' &middot; <b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b></p></div>'
+      + '<div class="hero-dir"><span class="pill ' + d.situacao.cls + '">' + d.situacao.txt + '</span>'
+      + '<p class="nota">' + notaSituacao(d) + '</p></div></section>');
+
+    var pctBarra = Math.min(d.pct,1)*100, pctMarca = Math.min(d.decorrido/(BLOCOS*60),1)*100;
+    h.push('<div class="barra"><div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="' + d.meta + '" aria-valuenow="' + Math.round(d.total) + '" aria-label="Progresso da meta do dia">'
+      + '<div class="fill" style="width:calc(' + pctBarra.toFixed(2) + '% - 2px)"></div>'
+      + (d.decorrido > 0 && d.restante > 0 ? '<div class="marca" style="left:' + pctMarca.toFixed(2) + '%"><span>agora</span></div>' : '')
+      + '</div><div class="ticks">' + ticks() + '</div></div>');
+
+    h.push('<section class="kpis">'
+      + kpi("Falta para a meta", brl(d.falta), d.batida ? "meta batida" : "faltam " + hhmm(d.restante) + " de venda", d.batida ? "acc" : "")
+      + kpi("Ritmo necessário", d.restante > 0 ? brl(d.ritmoNec) + "<span style=\"font-size:.5em;font-weight:600;color:var(--ink-3)\">/h</span>" : "—",
+            d.restante > 0 ? "até as 19h" : "janela encerrada", "acc", d.restante > 0 && !d.batida ? "destaque" : "")
+      + kpi("Ritmo realizado", brl(d.ritmoReal) + "<span style=\"font-size:.5em;font-weight:600;color:var(--ink-3)\">/h</span>", "ritmo ideal " + brl(d.metaHora) + "/h")
+      + kpi("Projeção 19h", brl(d.projecao), d.projecao >= d.meta ? "bate a meta no ritmo atual" : "faltariam " + brl(Math.max(d.meta-d.projecao,0)))
+      + '</section>');
+
+    h.push('<div class="colunas"><div class="painel"><h3>Hora a hora</h3><p class="legenda">Cada bloco precisa de ' + brl(d.metaHora) + ' para a meta fechar às 19h.</p>'
+      + '<div class="hlinha hcab"><span>Hora</span><span>Ritmo do bloco</span><span>Realizado</span><span>Acum. vs meta</span></div>'
+      + d.blocos.map(function(b){ return blocoHTML(b, d); }).join("") + '</div>');
+
+    h.push('<div style="display:flex;flex-direction:column;gap:12px">' + formHTML(d) + lancamentosHTML(d) + vendedoresHTML(d) + '</div>');
+    h.push('</div>');
+
+    h.push('<footer class="rodape"><span>Meta diária ' + brl(d.meta) + ' &middot; janela 9h–19h &middot; horário de Brasília</span>'
+      + '<span>' + statusArmazenamento() + '</span></footer>');
+    h.push('</div>');
+    return h.join("");
+  }
+
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function ticks(){
+    var out = "";
+    for(var h = H_INI; h <= H_FIM; h++) out += "<span>" + pad(h) + "</span>";
+    return out;
+  }
+  function notaSituacao(d){
+    if(d.batida) return "<b>" + brl(d.total - d.meta) + "</b> acima da meta";
+    if(d.decorrido <= 0) return "a janela abre às 9h";
+    if(d.restante <= 0) return "fechou <b>" + brl(d.meta - d.total) + "</b> abaixo da meta";
+    var dif = d.total - d.esperado;
+    return (dif >= 0 ? "<b>" + brl(dif) + "</b> à frente" : "<b>" + brl(-dif) + "</b> atrás") + " do esperado para " + pad(d.ag.h) + ":" + pad(d.ag.m);
+  }
+  function kpi(rot, val, nota, cls, extra){
+    return '<div class="kpi ' + (extra||"") + '"><p class="rot">' + rot + '</p><p class="val ' + (cls||"") + ' tab">' + val + '</p><p class="nota">' + nota + '</p></div>';
+  }
+  function blocoHTML(b, d){
+    var agoraBloco = b.h === d.ag.h && d.decorrido > 0 && d.restante > 0;
+    var futuro = (b.h*60) > (d.ag.h*60 + d.ag.m);
+    var pct = Math.min(b.valor / b.meta, 1) * 100;
+    var cls = "hlinha" + (agoraBloco ? " agora" : "") + (futuro ? " futuro" : "") + (b.valor >= b.meta ? " cheio" : "");
+    var delta = futuro || (b.h*60 + 60) > (d.ag.h*60 + d.ag.m)
+      ? '<span class="hd">—</span>'
+      : '<span class="hd ' + (b.delta >= 0 ? "pos" : "neg") + '">' + (b.delta >= 0 ? "+" : "−") + brl(Math.abs(b.delta)).replace("R$ ","") + '</span>';
+    return '<div class="' + cls + '"><span class="hl">' + pad(b.h) + '–' + pad(b.h+1) + '</span>'
+      + '<div class="hbar"><i style="width:' + pct.toFixed(1) + '%"></i></div>'
+      + '<span class="hv tab">' + (b.valor ? brl(b.valor) : "—") + '</span>' + delta + '</div>';
+  }
+  function formHTML(d){
+    if(somenteLeitura) return '<div class="painel"><h3>Lançar venda</h3><p class="vazio">Este acesso é somente leitura. Peça o link de edição para lançar vendas.</p></div>';
+    return '<div class="painel"><h3>Lançar venda</h3><p class="legenda">Some ao total do dia — todo mundo vê na hora.</p>'
+      + '<form class="lanc" id="form"><div class="campo"><label class="rot" for="valor" style="display:block;margin-bottom:6px">Valor</label>'
+      + '<input id="valor" inputmode="decimal" autocomplete="off" placeholder="0,00" aria-label="Valor da venda"></div>'
+      + '<div><p class="rot" style="margin-bottom:7px">Vendedor</p><div class="chips">'
+      + VENDEDORES.map(function(v){ return '<button type="button" class="chip" data-v="' + esc(v) + '" aria-pressed="' + (vendedorSel === v) + '">' + esc(v) + '</button>'; }).join("")
+      + '</div></div>'
+      + '<div class="campo"><input id="cliente" autocomplete="off" placeholder="Cliente (opcional)" aria-label="Cliente"></div>'
+      + '<button class="btn" type="submit">Lançar venda</button>'
+      + '<p class="aviso' + (avisoOk ? " ok" : "") + '" role="status">' + esc(aviso) + '</p></form></div>';
+  }
+  function lancamentosHTML(d){
+    var itens = d.doDia.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,8);
+    return '<div class="painel"><h3>Últimos lançamentos</h3><p class="legenda">' + d.doDia.length + ' venda' + (d.doDia.length === 1 ? "" : "s") + ' hoje</p>'
+      + (itens.length ? '<ul class="lista">' + itens.map(function(l){
+          var q = pad(l.hora) + ":" + pad(l.min);
+          var quem = [l.vendedor, l.cliente].filter(Boolean).join(" · ") || "sem identificação";
+          return '<li><span class="quando tab">' + q + '</span><span class="quem">' + esc(quem) + '</span>'
+            + '<span class="qtd tab">' + brlc(l.valor) + '</span>'
+            + (somenteLeitura ? "" : (confirmarId === l.id
+                ? '<button class="mini confirma" data-del="' + esc(l.id) + '">apagar?</button>'
+                : '<button class="mini" data-pede="' + esc(l.id) + '" aria-label="Remover lançamento">×</button>')) + '</li>';
+        }).join("") + '</ul>' : '<p class="vazio">Nenhuma venda lançada hoje ainda.</p>') + '</div>';
+  }
+  function vendedoresHTML(d){
+    var por = {};
+    d.doDia.forEach(function(l){ var k = l.vendedor || "Sem vendedor"; por[k] = (por[k]||0) + l.valor; });
+    var lista = Object.keys(por).map(function(k){ return { nome:k, v:por[k] }; }).sort(function(a,b){ return b.v - a.v; });
+    if(!lista.length) return "";
+    var topo = lista[0].v || 1;
+    return '<div class="painel"><h3>Por vendedor</h3><p class="legenda">Hoje</p>'
+      + lista.map(function(x){
+          return '<div class="vend"><span class="nome">' + esc(x.nome) + '</span><span class="vl tab">' + brl(x.v) + '</span>'
+            + '<span class="vb"><i style="width:' + (x.v/topo*100).toFixed(1) + '%"></i></span></div>';
+        }).join("") + '</div>';
+  }
+  /* ---- histórico completo ---- */
+  function agrupaDias(){
+    var mapa = {};
+    estado.lancamentos.forEach(function(l){
+      if(!mapa[l.dia]) mapa[l.dia] = { dia:l.dia, itens:[], total:0 };
+      mapa[l.dia].itens.push(l); mapa[l.dia].total += l.valor;
+    });
+    return Object.keys(mapa).sort().reverse().map(function(k){
+      mapa[k].itens.sort(function(a,b){ return (a.hora*60+a.min) - (b.hora*60+b.min); });
+      return mapa[k];
+    });
+  }
+  function casa(l, termo){
+    if(!termo) return true;
+    var t = termo.toLowerCase();
+    return (l.vendedor||"").toLowerCase().indexOf(t) > -1
+      || (l.cliente||"").toLowerCase().indexOf(t) > -1
+      || String(Math.round(l.valor)).indexOf(t.replace(/\D/g,"")) > -1 && /\d/.test(t);
+  }
+  function historicoHTML(d){
+    var dias = agrupaDias();
+    var filtrados = dias.map(function(g){
+      var itens = g.itens.filter(function(l){ return casa(l, filtro); });
+      return { dia:g.dia, itens:itens, total:itens.reduce(function(a,l){ return a + l.valor; },0), totalDia:g.total };
+    }).filter(function(g){ return g.itens.length; });
+
+    var totalGeral = filtrados.reduce(function(a,g){ return a + g.total; }, 0);
+    var qtd = filtrados.reduce(function(a,g){ return a + g.itens.length; }, 0);
+    var batidos = filtrados.filter(function(g){ return g.totalDia >= d.meta; }).length;
+    var melhor = filtrados.slice().sort(function(a,b){ return b.totalDia - a.totalDia; })[0];
+    var media = filtrados.length ? totalGeral / filtrados.length : 0;
+
+    var h = ['<div class="wrap">'];
+    h.push('<header class="topo"><div class="logo">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 3.4h5.3L12 12.9l4.5-9.5h5.3L12 21.4z" fill="#FFCD1C"/></svg>'
+      + '<div><b>VETOR<i> SST</i></b><span>PAINEL COMERCIAL</span></div></div>'
+      + '<div class="acoes-topo"><button class="link" id="baixar-csv">Baixar CSV</button>'
+      + '<button class="link forte" id="ir-painel">Voltar ao painel</button></div></header>');
+
+    h.push('<div class="hist-topo"><div><h2>Histórico de lançamentos</h2>'
+      + '<p>' + (dias.length ? 'Todos os dias registrados neste painel · de ' + nomeDia(dias[dias.length-1].dia) + ' até ' + nomeDia(dias[0].dia) : 'Nenhum lançamento registrado ainda') + '</p></div>'
+      + (avisoHist ? '<p class="aviso' + (avisoOk ? " ok" : "") + '" role="status" style="margin:0">' + esc(avisoHist) + '</p>' : '') + '</div>');
+
+    h.push('<section class="resumo">'
+      + kpi("Total no período", brl(totalGeral), qtd + " venda" + (qtd === 1 ? "" : "s"), "acc")
+      + kpi("Dias com venda", String(filtrados.length), "meta de " + brl(d.meta) + "/dia")
+      + kpi("Dias que bateram", String(batidos), filtrados.length ? (batidos/filtrados.length*100).toFixed(0) + "% dos dias" : "—")
+      + kpi("Melhor dia", melhor ? brl(melhor.totalDia) : "—", melhor ? nomeDia(melhor.dia) : "sem dados")
+      + kpi("Média por dia", brl(media), "considerando dias com venda")
+      + '</section>');
+
+    h.push('<div class="busca"><input id="filtro" value="' + esc(filtro) + '" placeholder="Filtrar por vendedor, cliente ou valor" aria-label="Filtrar lançamentos">'
+      + (filtro ? '<button class="link" id="limpar-filtro">Limpar</button>' : '') + '</div>');
+
+    if(!filtrados.length){
+      h.push('<p class="sem-resultado">' + (filtro ? "Nenhum lançamento encontrado para “" + esc(filtro) + "”." : "Assim que a equipe lançar a primeira venda, ela aparece aqui.") + '</p>');
+    } else {
+      filtrados.forEach(function(g){
+        var aberto = diasAbertos[g.dia] !== undefined ? diasAbertos[g.dia] : (g.dia === d.hoje || !!filtro);
+        var batido = g.totalDia >= d.meta;
+        h.push('<div class="dia' + (batido ? " batido" : "") + (aberto ? " aberto" : "") + '">'
+          + '<button class="dia-cab" data-dia="' + esc(g.dia) + '" aria-expanded="' + aberto + '">'
+          + '<span class="data"><span class="seta">▶</span>' + esc(nomeDia(g.dia)) + (batido ? ' <span class="selo">meta batida</span>' : '') + '</span>'
+          + '<span class="tot tab">' + brl(g.totalDia) + '</span>'
+          + '<span class="meta-info"><span>' + g.itens.length + ' venda' + (g.itens.length === 1 ? "" : "s")
+          + (filtro ? ' de ' + brl(g.total) + ' no filtro' : '') + '</span>'
+          + '<span class="db"><i style="width:' + Math.min(g.totalDia/d.meta*100,100).toFixed(1) + '%"></i></span>'
+          + '<span class="tab">' + (g.totalDia/d.meta*100).toFixed(0) + '% da meta</span></span></button>');
+        if(aberto){
+          h.push('<div class="dia-corpo">' + g.itens.map(function(l){
+            var quem = l.cliente ? '<b>' + esc(l.cliente) + '</b>' + (l.vendedor ? ' · ' + esc(l.vendedor) : '') : (l.vendedor ? esc(l.vendedor) : '<span style="color:var(--ink-3)">sem identificação</span>');
+            return '<div class="hist-linha"><span class="hora tab">' + pad(l.hora) + ':' + pad(l.min) + '</span>'
+              + '<span class="quem">' + quem + '</span>'
+              + '<span class="val tab">' + brlc(l.valor) + '</span>'
+              + '<span class="acao">' + (somenteLeitura ? "" : (confirmarId === l.id
+                  ? '<button class="mini confirma" data-del="' + esc(l.id) + '">apagar?</button>'
+                  : '<button class="mini" data-pede="' + esc(l.id) + '" aria-label="Remover lançamento">×</button>')) + '</span></div>';
+          }).join("") + '</div>');
+        }
+        h.push('</div>');
+      });
+    }
+    h.push('<footer class="rodape"><span>' + estado.lancamentos.length + ' lançamento' + (estado.lancamentos.length === 1 ? "" : "s") + ' guardados no painel</span>'
+      + '<span>horário de Brasília</span></footer></div>');
+    return h.join("");
+  }
+
+  function montarCSV(){
+    var linhas = [["data","hora","vendedor","cliente","valor"]];
+    estado.lancamentos.slice().sort(function(a,b){
+      return a.dia === b.dia ? (a.hora*60+a.min) - (b.hora*60+b.min) : (a.dia < b.dia ? -1 : 1);
+    }).forEach(function(l){
+      linhas.push([l.dia, pad(l.hora)+":"+pad(l.min), l.vendedor||"", l.cliente||"", String(l.valor).replace(".",",")]);
+    });
+    return "﻿" + linhas.map(function(r){
+      return r.map(function(c){ return '"' + String(c).replace(/"/g,'""') + '"'; }).join(";");
+    }).join("\r\n");
+  }
+
+  function festaHTML(d){
+    var quando = d.doDia.filter(function(l){ return true; }).sort(function(a,b){ return a.ts - b.ts; });
+    var soma = 0, hora = "";
+    for(var i=0;i<quando.length;i++){ soma += quando[i].valor; if(soma >= d.meta){ hora = pad(quando[i].hora) + ":" + pad(quando[i].min); break; } }
+    return '<div class="party-bg"></div><div class="party"><p class="party-kicker">Meta de ' + brl(d.meta) + ' batida' + (hora ? ' às ' + hora : '') + '</p>'
+      + '<h1 class="party-title">PIX MALUCO<br>PRA TODO MUNDO</h1>'
+      + '<p class="party-sub"><span>' + brl(d.total) + '</span> vendidos hoje</p>'
+      + '<button class="btn-ghost" id="ver-painel">ver o painel</button></div>';
+  }
+
+  /* ====== eventos ====== */
+  function ligarEventos(d){
+    var form = document.getElementById("form");
+    if(form){
+      form.addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var v = paraNumero(document.getElementById("valor").value);
+        if(!isFinite(v) || v <= 0){ aviso = "Informe um valor maior que zero."; avisoOk = false; render(); return; }
+        var p = partesSP();
+        var novo = {
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+          ts: Date.now(), dia: p.dia, hora: p.h, min: p.m,
+          valor: Math.round(v*100)/100,
+          vendedor: vendedorSel === "Outro" ? "" : vendedorSel,
+          cliente: document.getElementById("cliente").value.trim().slice(0,60)
+        };
+        aviso = ""; avisoOk = false; confirmarId = "";
+        rascunho = { valor: document.getElementById("valor").value, cliente: document.getElementById("cliente").value };
+        document.getElementById("valor").value = "";
+        document.getElementById("cliente").value = "";
+        salvar(estado.lancamentos.concat([novo]));
+      });
+      Array.prototype.forEach.call(document.querySelectorAll(".chip"), function(c){
+        c.addEventListener("click", function(){
+          vendedorSel = vendedorSel === c.dataset.v ? "" : c.dataset.v;
+          var val = document.getElementById("valor").value, cli = document.getElementById("cliente").value;
+          render();
+          document.getElementById("valor").value = val; document.getElementById("cliente").value = cli;
+        });
+      });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-pede]"), function(b){
+      b.addEventListener("click", function(){ confirmarId = b.dataset.pede; render(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-del]"), function(b){
+      b.addEventListener("click", function(){
+        var id = b.dataset.del; confirmarId = "";
+        salvar(estado.lancamentos.filter(function(l){ return l.id !== id; }));
+      });
+    });
+    var ih = document.getElementById("ir-historico");
+    if(ih) ih.addEventListener("click", function(){ irPara("historico"); });
+    var ip = document.getElementById("ir-painel");
+    if(ip) ip.addEventListener("click", function(){ avisoHist = ""; irPara("painel"); });
+
+    var fi = document.getElementById("filtro");
+    if(fi){
+      fi.addEventListener("input", function(){
+        filtro = fi.value;
+        var pos = fi.selectionStart;
+        render();
+        var novo = document.getElementById("filtro");
+        if(novo){ novo.focus(); try { novo.setSelectionRange(pos, pos); } catch(e){} }
+      });
+    }
+    var lf = document.getElementById("limpar-filtro");
+    if(lf) lf.addEventListener("click", function(){ filtro = ""; render(); });
+
+    Array.prototype.forEach.call(document.querySelectorAll("[data-dia]"), function(b){
+      b.addEventListener("click", function(){
+        var k = b.dataset.dia;
+        var atual = b.getAttribute("aria-expanded") === "true";
+        diasAbertos[k] = !atual;
+        render();
+      });
+    });
+
+    var bc = document.getElementById("baixar-csv");
+    if(bc) bc.addEventListener("click", function(){
+      if(!estado.lancamentos.length){ avisoHist = "Não há lançamentos para exportar."; avisoOk = false; render(); return; }
+      try {
+        var blob = new Blob([montarCSV()], { type:"text/csv;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = "lancamentos-vetor-" + hojeSP() + ".csv";
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1000);
+        avisoHist = "CSV gerado."; avisoOk = true; render();
+      } catch(e){ avisoHist = "Não deu para gerar o CSV neste navegador."; avisoOk = false; render(); }
+    });
+
+    var vp = document.getElementById("ver-painel");
+    if(vp) vp.addEventListener("click", function(){
+      festaVista = true;
+      try { sessionStorage.setItem("festa-vista", hojeSP()); } catch(e){}
+      render();
+    });
+    var rv = document.getElementById("revive");
+    if(rv) rv.addEventListener("click", function(){
+      festaVista = false;
+      try { sessionStorage.removeItem("festa-vista"); } catch(e){}
+      render();
+    });
+  }
+
+  /* ====== persistência ====== */
+  var ultimaSync = 0, syncOk = true;
+  var CHAVE = "ritmo40k";
+
+  function carregarLocal(){
+    try {
+      var t = localStorage.getItem(CHAVE);
+      if(!t) return null;
+      var s = JSON.parse(t);
+      if(s && Array.isArray(s.lancamentos)) return s;
+    } catch(e){}
+    return null;
+  }
+  function gravarLocal(){
+    try { localStorage.setItem(CHAVE, JSON.stringify(estado)); return true; } catch(e){ return false; }
+  }
+  function cabecalhos(){
+    var h = { "Content-Type": "application/json" };
+    if(CONFIG.API_TOKEN) h["Authorization"] = "Bearer " + CONFIG.API_TOKEN;
+    return h;
+  }
+  function normalizar(l){
+    if(!l) return null;
+    var v = typeof l.valor === "number" ? l.valor : paraNumero(l.valor);
+    if(!isFinite(v) || v <= 0) return null;
+    var ts = +l.ts || Date.parse(l.ts) || Date.now();
+    var p = partesSP(new Date(ts));
+    return {
+      id: String(l.id || (ts + "-" + Math.random().toString(36).slice(2,7))),
+      ts: ts,
+      dia: l.dia || p.dia,
+      hora: typeof l.hora === "number" ? l.hora : p.h,
+      min: typeof l.min === "number" ? l.min : p.m,
+      valor: Math.round(v*100)/100,
+      vendedor: l.vendedor || "",
+      cliente: l.cliente || ""
+    };
+  }
+  function buscarAPI(){
+    return fetch(CONFIG.API_URL, { headers: cabecalhos(), cache: "no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(j){
+        var lancs = Array.isArray(j) ? j : (j && j.lancamentos);
+        if(!Array.isArray(lancs)) return;
+        var novos = lancs.map(normalizar).filter(Boolean);
+        /* servidor vazio e este navegador com histórico: sobe o que já existe
+           em vez de apagar (evita perder dados na primeira configuração) */
+        if(!novos.length && estado.lancamentos.length){ ultimaSync = Date.now(); syncOk = true; return enviarAPI(); }
+        var mudou = JSON.stringify(novos) !== JSON.stringify(estado.lancamentos);
+        if(j && typeof j.meta === "number" && j.meta > 0 && j.meta !== estado.meta){ estado.meta = j.meta; mudou = true; }
+        if(mudou){ estado.lancamentos = novos; gravarLocal(); render(); }
+        ultimaSync = Date.now(); syncOk = true;
+      })
+      .catch(function(e){ syncOk = false; throw e; });
+  }
+  function enviarAPI(){
+    return fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: cabecalhos(),
+      body: JSON.stringify({ meta: estado.meta, lancamentos: estado.lancamentos })
+    }).then(function(r){
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      ultimaSync = Date.now(); syncOk = true;
+    }).catch(function(e){ syncOk = false; throw e; });
+  }
+  function statusArmazenamento(){
+    if(!CONFIG.API_URL) return "os lançamentos ficam salvos neste navegador";
+    if(!syncOk) return "sem conexão com o servidor — salvo só neste navegador";
+    return "sincronizado com o servidor · todo mundo vê o mesmo número";
+  }
+
+  function salvar(lancamentos){
+    var anterior = estado.lancamentos;
+    estado.lancamentos = lancamentos;
+    render();
+    if(!gravarLocal() && !CONFIG.API_URL){
+      estado.lancamentos = anterior;
+      aviso = "Não deu para salvar neste navegador."; avisoOk = false; render();
+      return;
+    }
+    if(!CONFIG.API_URL) return;
+    enviarAPI().catch(function(){
+      aviso = "Sem conexão com o servidor. O lançamento ficou salvo neste navegador e vai junto na próxima tentativa.";
+      avisoOk = false; render();
+      if(rascunho){
+        var cv = document.getElementById("valor"), cc = document.getElementById("cliente");
+        if(cv && !cv.value) cv.value = "";
+      }
+    });
+  }
+  function iniciarSync(){
+    if(!CONFIG.API_URL) return;
+    buscarAPI().catch(function(){ render(); });
+    setInterval(function(){ buscarAPI().catch(function(){}); }, Math.max(CONFIG.SYNC_SEGUNDOS || 15, 5) * 1000);
+  }
+
+  /* ====== fogos e balões ====== */
+  var cv = document.getElementById("fx"), ctx = cv.getContext("2d"), anim = 0, parts = [], baloes = [], ultimoFogo = 0, ultimoBalao = 0;
+  var CORES = ["#FFCD1C","#FFFFFF","#FF6B8B","#4AD6FF","#7CF58F","#C89BFF","#FFA23A"];
+  var reduzido = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function dimensionar(){
+    var r = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.floor(innerWidth * r); cv.height = Math.floor(innerHeight * r);
+    ctx.setTransform(r,0,0,r,0,0);
+  }
+  function explodir(x,y,cor){
+    var n = 46 + Math.floor(Math.random()*34);
+    for(var i=0;i<n;i++){
+      var a = Math.random()*Math.PI*2, v = 1.4 + Math.random()*4.4;
+      parts.push({ x:x, y:y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, vida:1, dec:0.007+Math.random()*0.01, cor:cor, r:1.9+Math.random()*2.4 });
+    }
+  }
+  function novoBalao(){
+    var cor = CORES[Math.floor(Math.random()*CORES.length)];
+    baloes.push({ x:40 + Math.random()*(innerWidth-80), y:innerHeight+60, v:0.5+Math.random()*0.9, r:16+Math.random()*16, cor:cor, f:Math.random()*Math.PI*2, amp:12+Math.random()*22 });
+  }
+  function desenharBalao(b){
+    var x = b.x + Math.sin(b.f)*b.amp;
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,.22)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, b.y + b.r*1.25);
+    ctx.quadraticCurveTo(x + Math.sin(b.f*2)*8, b.y + b.r*1.25 + 26, x, b.y + b.r*1.25 + 52); ctx.stroke();
+    ctx.fillStyle = b.cor; ctx.globalAlpha = .92;
+    ctx.beginPath(); ctx.ellipse(x, b.y, b.r*0.82, b.r, 0, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = .35; ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.ellipse(x - b.r*0.28, b.y - b.r*0.34, b.r*0.16, b.r*0.24, -0.4, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  function quadro(t){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    if(t - ultimoFogo > 380 + Math.random()*380){
+      ultimoFogo = t;
+      explodir(innerWidth*(0.14 + Math.random()*0.72), innerHeight*(0.12 + Math.random()*0.42), CORES[Math.floor(Math.random()*CORES.length)]);
+    }
+    if(t - ultimoBalao > 700){ ultimoBalao = t; novoBalao(); }
+    ctx.shadowBlur = 14;
+    for(var i=parts.length-1;i>=0;i--){
+      var p = parts[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.045; p.vx *= 0.986; p.vy *= 0.986; p.vida -= p.dec;
+      if(p.vida <= 0){ parts.splice(i,1); continue; }
+      ctx.globalAlpha = Math.max(p.vida,0); ctx.fillStyle = p.cor; ctx.shadowColor = p.cor;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r*(0.4 + p.vida*0.6), 0, Math.PI*2); ctx.fill();
+    }
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    for(var j=baloes.length-1;j>=0;j--){
+      var b = baloes[j]; b.y -= b.v; b.f += 0.012;
+      if(b.y < -140){ baloes.splice(j,1); continue; }
+      desenharBalao(b);
+    }
+    anim = requestAnimationFrame(quadro);
+  }
+  function iniciarFogos(){
+    if(anim) return;
+    dimensionar();
+    if(reduzido){
+      for(var i=0;i<7;i++) desenharBalao({ x:innerWidth*(i+0.5)/7, y:innerHeight*0.7, r:24, cor:CORES[i%CORES.length], f:0, amp:0 });
+      return;
+    }
+    ultimoFogo = 0; ultimoBalao = 0;
+    for(var k=0;k<3;k++) explodir(innerWidth*(0.25+k*0.25), innerHeight*(0.2+Math.random()*0.2), CORES[k]);
+    for(var n=0;n<7;n++){ novoBalao(); baloes[baloes.length-1].y = innerHeight*(0.35 + n*0.12); }
+    anim = requestAnimationFrame(quadro);
+  }
+  function pararFogos(){
+    if(anim){ cancelAnimationFrame(anim); anim = 0; }
+    parts = []; baloes = [];
+    if(ctx) ctx.clearRect(0,0,innerWidth,innerHeight);
+  }
+  addEventListener("resize", function(){ if(document.body.classList.contains("festa")) dimensionar(); });
+
+  /* ====== ciclo ====== */
+  var salvo = carregarLocal();
+  if(salvo){
+    estado.lancamentos = salvo.lancamentos.map(normalizar).filter(Boolean);
+    if(typeof salvo.meta === "number" && salvo.meta > 0) estado.meta = salvo.meta;
+  }
+  render();
+  iniciarSync();
+  setInterval(function(){
+    var el = document.querySelector(".relogio .hora");
+    var p = partesSP();
+    if(el) el.innerHTML = pad(p.h) + ":" + pad(p.m) + '<span style="font-size:.55em;color:var(--ink-3)">:' + pad(p.s) + '</span>';
+  }, 1000);
+  setInterval(render, 30000);
+})();
+</script>
+</body>
+</html>
