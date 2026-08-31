@@ -76,12 +76,24 @@ Onde:
 
 ## Publicação
 
-O site está hospedado no Netlify, conectado a este repositório: cada `git push`
-na branch `main` republica o painel automaticamente. O `netlify.toml` já diz que
-não há nada para compilar — o Netlify apenas serve a raiz do repositório, e o
-`index.html` é o painel.
+O painel é publicado no **Cloudflare Workers** como site estático, o mesmo
+caminho do `painel-comercial` — é o que permite manter o repositório privado e
+ainda assim ter o painel no ar.
 
-O repositório é privado; só o site fica público. Vale lembrar que, com
-`API_URL` vazio, cada navegador guarda os seus próprios lançamentos no
-`localStorage` — para a equipe inteira ver o mesmo número é preciso configurar
-o `API_URL`.
+A configuração está no `wrangler.jsonc`: não há build, o Cloudflare apenas serve
+a raiz do repositório (`assets.directory = "."`) e o `index.html` responde na
+raiz do site. O `.assetsignore` mantém fora do ar os arquivos que são só do
+repositório (configuração, README, `.git`).
+
+Para publicar uma alteração:
+
+```
+npx wrangler deploy
+```
+
+Na primeira vez é preciso autenticar com `npx wrangler login`, que abre o
+navegador para autorizar a conta Cloudflare.
+
+> Com `API_URL` vazio, cada navegador guarda os seus próprios lançamentos no
+> `localStorage`. Para a equipe inteira ver o mesmo número é preciso um endpoint
+> no `API_URL` — o painel já fala o contrato descrito acima.
