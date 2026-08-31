@@ -76,24 +76,19 @@ Onde:
 
 ## Publicação
 
-O painel é publicado no **Cloudflare Workers** como site estático, o mesmo
-caminho do `painel-comercial` — é o que permite manter o repositório privado e
-ainda assim ter o painel no ar.
+O painel está no **GitHub Pages**, o mesmo caminho do `relatorio-semanal-vetor`:
 
-A configuração está no `wrangler.jsonc`: não há build, o Cloudflare apenas serve
-a raiz do repositório (`assets.directory = "."`) e o `index.html` responde na
-raiz do site. O `.assetsignore` mantém fora do ar os arquivos que são só do
-repositório (configuração, README, `.git`).
+**https://vetorsst.github.io/painel-diario/**
 
-Para publicar uma alteração:
+A publicação sai da branch `main`, a partir da raiz do repositório — o
+`index.html` responde direto na raiz do site. Cada `git push` na `main`
+republica o painel automaticamente, em cerca de um minuto.
 
-```
-npx wrangler deploy
-```
-
-Na primeira vez é preciso autenticar com `npx wrangler login`, que abre o
-navegador para autorizar a conta Cloudflare.
+O arquivo `.nojekyll` desliga o processamento Jekyll, que não tem serventia aqui
+e só atrasaria o build de um site de arquivo único.
 
 > Com `API_URL` vazio, cada navegador guarda os seus próprios lançamentos no
-> `localStorage`. Para a equipe inteira ver o mesmo número é preciso um endpoint
-> no `API_URL` — o painel já fala o contrato descrito acima.
+> `localStorage`. Quem abrir o site vê os lançamentos que estão embutidos no
+> `index.html` como ponto de partida e, a partir daí, os seus próprios. Para a
+> equipe inteira ver o mesmo número é preciso um endpoint no `API_URL` — o
+> painel já fala o contrato descrito acima.
