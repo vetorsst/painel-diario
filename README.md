@@ -6,7 +6,7 @@ quando a meta é batida.
 
 ## Como usar
 
-Abra `painel-ritmo-40k.html` direto no navegador — não precisa build, servidor
+Abra `index.html` direto no navegador — não precisa build, servidor
 nem instalação. Para deixar no ar, basta subir o arquivo em qualquer hospedagem
 estática (GitHub Pages, Netlify, Vercel, Hostinger ou a pasta `public/` do seu
 servidor).
@@ -73,3 +73,15 @@ Onde:
   devolver `id`, `ts` e `valor`, já que `dia`, `hora` e `min` são deduzidos do `ts`.
 
 > Não versione tokens: deixe `API_TOKEN` vazio no arquivo publicado.
+
+## Publicação
+
+O site está hospedado no Netlify, conectado a este repositório: cada `git push`
+na branch `main` republica o painel automaticamente. O `netlify.toml` já diz que
+não há nada para compilar — o Netlify apenas serve a raiz do repositório, e o
+`index.html` é o painel.
+
+O repositório é privado; só o site fica público. Vale lembrar que, com
+`API_URL` vazio, cada navegador guarda os seus próprios lançamentos no
+`localStorage` — para a equipe inteira ver o mesmo número é preciso configurar
+o `API_URL`.

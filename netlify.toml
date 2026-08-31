@@ -1,0 +1,12 @@
+# Painel Ritmo 40K — site estático de arquivo único, não há nada para compilar.
+# O Netlify só precisa servir a raiz do repositório.
+
+[build]
+  publish = "."
+  command = ""
+
+# O painel muda com frequência: o navegador revalida em vez de servir cache velho.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
