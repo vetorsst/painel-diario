@@ -4,14 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#092737">
-<title>Ritmo 40K · Vetor SST</title>
+<title>Painel Comercial · Vetor SST</title>
 <!--
   Painel de ritmo comercial — Vetor SST
-  Meta do dia, ritmo necessário por hora (9h–19h), histórico completo
-  e comemoração ao bater a meta.
+  Meta do mês, quanto falta para bater, ritmo atual e ritmo diário necessário.
 
   Arquivo único: abra direto no navegador ou suba em qualquer hospedagem
-  estática (Netlify, Vercel, GitHub Pages, Hostinger, um /public do seu servidor).
+  estática. Publicado em https://vetorsst.github.io/painel-diario/
   Configuração no início da tag <script> lá embaixo: procure por "var CONFIG".
 -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -99,23 +98,6 @@ body{
 .painel h3{margin:0 0 2px;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
 .painel .legenda{margin:0 0 14px;font-size:.72rem;color:var(--ink-3)}
 
-/* horas */
-.hlinha{display:grid;grid-template-columns:58px 1fr 96px 84px;align-items:center;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.05)}
-.hlinha:first-of-type{border-top:0}
-.hcab{font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);padding-bottom:6px;border-top:0}
-.hcab span:nth-child(3),.hcab span:nth-child(4){text-align:right}
-.hl{font-size:.78rem;color:var(--ink-2);font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.hbar{height:9px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden}
-.hbar i{display:block;height:100%;border-radius:5px;background:var(--amarelo-esc);transition:width .5s ease}
-.hlinha.cheio .hbar i{background:var(--amarelo)}
-.hv{text-align:right;font-size:.86rem;font-weight:600;font-variant-numeric:tabular-nums}
-.hd{text-align:right;font-size:.78rem;font-variant-numeric:tabular-nums;color:var(--ink-3)}
-.hd.pos{color:var(--ok)}
-.hd.neg{color:var(--alerta)}
-.hlinha.futuro .hl,.hlinha.futuro .hv{color:var(--ink-3);font-weight:400}
-.hlinha.agora{background:rgba(255,205,28,.07);border-radius:8px;box-shadow:inset 0 0 0 1px rgba(255,205,28,.22);padding-left:8px;padding-right:8px;margin:2px -8px}
-.hlinha.agora .hl{color:var(--amarelo);font-weight:700}
-
 /* form */
 .lanc{display:flex;flex-direction:column;gap:10px}
 .campo{position:relative}
@@ -144,32 +126,11 @@ body{
 .mini{background:none;border:0;color:var(--ink-3);cursor:pointer;font:inherit;font-size:.9rem;line-height:1;padding:4px 6px;border-radius:6px;flex:none}
 .mini:hover{color:var(--alerta);background:rgba(255,125,99,.12)}
 .mini.confirma{color:var(--alerta);font-size:.7rem;font-weight:700;letter-spacing:.08em}
-.vend{display:grid;grid-template-columns:1fr 92px;gap:4px 12px;align-items:center;padding:9px 0;border-top:1px solid rgba(255,255,255,.05)}
-.vend:first-child{border-top:0}
-.vend .nome{font-size:.86rem;color:var(--ink-2)}
-.vend .vl{text-align:right;font-size:.88rem;font-weight:700;font-variant-numeric:tabular-nums}
-.vend .vb{grid-column:1/-1;height:5px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden}
-.vend .vb i{display:block;height:100%;background:var(--amarelo);border-radius:3px}
 .vazio{margin:6px 0 0;font-size:.8rem;color:var(--ink-3)}
 .rodape{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.7rem;color:var(--ink-3);letter-spacing:.04em}
 
-/* ---------- ritmos necessários ---------- */
-.ritmos{display:flex;flex-direction:column}
-.rl{display:grid;grid-template-columns:1fr auto;gap:2px 14px;align-items:baseline;padding:10px 0;border-top:1px solid rgba(255,255,255,.05)}
-.rl:first-child{border-top:0;padding-top:0}
-.rl-rot{font-size:.84rem;color:var(--ink-2)}
-.rl-val{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;text-align:right;white-space:nowrap}
-.rl-val.forte{color:var(--amarelo);font-size:1.4rem}
-.rl-val.ok{color:var(--ok)}
-.rl-val.ruim{color:var(--alerta)}
-.rl-nota{grid-column:1/-1;font-size:.72rem;color:var(--ink-3)}
-.ritmo-blocos{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px}
-.rb{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:9px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;font-size:.84rem;font-weight:700;font-variant-numeric:tabular-nums}
-.rb b{font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
-.rb.parcial{border-color:rgba(255,205,28,.32);background:rgba(255,205,28,.08)}
-.rb.parcial b{color:var(--amarelo)}
-
-/* ---------- metas ---------- */
+/* ---------- meta do mês ---------- */
+.sub .metaval{color:var(--amarelo);font-weight:800}
 .metas-form .link{align-self:flex-start;padding:7px 14px}
 .meta-atual{margin:0;font-size:.72rem;color:var(--ink-3)}
 
@@ -257,8 +218,6 @@ body.festa #fx{display:block}
 }
 @media (max-width:560px){
   .kpis{grid-template-columns:1fr 1fr;gap:8px}
-  .hlinha{grid-template-columns:52px 1fr 82px;gap:9px}
-  .hlinha .hd,.hcab span:nth-child(4){display:none}
   .hero-dir{align-items:flex-start;text-align:left}
   .ticks span:nth-child(even){visibility:hidden}
   .resumo{grid-template-columns:1fr 1fr;gap:8px}
@@ -271,45 +230,44 @@ body.festa #fx{display:block}
 <body>
 <div id="app"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
-<script type="application/json" id="estado">{"meta":40000,"lancamentos":[{"id":"mth8ekzy8ywf1","ts":1788180340174,"dia":"2026-08-31","hora":9,"min":45,"valor":1019,"vendedor":"","cliente":"LUMO SOLUTIONS"},{"id":"mth8ivpxmg3g6","ts":1788180540693,"dia":"2026-08-31","hora":9,"min":49,"valor":1870.79,"vendedor":"","cliente":"STK"},{"id":"mth8j89muoog1","ts":1788180556954,"dia":"2026-08-31","hora":9,"min":49,"valor":5714.05,"vendedor":"","cliente":"Asaas"},{"id":"mth8qnoel204f","ts":1788180903518,"dia":"2026-08-31","hora":9,"min":55,"valor":759.81,"vendedor":"","cliente":"AG FORROS"},{"id":"mth9ct436hdn2","ts":1788181936995,"dia":"2026-08-31","hora":10,"min":12,"valor":1235.28,"vendedor":"","cliente":"Edson Ramos"},{"id":"mthaqblt2wyjz","ts":1788184247105,"dia":"2026-08-31","hora":10,"min":50,"valor":60,"vendedor":"","cliente":"Exames"},{"id":"mthbgmd6q4inu","ts":1788185474106,"dia":"2026-08-31","hora":11,"min":11,"valor":999.8,"vendedor":"Felipe","cliente":"CIAA"},{"id":"mthcm2ivea5k6","ts":1788187407943,"dia":"2026-08-31","hora":11,"min":43,"valor":99.9,"vendedor":"","cliente":"GLIKO"},{"id":"mthe6znastjid","ts":1788190063606,"dia":"2026-08-31","hora":12,"min":27,"valor":300,"vendedor":"","cliente":"André aparecido"},{"id":"mthg6r1vuka1t","ts":1788193411699,"dia":"2026-08-31","hora":13,"min":23,"valor":500,"vendedor":"","cliente":"Robson godoy"},{"id":"mthj5v2l19km3","ts":1788198409101,"dia":"2026-08-31","hora":14,"min":46,"valor":360,"vendedor":"","cliente":"Jeferson Fernandes"},{"id":"mthkz7ryi66ey","ts":1788201458206,"dia":"2026-08-31","hora":15,"min":37,"valor":1060,"vendedor":"","cliente":"ghedini"},{"id":"mthl1f1i74z1b","ts":1788201560934,"dia":"2026-08-31","hora":15,"min":39,"valor":199,"vendedor":"","cliente":"S & R"},{"id":"mthltr02wbu3x","ts":1788202882802,"dia":"2026-08-31","hora":16,"min":1,"valor":649.95,"vendedor":"","cliente":"J camargo"}]}</script>
+<script type="application/json" id="estado">{"metaMes":250000,"lancamentos":[{"id":"mth8ekzy8ywf1","ts":1788180340174,"dia":"2026-08-31","hora":9,"min":45,"valor":1019,"vendedor":"","cliente":"LUMO SOLUTIONS"},{"id":"mth8ivpxmg3g6","ts":1788180540693,"dia":"2026-08-31","hora":9,"min":49,"valor":1870.79,"vendedor":"","cliente":"STK"},{"id":"mth8j89muoog1","ts":1788180556954,"dia":"2026-08-31","hora":9,"min":49,"valor":5714.05,"vendedor":"","cliente":"Asaas"},{"id":"mth8qnoel204f","ts":1788180903518,"dia":"2026-08-31","hora":9,"min":55,"valor":759.81,"vendedor":"","cliente":"AG FORROS"},{"id":"mth9ct436hdn2","ts":1788181936995,"dia":"2026-08-31","hora":10,"min":12,"valor":1235.28,"vendedor":"","cliente":"Edson Ramos"},{"id":"mthaqblt2wyjz","ts":1788184247105,"dia":"2026-08-31","hora":10,"min":50,"valor":60,"vendedor":"","cliente":"Exames"},{"id":"mthbgmd6q4inu","ts":1788185474106,"dia":"2026-08-31","hora":11,"min":11,"valor":999.8,"vendedor":"Felipe","cliente":"CIAA"},{"id":"mthcm2ivea5k6","ts":1788187407943,"dia":"2026-08-31","hora":11,"min":43,"valor":99.9,"vendedor":"","cliente":"GLIKO"},{"id":"mthe6znastjid","ts":1788190063606,"dia":"2026-08-31","hora":12,"min":27,"valor":300,"vendedor":"","cliente":"André aparecido"},{"id":"mthg6r1vuka1t","ts":1788193411699,"dia":"2026-08-31","hora":13,"min":23,"valor":500,"vendedor":"","cliente":"Robson godoy"},{"id":"mthj5v2l19km3","ts":1788198409101,"dia":"2026-08-31","hora":14,"min":46,"valor":360,"vendedor":"","cliente":"Jeferson Fernandes"},{"id":"mthkz7ryi66ey","ts":1788201458206,"dia":"2026-08-31","hora":15,"min":37,"valor":1060,"vendedor":"","cliente":"ghedini"},{"id":"mthl1f1i74z1b","ts":1788201560934,"dia":"2026-08-31","hora":15,"min":39,"valor":199,"vendedor":"","cliente":"S & R"},{"id":"mthltr02wbu3x","ts":1788202882802,"dia":"2026-08-31","hora":16,"min":1,"valor":649.95,"vendedor":"","cliente":"J camargo"},{"id":"mthn3edrs2w5t","ts":1788205012623,"dia":"2026-08-31","hora":16,"min":36,"valor":2100,"vendedor":"","cliente":"Cotecons"},{"id":"mthndm43fi3e4","ts":1788205489203,"dia":"2026-08-31","hora":16,"min":44,"valor":100,"vendedor":"","cliente":"Castro de borda"},{"id":"mthnirsmjzrtt","ts":1788205729847,"dia":"2026-08-31","hora":16,"min":48,"valor":400,"vendedor":"","cliente":"armazem do granel"},{"id":"mthoywm0bns7n","ts":1788208162200,"dia":"2026-08-31","hora":17,"min":29,"valor":550,"vendedor":"","cliente":"Adubos real"},{"id":"mthp91yao8rjo","ts":1788208635682,"dia":"2026-08-31","hora":17,"min":37,"valor":229,"vendedor":"","cliente":""},{"id":"mthpmcs8mfdy6","ts":1788209256248,"dia":"2026-08-31","hora":17,"min":47,"valor":821.51,"vendedor":"","cliente":"padaria reis"},{"id":"mthpn358u1kmj","ts":1788209290412,"dia":"2026-08-31","hora":17,"min":48,"valor":462.88,"vendedor":"","cliente":"Souza"},{"id":"mthqmsy3khilh","ts":1788210956811,"dia":"2026-08-31","hora":18,"min":15,"valor":297,"vendedor":"","cliente":"escola da vida"},{"id":"mths4p79wco7q","ts":1788213471381,"dia":"2026-08-31","hora":18,"min":57,"valor":712.5,"vendedor":"","cliente":"Bernadete"}]}
+</script>
 <script id="app-script">
 (function(){
   "use strict";
 
+
   /* ============================================================
      CONFIGURAÇÃO
      ------------------------------------------------------------
-     META           meta padrão do dia em reais (dá para trocar pelo painel,
-                    em "Metas" — o que for salvo ali manda nisto aqui)
-     API_URL        (opcional) endpoint que guarda os lançamentos.
-                    Vazio  -> cada navegador guarda os seus (localStorage)
+     META_MES       meta do mês em reais. Dá para trocar pelo painel, no
+                    quadro "Meta do mês" — o que for salvo ali manda nisto.
+     API_URL        (opcional) endpoint que guarda o estado.
+                    Vazio  -> cada navegador guarda o seu (localStorage)
                     Preenchido -> todo mundo vê o mesmo número
      API_TOKEN      (opcional) enviado como "Authorization: Bearer ..."
      SYNC_SEGUNDOS  de quanto em quanto tempo busca o que os outros lançaram
 
      Contrato da API (dois métodos na mesma URL):
-       GET  -> {"meta":40000,"metas":{...},"lancamentos":[ ... ]}  (ou só o array)
-       POST -> recebe {"meta":40000,"metas":{...},"lancamentos":[ ... ]} e grava tudo
+       GET  -> {"metaMes":250000,"lancamentos":[ ... ]}   (ou só o array)
+       POST -> recebe {"metaMes":250000,"lancamentos":[ ... ]} e grava tudo
      Cada lançamento: {id, ts, dia:"AAAA-MM-DD", hora, min, valor, vendedor, cliente}
      (basta devolver id/ts/valor — dia, hora e min são deduzidos do ts)
-     "meta"  é a meta padrão, usada em todo dia que não tiver a sua própria.
-     "metas" guarda as metas de dias específicos: {"2026-08-31":45000}
      ============================================================ */
   var CONFIG = {
-    META: 40000,
+    META_MES: 250000,
     API_URL: "",
     API_TOKEN: "",
     SYNC_SEGUNDOS: 15
   };
-
   /* ====== estado ====== */
-  var META_PADRAO = CONFIG.META || 40000, H_INI = 9, H_FIM = 19, BLOCOS = H_FIM - H_INI;
+  var META_MES_PADRAO = CONFIG.META_MES || 250000;
   var VENDEDORES = ["Felipe","Fran","Glauber","Outro"];
   var estado = lerEstado();
   var somenteLeitura = false, semSalvar = false, vendedorSel = "", aviso = "", avisoOk = false, confirmarId = "", rascunho = null;
   var festaVista = false, tela = "painel", filtro = "", diasAbertos = {}, avisoHist = "";
   var editandoId = "", avisoEd = "", avisoMeta = "", avisoMetaOk = false, focarEdicao = false, recarregarMetas = false;
-  try { festaVista = sessionStorage.getItem("festa-vista") === hojeSP(); } catch(e){}
+  try { festaVista = sessionStorage.getItem("festa-vista") === mesDe(hojeSP()); } catch(e){}
   try { tela = sessionStorage.getItem("tela") === "historico" ? "historico" : "painel"; } catch(e){}
 
   function lerEstado(){
@@ -317,40 +275,13 @@ body.festa #fx{display:block}
       var s = JSON.parse(document.getElementById("estado").textContent);
       if(!s || typeof s !== "object") throw 0;
       if(!Array.isArray(s.lancamentos)) s.lancamentos = [];
-      if(typeof s.meta !== "number" || !(s.meta > 0)) s.meta = META_PADRAO;
-      s.metas = limparMetas(s.metas);
+      if(typeof s.metaMes !== "number" || !(s.metaMes > 0)) s.metaMes = META_MES_PADRAO;
+      /* formato antigo: meta diária fixa e metas por dia. A meta do dia agora
+         sai da meta do mês, então esses campos deixam de ser lidos e gravados. */
+      delete s.meta; delete s.metas;
       return s;
-    } catch(e){ return { meta: META_PADRAO, metas: {}, lancamentos: [] }; }
+    } catch(e){ return { metaMes: META_MES_PADRAO, lancamentos: [] }; }
   }
-
-  /* ====== metas ======
-     estado.meta  -> meta padrão, vale para qualquer dia sem meta própria
-     estado.metas -> metas de dias específicos: {"2026-08-31": 45000}
-     Guardar a meta por dia é o que faz o histórico continuar certo depois de
-     trocar a meta: cada dia é julgado pela meta que valia nele. */
-  function limparMetas(m){
-    var out = {};
-    if(m && typeof m === "object"){
-      Object.keys(m).forEach(function(k){
-        var v = typeof m[k] === "number" ? m[k] : paraNumero(m[k]);
-        if(/^\d{4}-\d{2}-\d{2}$/.test(k) && isFinite(v) && v > 0) out[k] = Math.round(v*100)/100;
-      });
-    }
-    return out;
-  }
-  function metaDoDia(dia){
-    var m = estado.metas && estado.metas[dia];
-    return (typeof m === "number" && m > 0) ? m : estado.meta;
-  }
-  function temMetaPropria(dia){
-    return !!(estado.metas && estado.metas[dia] > 0);
-  }
-  function copiaMetas(){
-    var out = {};
-    Object.keys(estado.metas || {}).forEach(function(k){ out[k] = estado.metas[k]; });
-    return out;
-  }
-
   /* ====== tempo (America/Sao_Paulo) ====== */
   var FMT = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
   function partesSP(d){
@@ -388,45 +319,70 @@ body.festa #fx{display:block}
     return isFinite(n) ? n : NaN;
   }
 
-  /* ====== cálculo ====== */
+  /* ====== cálculo ======
+     Tudo gira em torno da meta do mês. A meta do dia deixou de ser um número
+     fixo: é o que falta dividido pelos dias úteis que ainda restam, então ela
+     se reajusta sozinha a cada venda lançada e a cada dia que passa.
+     Dia útil = segunda a sexta. Feriados não são descontados. */
+  function mesDe(dia){ return String(dia).slice(0,7); }
+  function nomeMes(mes){
+    var p = String(mes).split("-");
+    var d = new Date(Date.UTC(+p[0], +p[1]-1, 1, 12));
+    return new Intl.DateTimeFormat("pt-BR",{timeZone:"UTC",month:"long",year:"numeric"}).format(d);
+  }
+  function diasNoMes(mes){
+    var p = String(mes).split("-");
+    return new Date(Date.UTC(+p[0], +p[1], 0)).getUTCDate();
+  }
+  function ehUtil(mes, dia){
+    var p = String(mes).split("-");
+    var s = new Date(Date.UTC(+p[0], +p[1]-1, dia, 12)).getUTCDay();
+    return s >= 1 && s <= 5;
+  }
+  function contaUteis(mes, de, ate){
+    var n = 0;
+    for(var i = de; i <= ate; i++) if(ehUtil(mes, i)) n++;
+    return n;
+  }
+  function plural(n, um, muitos){ return n + " " + (n === 1 ? um : muitos); }
+
   function calcular(){
-    var ag = partesSP(), hoje = ag.dia;
-    var doDia = estado.lancamentos.filter(function(l){ return l.dia === hoje; });
-    var total = doDia.reduce(function(a,l){ return a + l.valor; }, 0);
-    var meta = metaDoDia(hoje), metaHora = meta / BLOCOS;
-    var minAgora = ag.h*60 + ag.m;
-    var decorrido = Math.min(Math.max(minAgora - H_INI*60, 0), BLOCOS*60);
-    var restante = BLOCOS*60 - decorrido;
-    var esperado = meta * (decorrido / (BLOCOS*60));
-    var falta = Math.max(meta - total, 0);
-    var blocos = [];
-    for(var h = H_INI; h < H_FIM; h++){
-      var no = doDia.filter(function(l){ return l.hora === h; }).reduce(function(a,l){ return a + l.valor; }, 0);
-      blocos.push({ h:h, valor:no, meta:metaHora });
-    }
-    var acc = 0;
-    blocos.forEach(function(b){
-      acc += b.valor; b.acum = acc; b.metaAcum = (b.h - H_INI + 1) * metaHora; b.delta = b.acum - b.metaAcum;
-      /* minutos do bloco que ainda não passaram — o bloco corrente entra pela metade */
-      b.faltaMin = Math.max(0, Math.min(b.h*60 + 60, H_FIM*60) - Math.max(b.h*60, minAgora));
-    });
+    var ag = partesSP(), hoje = ag.dia, mes = mesDe(hoje);
+    var diaNum = +hoje.slice(8,10), ultimo = diasNoMes(mes);
+
+    var doMes = estado.lancamentos.filter(function(l){ return mesDe(l.dia) === mes; });
+    var doDia = doMes.filter(function(l){ return l.dia === hoje; });
+    var acumulado = doMes.reduce(function(a,l){ return a + l.valor; }, 0);
+    var hojeTotal = doDia.reduce(function(a,l){ return a + l.valor; }, 0);
+
+    var metaMes = estado.metaMes;
+    var falta = Math.max(metaMes - acumulado, 0);
+    var batida = acumulado >= metaMes;
+
+    var uteisTotal = contaUteis(mes, 1, ultimo);
+    var uteisDecorridos = contaUteis(mes, 1, diaNum);      /* inclui hoje */
+    var uteisRestantes = contaUteis(mes, diaNum, ultimo);  /* inclui hoje */
+    var hojeUtil = ehUtil(mes, diaNum);
+
+    var ritmoAtual = uteisDecorridos > 0 ? acumulado / uteisDecorridos : 0;
+    var ritmoNec = uteisRestantes > 0 ? falta / uteisRestantes : 0;
+    var esperado = uteisTotal > 0 ? metaMes * (uteisDecorridos / uteisTotal) : 0;
+
     var situacao;
-    if(total >= meta) situacao = { txt:"META BATIDA", cls:"ok" };
-    else if(decorrido <= 0) situacao = { txt:"COMEÇA ÀS 9H", cls:"neutro" };
-    else if(restante <= 0) situacao = { txt:"DIA ENCERRADO", cls:"ruim" };
+    if(batida) situacao = { txt:"META BATIDA", cls:"ok" };
+    else if(uteisRestantes <= 0) situacao = { txt:"MÊS ENCERRADO", cls:"ruim" };
     else {
-      var r = esperado > 0 ? total / esperado : 1;
+      var r = esperado > 0 ? acumulado / esperado : 1;
       situacao = r >= 1.02 ? { txt:"ADIANTADO", cls:"ok" } : (r >= 0.9 ? { txt:"NO RITMO", cls:"at" } : { txt:"ATRASADO", cls:"ruim" });
     }
     return {
-      hoje:hoje, ag:ag, doDia:doDia, total:total, meta:meta, metaHora:metaHora,
-      metaPropria: temMetaPropria(hoje),
-      decorrido:decorrido, restante:restante, esperado:esperado, falta:falta, blocos:blocos, situacao:situacao,
-      pct: meta > 0 ? total/meta : 0,
-      ritmoNec: restante > 0 ? falta / (restante/60) : 0,
-      ritmoReal: decorrido > 0 ? total / (decorrido/60) : 0,
-      projecao: decorrido > 0 ? total * (BLOCOS*60) / decorrido : 0,
-      batida: total >= meta
+      hoje:hoje, ag:ag, mes:mes, doMes:doMes, doDia:doDia,
+      acumulado:acumulado, hojeTotal:hojeTotal, metaMes:metaMes, falta:falta, batida:batida,
+      uteisTotal:uteisTotal, uteisDecorridos:uteisDecorridos, uteisRestantes:uteisRestantes, hojeUtil:hojeUtil,
+      ritmoAtual:ritmoAtual, ritmoNec:ritmoNec, esperado:esperado,
+      projecao: ritmoAtual * uteisTotal,
+      pct: metaMes > 0 ? acumulado/metaMes : 0,
+      situacao:situacao
     };
   }
 
@@ -435,10 +391,10 @@ body.festa #fx{display:block}
     /* preserva o que a pessoa está digitando entre renders (o painel se redesenha sozinho) */
     var foco = document.activeElement && document.activeElement.id, sel = null, vals = {};
     try { if(foco) sel = document.activeElement.selectionStart; } catch(e){}
-    ["valor","cliente","filtro","meta-hoje","meta-padrao","ed-valor","ed-hora","ed-vendedor","ed-cliente"]
+    ["valor","cliente","filtro","meta-mes","ed-valor","ed-hora","ed-vendedor","ed-cliente"]
       .forEach(function(id){ var e = document.getElementById(id); if(e) vals[id] = e.value; });
-    /* depois de salvar uma meta os campos voltam a nascer do estado, já formatados */
-    if(recarregarMetas){ delete vals["meta-hoje"]; delete vals["meta-padrao"]; recarregarMetas = false; }
+    /* depois de salvar a meta o campo volta a nascer do estado, já formatado */
+    if(recarregarMetas){ delete vals["meta-mes"]; recarregarMetas = false; }
 
     var d = calcular();
     var comFesta = tela === "painel" && d.batida && !festaVista;
@@ -470,142 +426,63 @@ body.festa #fx{display:block}
       + '<span class="hora tab">' + pad(d.ag.h) + ':' + pad(d.ag.m) + '<span style="font-size:.55em;color:var(--ink-3)">:' + pad(d.ag.s) + '</span></span></div></div></header>');
 
     if(d.batida && festaVista){
-      h.push('<button class="banner" id="revive" style="margin-top:16px">🎉 Meta batida — PIX maluco pra todo mundo · clique pra comemorar de novo</button>');
+      h.push('<button class="banner" id="revive" style="margin-top:16px">🎉 Meta do mês batida — PIX maluco pra todo mundo · clique pra comemorar de novo</button>');
     }
 
-    h.push('<section class="hero"><div><p class="rot">Realizado hoje</p>'
-      + '<p class="big' + (d.total ? "" : " zerado") + ' tab">' + brl(d.total) + '</p>'
-      + '<p class="sub">de ' + brl(d.meta) + ' &middot; <b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b></p></div>'
+    h.push('<section class="hero"><div><p class="rot">Realizado em ' + esc(nomeMes(d.mes)) + '</p>'
+      + '<p class="big' + (d.acumulado ? "" : " zerado") + ' tab">' + brl(d.acumulado) + '</p>'
+      + '<p class="sub">de <span class="metaval tab">' + brl(d.metaMes) + '</span> &middot; <b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b> da meta do mês</p></div>'
       + '<div class="hero-dir"><span class="pill ' + d.situacao.cls + '">' + d.situacao.txt + '</span>'
       + '<p class="nota">' + notaSituacao(d) + '</p></div></section>');
 
-    var pctBarra = Math.min(d.pct,1)*100, pctMarca = Math.min(d.decorrido/(BLOCOS*60),1)*100;
-    h.push('<div class="barra"><div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="' + d.meta + '" aria-valuenow="' + Math.round(d.total) + '" aria-label="Progresso da meta do dia">'
+    var pctBarra = Math.min(d.pct,1)*100;
+    var pctMarca = d.uteisTotal > 0 ? Math.min(d.uteisDecorridos/d.uteisTotal,1)*100 : 0;
+    h.push('<div class="barra"><div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="' + d.metaMes + '" aria-valuenow="' + Math.round(d.acumulado) + '" aria-label="Progresso da meta do mês">'
       + '<div class="fill" style="width:calc(' + pctBarra.toFixed(2) + '% - 2px)"></div>'
-      + (d.decorrido > 0 && d.restante > 0 ? '<div class="marca" style="left:' + pctMarca.toFixed(2) + '%"><span>agora</span></div>' : '')
-      + '</div><div class="ticks">' + ticks() + '</div></div>');
+      + (d.uteisRestantes > 0 && d.uteisDecorridos > 0 ? '<div class="marca" style="left:' + pctMarca.toFixed(2) + '%"><span>hoje</span></div>' : '')
+      + '</div><div class="ticks"><span>0</span><span>' + brl(d.metaMes/2) + '</span><span>' + brl(d.metaMes) + '</span></div></div>');
 
     h.push('<section class="kpis">'
-      + kpi("Falta para a meta", brl(d.falta), d.batida ? "meta batida" : "faltam " + hhmm(d.restante) + " de venda", d.batida ? "acc" : "")
-      + kpi("Ritmo necessário", d.restante > 0 ? brl(d.ritmoNec) + "<span style=\"font-size:.5em;font-weight:600;color:var(--ink-3)\">/h</span>" : "—",
-            d.restante > 0 ? "até as 19h" : "janela encerrada", "acc", d.restante > 0 && !d.batida ? "destaque" : "")
-      + kpi("Ritmo realizado", brl(d.ritmoReal) + "<span style=\"font-size:.5em;font-weight:600;color:var(--ink-3)\">/h</span>", "ritmo ideal " + brl(d.metaHora) + "/h")
-      + kpi("Projeção 19h", brl(d.projecao), d.projecao >= d.meta ? "bate a meta no ritmo atual" : "faltariam " + brl(Math.max(d.meta-d.projecao,0)))
+      + kpi("Falta para bater", brl(d.falta),
+            d.batida ? "meta do mês batida" : plural(d.uteisRestantes, "dia útil", "dias úteis") + " até o fim do mês",
+            d.batida ? "acc" : "")
+      + kpi("Ritmo atual", brl(d.ritmoAtual) + porDia(),
+            "média em " + plural(d.uteisDecorridos, "dia útil", "dias úteis"))
+      + kpi("Ritmo necessário", d.uteisRestantes > 0 && !d.batida ? brl(d.ritmoNec) + porDia() : "—",
+            d.batida ? "não falta mais nada" : (d.uteisRestantes > 0 ? "por dia útil, até fechar o mês" : "não há mais dia útil"),
+            "acc", d.uteisRestantes > 0 && !d.batida ? "destaque" : "")
+      + kpi("Hoje", brl(d.hojeTotal),
+            !d.hojeUtil ? "hoje não é dia útil"
+              : (d.batida || d.uteisRestantes <= 0 ? plural(d.doDia.length, "venda lançada", "vendas lançadas")
+                 : "de " + brl(d.ritmoNec) + " que hoje precisa trazer"))
       + '</section>');
 
-    h.push('<div class="colunas"><div style="display:flex;flex-direction:column;gap:12px">'
-      + '<div class="painel"><h3>Hora a hora</h3><p class="legenda">Cada bloco precisa de ' + brl(d.metaHora) + ' para a meta fechar às 19h.</p>'
-      + '<div class="hlinha hcab"><span>Hora</span><span>Ritmo do bloco</span><span>Realizado</span><span>Acum. vs meta</span></div>'
-      + d.blocos.map(function(b){ return blocoHTML(b, d); }).join("") + '</div>'
-      + ritmosHTML(d) + '</div>');
+    h.push('<div class="colunas">' + lancamentosHTML(d)
+      + '<div style="display:flex;flex-direction:column;gap:12px">' + formHTML(d) + metasHTML(d) + '</div></div>');
 
-    h.push('<div style="display:flex;flex-direction:column;gap:12px">'
-      + formHTML(d) + metasHTML(d) + lancamentosHTML(d) + vendedoresHTML(d) + '</div>');
-    h.push('</div>');
-
-    h.push('<footer class="rodape"><span>Meta de hoje ' + brl(d.meta)
-      + (d.metaPropria ? ' (só para hoje)' : ' (padrão)') + ' &middot; janela 9h–19h &middot; horário de Brasília</span>'
+    h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
+      + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' (seg–sex, sem descontar feriados)</span>'
       + '<span>' + statusArmazenamento() + '</span></footer>');
     h.push('</div>');
     return h.join("");
   }
 
   function pad(n){ return (n < 10 ? "0" : "") + n; }
-  function ticks(){
-    var out = "";
-    for(var h = H_INI; h <= H_FIM; h++) out += "<span>" + pad(h) + "</span>";
-    return out;
-  }
+  function porDia(){ return '<span style="font-size:.5em;font-weight:600;color:var(--ink-3)">/dia</span>'; }
   function notaSituacao(d){
-    if(d.batida) return "<b>" + brl(d.total - d.meta) + "</b> acima da meta";
-    if(d.decorrido <= 0) return "a janela abre às 9h";
-    if(d.restante <= 0) return "fechou <b>" + brl(d.meta - d.total) + "</b> abaixo da meta";
-    var dif = d.total - d.esperado;
-    return (dif >= 0 ? "<b>" + brl(dif) + "</b> à frente" : "<b>" + brl(-dif) + "</b> atrás") + " do esperado para " + pad(d.ag.h) + ":" + pad(d.ag.m);
+    if(d.batida) return "<b>" + brl(d.acumulado - d.metaMes) + "</b> acima da meta do mês";
+    if(d.uteisRestantes <= 0) return "o mês fechou <b>" + brl(d.metaMes - d.acumulado) + "</b> abaixo";
+    var dif = d.acumulado - d.esperado;
+    return (dif >= 0 ? "<b>" + brl(dif) + "</b> à frente" : "<b>" + brl(-dif) + "</b> atrás")
+      + " do esperado para o " + d.uteisDecorridos + "º dia útil";
   }
   function kpi(rot, val, nota, cls, extra){
     return '<div class="kpi ' + (extra||"") + '"><p class="rot">' + rot + '</p><p class="val ' + (cls||"") + ' tab">' + val + '</p><p class="nota">' + nota + '</p></div>';
   }
-  function blocoHTML(b, d){
-    var agoraBloco = b.h === d.ag.h && d.decorrido > 0 && d.restante > 0;
-    var futuro = (b.h*60) > (d.ag.h*60 + d.ag.m);
-    var pct = Math.min(b.valor / b.meta, 1) * 100;
-    var cls = "hlinha" + (agoraBloco ? " agora" : "") + (futuro ? " futuro" : "") + (b.valor >= b.meta ? " cheio" : "");
-    var delta = futuro || (b.h*60 + 60) > (d.ag.h*60 + d.ag.m)
-      ? '<span class="hd">—</span>'
-      : '<span class="hd ' + (b.delta >= 0 ? "pos" : "neg") + '">' + (b.delta >= 0 ? "+" : "−") + brl(Math.abs(b.delta)).replace("R$ ","") + '</span>';
-    return '<div class="' + cls + '"><span class="hl">' + pad(b.h) + '–' + pad(b.h+1) + '</span>'
-      + '<div class="hbar"><i style="width:' + pct.toFixed(1) + '%"></i></div>'
-      + '<span class="hv tab">' + (b.valor ? brl(b.valor) : "—") + '</span>' + delta + '</div>';
-  }
-  /* ---- ritmos necessários ---- */
-  function ritmoLinha(rot, val, nota, cls){
-    return '<div class="rl"><span class="rl-rot">' + rot + '</span>'
-      + '<span class="rl-val tab ' + (cls || "") + '">' + val + '</span>'
-      + '<span class="rl-nota">' + nota + '</span></div>';
-  }
-  function ritmosHTML(d){
-    var restantes = d.blocos.filter(function(b){ return b.faltaMin > 0; });
-    var emAndamento = !d.batida && d.restante > 0;
-    var linhas = [];
-
-    linhas.push(ritmoLinha("Ritmo ideal do dia", brl(d.metaHora) + "/h",
-      "a meta de " + brl(d.meta) + " dividida pelos " + BLOCOS + " blocos entre 9h e 19h"));
-
-    if(d.batida){
-      linhas.push(ritmoLinha("Ritmo necessário agora", "meta batida", brl(d.total - d.meta) + " acima do combinado", "ok"));
-    } else if(d.decorrido <= 0){
-      linhas.push(ritmoLinha("Ritmo necessário agora", brl(d.metaHora) + "/h", "o dia ainda não abriu — vale o ritmo ideal"));
-    } else if(d.restante <= 0){
-      linhas.push(ritmoLinha("Ritmo necessário agora", "—", "a janela das 19h já fechou"));
-    } else {
-      linhas.push(ritmoLinha("Ritmo necessário agora", brl(d.ritmoNec) + "/h",
-        "para fechar " + brl(d.falta) + " nas " + hhmm(d.restante) + " que sobram", "forte"));
-      linhas.push(ritmoLinha("A cada 30 minutos", brl(d.ritmoNec/2), "o mesmo ritmo, em pedaços menores"));
-      linhas.push(ritmoLinha("A cada 15 minutos", brl(d.ritmoNec/4), "para acompanhar de perto"));
-    }
-
-    linhas.push(ritmoLinha("Ritmo realizado", brl(d.ritmoReal) + "/h",
-      d.decorrido <= 0 ? "o relógio da meta ainda não começou"
-        : (d.ritmoReal >= d.metaHora ? "acima do ritmo ideal" : "abaixo do ritmo ideal"),
-      d.decorrido <= 0 ? "" : (d.ritmoReal >= d.metaHora ? "ok" : "ruim")));
-
-    var blocos = "";
-    if(emAndamento && restantes.length){
-      blocos = '<p class="legenda" style="margin:16px 0 8px">Quanto cada bloco que ainda vem precisa trazer</p>'
-        + '<div class="ritmo-blocos">' + restantes.map(function(b){
-            var parcial = b.faltaMin < 60;
-            return '<span class="rb' + (parcial ? " parcial" : "") + '">'
-              + '<b>' + pad(b.h) + '–' + pad(b.h+1) + (parcial ? " · " + b.faltaMin + "min" : "") + '</b>'
-              + brl(d.falta * b.faltaMin / d.restante) + '</span>';
-          }).join("") + '</div>';
-    }
-
-    return '<div class="painel"><h3>Ritmos necessários</h3>'
-      + '<p class="legenda">Recalculado a cada lançamento e a cada troca de meta.</p>'
-      + '<div class="ritmos">' + linhas.join("") + '</div>' + blocos + '</div>';
-  }
-
-  /* ---- metas editáveis ---- */
-  function metasHTML(d){
-    if(somenteLeitura) return "";
-    return '<div class="painel"><h3>Metas</h3>'
-      + '<p class="legenda">A meta de hoje vale só para hoje. A padrão vale para todo dia que não tiver a sua própria — inclusive os que ainda vêm.</p>'
-      + '<form class="lanc metas-form" id="form-metas">'
-      + '<div class="campo"><label class="rot" for="meta-hoje" style="display:block;margin-bottom:6px">Meta de hoje (R$)</label>'
-      + '<input id="meta-hoje" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(d.meta)) + '" aria-label="Meta de hoje em reais"></div>'
-      + '<div class="campo"><label class="rot" for="meta-padrao" style="display:block;margin-bottom:6px">Meta padrão dos outros dias (R$)</label>'
-      + '<input id="meta-padrao" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(estado.meta)) + '" aria-label="Meta padrão em reais"></div>'
-      + '<button class="btn" type="submit">Salvar metas</button>'
-      + (d.metaPropria ? '<button class="link" type="button" id="meta-reset">Voltar hoje para a padrão</button>' : '')
-      + '<p class="meta-atual">Hoje está valendo ' + brl(d.meta)
-      + (d.metaPropria ? ', uma meta só deste dia.' : ', que é a meta padrão.') + '</p>'
-      + '<p class="aviso' + (avisoMetaOk ? " ok" : "") + '" role="status">' + esc(avisoMeta) + '</p></form></div>';
-  }
 
   function formHTML(d){
     if(somenteLeitura) return '<div class="painel"><h3>Lançar venda</h3><p class="vazio">Este acesso é somente leitura. Peça o link de edição para lançar vendas.</p></div>';
-    return '<div class="painel"><h3>Lançar venda</h3><p class="legenda">Some ao total do dia — todo mundo vê na hora.</p>'
+    return '<div class="painel"><h3>Lançar venda</h3><p class="legenda">Some ao mês — todo mundo vê na hora.</p>'
       + '<form class="lanc" id="form"><div class="campo"><label class="rot" for="valor" style="display:block;margin-bottom:6px">Valor</label>'
       + '<input id="valor" inputmode="decimal" autocomplete="off" placeholder="0,00" aria-label="Valor da venda"></div>'
       + '<div><p class="rot" style="margin-bottom:7px">Vendedor</p><div class="chips">'
@@ -615,6 +492,20 @@ body.festa #fx{display:block}
       + '<button class="btn" type="submit">Lançar venda</button>'
       + '<p class="aviso' + (avisoOk ? " ok" : "") + '" role="status">' + esc(aviso) + '</p></form></div>';
   }
+
+  function metasHTML(d){
+    if(somenteLeitura) return "";
+    return '<div class="painel"><h3>Meta do mês</h3>'
+      + '<p class="legenda">Vale para ' + esc(nomeMes(d.mes)) + '. O ritmo necessário sai dela.</p>'
+      + '<form class="lanc metas-form" id="form-metas">'
+      + '<div class="campo"><label class="rot" for="meta-mes" style="display:block;margin-bottom:6px">Meta do mês (R$)</label>'
+      + '<input id="meta-mes" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(d.metaMes)) + '" aria-label="Meta do mês em reais"></div>'
+      + '<button class="btn" type="submit">Salvar meta</button>'
+      + '<p class="meta-atual">' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' no mês &middot; '
+      + brl(d.uteisTotal > 0 ? d.metaMes/d.uteisTotal : 0) + ' por dia se dividida por igual.</p>'
+      + '<p class="aviso' + (avisoMetaOk ? " ok" : "") + '" role="status">' + esc(avisoMeta) + '</p></form></div>';
+  }
+
   /* ---- editar e remover um lançamento ---- */
   function acoesHTML(l){
     if(somenteLeitura) return "";
@@ -650,31 +541,21 @@ body.festa #fx{display:block}
   }
 
   function lancamentosHTML(d){
-    var itens = d.doDia.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,8);
-    var emEdicao = editandoId && !itens.some(function(l){ return l.id === editandoId; })
-      && d.doDia.some(function(l){ return l.id === editandoId; });
-    if(emEdicao) itens = itens.concat(d.doDia.filter(function(l){ return l.id === editandoId; }));
-    return '<div class="painel"><h3>Últimos lançamentos</h3><p class="legenda">' + d.doDia.length + ' venda' + (d.doDia.length === 1 ? "" : "s")
-      + ' hoje' + (somenteLeitura ? "" : " · ✎ corrige, × apaga") + '</p>'
+    var todos = d.doMes.slice().sort(function(a,b){ return b.ts - a.ts; });
+    var itens = todos.slice(0,10);
+    if(editandoId && !itens.some(function(l){ return l.id === editandoId; })){
+      itens = itens.concat(todos.filter(function(l){ return l.id === editandoId; }));
+    }
+    return '<div class="painel"><h3>Últimos lançamentos</h3><p class="legenda">'
+      + plural(todos.length, "venda", "vendas") + ' em ' + esc(nomeMes(d.mes))
+      + (somenteLeitura ? "" : " &middot; ✎ corrige, × apaga") + '</p>'
       + (itens.length ? '<ul class="lista">' + itens.map(function(l){
           if(editandoId === l.id) return '<li class="editando">' + edicaoHTML(l) + '</li>';
-          var q = pad(l.hora) + ":" + pad(l.min);
+          var q = (l.dia === d.hoje ? "" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7) + " ") + pad(l.hora) + ":" + pad(l.min);
           var quem = [l.vendedor, l.cliente].filter(Boolean).join(" · ") || "sem identificação";
           return '<li><span class="quando tab">' + q + '</span><span class="quem">' + esc(quem) + '</span>'
             + '<span class="qtd tab">' + brlc(l.valor) + '</span>' + acoesHTML(l) + '</li>';
-        }).join("") + '</ul>' : '<p class="vazio">Nenhuma venda lançada hoje ainda.</p>') + '</div>';
-  }
-  function vendedoresHTML(d){
-    var por = {};
-    d.doDia.forEach(function(l){ var k = l.vendedor || "Sem vendedor"; por[k] = (por[k]||0) + l.valor; });
-    var lista = Object.keys(por).map(function(k){ return { nome:k, v:por[k] }; }).sort(function(a,b){ return b.v - a.v; });
-    if(!lista.length) return "";
-    var topo = lista[0].v || 1;
-    return '<div class="painel"><h3>Por vendedor</h3><p class="legenda">Hoje</p>'
-      + lista.map(function(x){
-          return '<div class="vend"><span class="nome">' + esc(x.nome) + '</span><span class="vl tab">' + brl(x.v) + '</span>'
-            + '<span class="vb"><i style="width:' + (x.v/topo*100).toFixed(1) + '%"></i></span></div>';
-        }).join("") + '</div>';
+        }).join("") + '</ul>' : '<p class="vazio">Nenhuma venda lançada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>') + '</div>';
   }
   /* ---- histórico completo ---- */
   function agrupaDias(){
@@ -704,9 +585,9 @@ body.festa #fx{display:block}
 
     var totalGeral = filtrados.reduce(function(a,g){ return a + g.total; }, 0);
     var qtd = filtrados.reduce(function(a,g){ return a + g.itens.length; }, 0);
-    var batidos = filtrados.filter(function(g){ return g.totalDia >= metaDoDia(g.dia); }).length;
     var melhor = filtrados.slice().sort(function(a,b){ return b.totalDia - a.totalDia; })[0];
     var media = filtrados.length ? totalGeral / filtrados.length : 0;
+    var topo = melhor && melhor.totalDia > 0 ? melhor.totalDia : 1;
 
     var h = ['<div class="wrap">'];
     h.push('<header class="topo"><div class="logo">'
@@ -720,9 +601,9 @@ body.festa #fx{display:block}
       + (avisoHist ? '<p class="aviso' + (avisoOk ? " ok" : "") + '" role="status" style="margin:0">' + esc(avisoHist) + '</p>' : '') + '</div>');
 
     h.push('<section class="resumo">'
-      + kpi("Total no período", brl(totalGeral), qtd + " venda" + (qtd === 1 ? "" : "s"), "acc")
-      + kpi("Dias com venda", String(filtrados.length), "meta padrão de " + brl(estado.meta) + "/dia")
-      + kpi("Dias que bateram", String(batidos), filtrados.length ? (batidos/filtrados.length*100).toFixed(0) + "% dos dias" : "—")
+      + kpi("Total no período", brl(totalGeral), plural(qtd, "venda", "vendas"), "acc")
+      + kpi("Em " + esc(nomeMes(d.mes)), brl(d.acumulado), (d.pct*100).toFixed(0) + "% da meta de " + brl(d.metaMes))
+      + kpi("Dias com venda", String(filtrados.length), "de " + plural(d.uteisTotal, "dia útil", "dias úteis") + " no mês")
       + kpi("Melhor dia", melhor ? brl(melhor.totalDia) : "—", melhor ? nomeDia(melhor.dia) : "sem dados")
       + kpi("Média por dia", brl(media), "considerando dias com venda")
       + '</section>');
@@ -735,17 +616,14 @@ body.festa #fx{display:block}
     } else {
       filtrados.forEach(function(g){
         var aberto = diasAbertos[g.dia] !== undefined ? diasAbertos[g.dia] : (g.dia === d.hoje || !!filtro);
-        var metaG = metaDoDia(g.dia);
-        var batido = g.totalDia >= metaG;
-        h.push('<div class="dia' + (batido ? " batido" : "") + (aberto ? " aberto" : "") + '">'
+        h.push('<div class="dia' + (aberto ? " aberto" : "") + '">'
           + '<button class="dia-cab" data-dia="' + esc(g.dia) + '" aria-expanded="' + aberto + '">'
-          + '<span class="data"><span class="seta">▶</span>' + esc(nomeDia(g.dia)) + (batido ? ' <span class="selo">meta batida</span>' : '') + '</span>'
+          + '<span class="data"><span class="seta">▶</span>' + esc(nomeDia(g.dia)) + '</span>'
           + '<span class="tot tab">' + brl(g.totalDia) + '</span>'
-          + '<span class="meta-info"><span>' + g.itens.length + ' venda' + (g.itens.length === 1 ? "" : "s")
+          + '<span class="meta-info"><span>' + plural(g.itens.length, "venda", "vendas")
           + (filtro ? ' de ' + brl(g.total) + ' no filtro' : '') + '</span>'
-          + '<span class="db"><i style="width:' + Math.min(g.totalDia/metaG*100,100).toFixed(1) + '%"></i></span>'
-          + '<span class="tab">' + (g.totalDia/metaG*100).toFixed(0) + '% de ' + brl(metaG)
-          + (temMetaPropria(g.dia) ? '' : ' (padrão)') + '</span></span></button>');
+          + '<span class="db"><i style="width:' + Math.min(g.totalDia/topo*100,100).toFixed(1) + '%"></i></span>'
+          + '<span class="tab">' + (g.totalDia/topo*100).toFixed(0) + '% do melhor dia</span></span></button>');
         if(aberto){
           h.push('<div class="dia-corpo">' + g.itens.map(function(l){
             if(editandoId === l.id) return '<div class="hist-edit">' + edicaoHTML(l) + '</div>';
@@ -759,7 +637,7 @@ body.festa #fx{display:block}
         h.push('</div>');
       });
     }
-    h.push('<footer class="rodape"><span>' + estado.lancamentos.length + ' lançamento' + (estado.lancamentos.length === 1 ? "" : "s") + ' guardados no painel</span>'
+    h.push('<footer class="rodape"><span>' + plural(estado.lancamentos.length, "lançamento guardado", "lançamentos guardados") + ' no painel</span>'
       + '<span>horário de Brasília</span></footer></div>');
     return h.join("");
   }
@@ -777,12 +655,15 @@ body.festa #fx{display:block}
   }
 
   function festaHTML(d){
-    var quando = d.doDia.filter(function(l){ return true; }).sort(function(a,b){ return a.ts - b.ts; });
-    var soma = 0, hora = "";
-    for(var i=0;i<quando.length;i++){ soma += quando[i].valor; if(soma >= d.meta){ hora = pad(quando[i].hora) + ":" + pad(quando[i].min); break; } }
-    return '<div class="party-bg"></div><div class="party"><p class="party-kicker">Meta de ' + brl(d.meta) + ' batida' + (hora ? ' às ' + hora : '') + '</p>'
+    var ordem = d.doMes.slice().sort(function(a,b){ return a.ts - b.ts; });
+    var soma = 0, quando = "";
+    for(var i=0;i<ordem.length;i++){
+      soma += ordem[i].valor;
+      if(soma >= d.metaMes){ quando = ordem[i].dia.slice(8,10) + "/" + ordem[i].dia.slice(5,7); break; }
+    }
+    return '<div class="party-bg"></div><div class="party"><p class="party-kicker">Meta de ' + brl(d.metaMes) + ' batida' + (quando ? ' em ' + quando : '') + '</p>'
       + '<h1 class="party-title">PIX MALUCO<br>PRA TODO MUNDO</h1>'
-      + '<p class="party-sub"><span>' + brl(d.total) + '</span> vendidos hoje</p>'
+      + '<p class="party-sub"><span>' + brl(d.acumulado) + '</span> vendidos em ' + esc(nomeMes(d.mes)) + '</p>'
       + '<button class="btn-ghost" id="ver-painel">ver o painel</button></div>';
   }
 
@@ -870,28 +751,19 @@ body.festa #fx{display:block}
       }
     }
 
-    /* ---- metas ---- */
+    /* ---- meta do mês ---- */
     var fm = document.getElementById("form-metas");
     if(fm){
       fm.addEventListener("submit", function(ev){
         ev.preventDefault();
-        var mh = paraNumero(document.getElementById("meta-hoje").value);
-        var mp = paraNumero(document.getElementById("meta-padrao").value);
-        if(!isFinite(mh) || mh <= 0 || !isFinite(mp) || mp <= 0){
-          avisoMeta = "As duas metas precisam ser maiores que zero."; avisoMetaOk = false; render(); return;
+        var m = paraNumero(document.getElementById("meta-mes").value);
+        if(!isFinite(m) || m <= 0){
+          avisoMeta = "A meta precisa ser maior que zero."; avisoMetaOk = false; render(); return;
         }
-        var novas = copiaMetas();
-        novas[d.hoje] = Math.round(mh*100)/100;
-        /* meta nova: a festa pode valer de novo se o dia passar a estar batido */
+        /* meta nova: a festa pode valer de novo se o mês passar a estar batido */
         festaVista = false;
         try { sessionStorage.removeItem("festa-vista"); } catch(e){}
-        salvarMetas(Math.round(mp*100)/100, novas, "Metas salvas.");
-      });
-      var mr = document.getElementById("meta-reset");
-      if(mr) mr.addEventListener("click", function(){
-        var novas = copiaMetas();
-        delete novas[d.hoje];
-        salvarMetas(estado.meta, novas, "Hoje voltou para a meta padrão.");
+        salvarMetas(Math.round(m*100)/100, "Meta do mês salva.");
       });
     }
     var ih = document.getElementById("ir-historico");
@@ -938,7 +810,7 @@ body.festa #fx{display:block}
     var vp = document.getElementById("ver-painel");
     if(vp) vp.addEventListener("click", function(){
       festaVista = true;
-      try { sessionStorage.setItem("festa-vista", hojeSP()); } catch(e){}
+      try { sessionStorage.setItem("festa-vista", mesDe(hojeSP())); } catch(e){}
       render();
     });
     var rv = document.getElementById("revive");
@@ -949,7 +821,11 @@ body.festa #fx{display:block}
     });
   }
 
-  /* ====== persistência ====== */
+
+  /* ====== persistência ======
+     Esta é a versão para hospedagem própria: sem API_URL, cada navegador
+     guarda o seu no localStorage; com API_URL, o estado inteiro — meta do mês
+     e lançamentos — vai e volta do servidor. */
   var ultimaSync = 0, syncOk = true;
   var CHAVE = "ritmo40k";
 
@@ -998,11 +874,7 @@ body.festa #fx{display:block}
            em vez de apagar (evita perder dados na primeira configuração) */
         if(!novos.length && estado.lancamentos.length){ ultimaSync = Date.now(); syncOk = true; return enviarAPI(); }
         var mudou = JSON.stringify(novos) !== JSON.stringify(estado.lancamentos);
-        if(j && typeof j.meta === "number" && j.meta > 0 && j.meta !== estado.meta){ estado.meta = j.meta; mudou = true; }
-        if(j && j.metas){
-          var ms = limparMetas(j.metas);
-          if(JSON.stringify(ms) !== JSON.stringify(estado.metas)){ estado.metas = ms; mudou = true; }
-        }
+        if(j && typeof j.metaMes === "number" && j.metaMes > 0 && j.metaMes !== estado.metaMes){ estado.metaMes = j.metaMes; mudou = true; }
         if(mudou){ estado.lancamentos = novos; gravarLocal(); render(); }
         ultimaSync = Date.now(); syncOk = true;
       })
@@ -1012,7 +884,7 @@ body.festa #fx{display:block}
     return fetch(CONFIG.API_URL, {
       method: "POST",
       headers: cabecalhos(),
-      body: JSON.stringify({ meta: estado.meta, metas: estado.metas || {}, lancamentos: estado.lancamentos })
+      body: JSON.stringify({ metaMes: estado.metaMes, lancamentos: estado.lancamentos })
     }).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
       ultimaSync = Date.now(); syncOk = true;
@@ -1022,34 +894,6 @@ body.festa #fx{display:block}
     if(!CONFIG.API_URL) return "os lançamentos ficam salvos neste navegador";
     if(!syncOk) return "sem conexão com o servidor — salvo só neste navegador";
     return "sincronizado com o servidor · todo mundo vê o mesmo número";
-  }
-
-  /* metas mudam sem tocar nos lançamentos, então têm o seu próprio caminho de
-     gravação — com o mesmo cuidado de desfazer se o navegador recusar salvar */
-  var limpezaAviso = 0;
-  function agendarLimpeza(){
-    clearTimeout(limpezaAviso);
-    limpezaAviso = setTimeout(function(){
-      if(avisoMeta || avisoEd){ avisoMeta = ""; avisoEd = ""; render(); }
-    }, 5000);
-  }
-  function salvarMetas(meta, metas, ok){
-    var antMeta = estado.meta, antMetas = estado.metas;
-    estado.meta = meta; estado.metas = metas;
-    if(!gravarLocal() && !CONFIG.API_URL){
-      estado.meta = antMeta; estado.metas = antMetas;
-      avisoMeta = "Não deu para salvar neste navegador."; avisoMetaOk = false; render();
-      return;
-    }
-    avisoMeta = ok; avisoMetaOk = true;
-    recarregarMetas = true;
-    agendarLimpeza();
-    render();
-    if(!CONFIG.API_URL) return;
-    enviarAPI().catch(function(){
-      avisoMeta = "Sem conexão com o servidor. A meta ficou salva neste navegador e vai junto na próxima tentativa.";
-      avisoMetaOk = false; render();
-    });
   }
 
   function salvar(lancamentos){
@@ -1065,10 +909,33 @@ body.festa #fx{display:block}
     enviarAPI().catch(function(){
       aviso = "Sem conexão com o servidor. O lançamento ficou salvo neste navegador e vai junto na próxima tentativa.";
       avisoOk = false; render();
-      if(rascunho){
-        var cv = document.getElementById("valor"), cc = document.getElementById("cliente");
-        if(cv && !cv.value) cv.value = "";
-      }
+    });
+  }
+
+  /* a meta muda sem tocar nos lançamentos, então tem o seu próprio caminho de
+     gravação — com o mesmo cuidado de desfazer se o navegador recusar salvar */
+  var limpezaAviso = 0;
+  function agendarLimpeza(){
+    clearTimeout(limpezaAviso);
+    limpezaAviso = setTimeout(function(){
+      if(avisoMeta || avisoEd){ avisoMeta = ""; avisoEd = ""; render(); }
+    }, 5000);
+  }
+  function salvarMetas(metaMes, ok){
+    var anterior = estado.metaMes;
+    estado.metaMes = metaMes;
+    if(!gravarLocal() && !CONFIG.API_URL){
+      estado.metaMes = anterior;
+      avisoMeta = "Não deu para salvar neste navegador."; avisoMetaOk = false; render();
+      return;
+    }
+    avisoMeta = ok; avisoMetaOk = true; recarregarMetas = true;
+    agendarLimpeza();
+    render();
+    if(!CONFIG.API_URL) return;
+    enviarAPI().catch(function(){
+      avisoMeta = "Sem conexão com o servidor. A meta ficou salva neste navegador e vai junto na próxima tentativa.";
+      avisoMetaOk = false; render();
     });
   }
   function iniciarSync(){
@@ -1076,7 +943,6 @@ body.festa #fx{display:block}
     buscarAPI().catch(function(){ render(); });
     setInterval(function(){ buscarAPI().catch(function(){}); }, Math.max(CONFIG.SYNC_SEGUNDOS || 15, 5) * 1000);
   }
-
   /* ====== fogos e balões ====== */
   var cv = document.getElementById("fx"), ctx = cv.getContext("2d"), anim = 0, parts = [], baloes = [], ultimoFogo = 0, ultimoBalao = 0;
   var CORES = ["#FFCD1C","#FFFFFF","#FF6B8B","#4AD6FF","#7CF58F","#C89BFF","#FFA23A"];
@@ -1156,8 +1022,7 @@ body.festa #fx{display:block}
   var salvo = carregarLocal();
   if(salvo){
     estado.lancamentos = salvo.lancamentos.map(normalizar).filter(Boolean);
-    if(typeof salvo.meta === "number" && salvo.meta > 0) estado.meta = salvo.meta;
-    if(salvo.metas) estado.metas = limparMetas(salvo.metas);
+    if(typeof salvo.metaMes === "number" && salvo.metaMes > 0) estado.metaMes = salvo.metaMes;
   }
   render();
   iniciarSync();

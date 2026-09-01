@@ -1,50 +1,46 @@
-# Painel Ritmo 40K · Vetor SST
+# Painel Comercial · Vetor SST
 
-Painel de ritmo comercial em arquivo único: mostra a meta do dia, os ritmos
-necessários para alcançá-la, o histórico completo de lançamentos e comemora
-quando a meta é batida.
+Painel de ritmo comercial em arquivo único: mostra a meta do mês, quanto falta
+para bater, o ritmo atual e o ritmo diário necessário, com histórico completo de
+lançamentos e comemoração ao bater a meta.
+
+**No ar em https://vetorsst.github.io/painel-diario/**
 
 ## Como usar
 
-Abra `index.html` direto no navegador — não precisa build, servidor
-nem instalação. Para deixar no ar, basta subir o arquivo em qualquer hospedagem
-estática (GitHub Pages, Netlify, Vercel, Hostinger ou a pasta `public/` do seu
-servidor).
+Abra `index.html` direto no navegador — não precisa build, servidor nem
+instalação. Para deixar no ar, basta subir o arquivo em qualquer hospedagem
+estática.
+
+### O que o painel mostra
+
+O topo traz o realizado do mês contra a meta, com barra de progresso. Abaixo,
+quatro números:
+
+| | |
+| --- | --- |
+| **Falta para bater** | quanto ainda falta, e quantos dias úteis restam |
+| **Ritmo atual** | o realizado dividido pelos dias úteis já decorridos |
+| **Ritmo necessário** | o que falta dividido pelos dias úteis que restam |
+| **Hoje** | o que já entrou hoje, contra o que hoje precisa trazer |
+
+Não existe meta diária fixa: **a meta do dia é o próprio ritmo necessário**, que
+se reajusta a cada venda lançada e a cada dia que passa. Dia útil é de segunda a
+sexta; feriados não são descontados.
 
 ### Lançar, corrigir e apagar
 
-- **Lançar** uma venda pelo painel "Lançar venda": valor, vendedor e cliente.
-- **Corrigir** um lançamento pelo botão ✎, tanto na lista "Últimos lançamentos"
-  quanto no histórico. Dá para mudar valor, hora, vendedor e cliente. Ao mudar a
-  hora, o lançamento se reposiciona no bloco certo sem trocar de dia.
+- **Lançar** uma venda pelo quadro "Lançar venda": valor, vendedor e cliente.
+- **Corrigir** pelo botão ✎, tanto na lista do painel quanto no histórico. Dá
+  para mudar valor, hora, vendedor e cliente. Ao mudar a hora, o lançamento se
+  reposiciona sem trocar de dia.
 - **Apagar** pelo botão ×, que pede confirmação antes.
 
-### Metas
+### Meta do mês
 
-O painel "Metas" tem dois campos:
-
-- **Meta de hoje** — vale só para o dia de hoje.
-- **Meta padrão dos outros dias** — vale para todo dia que não tiver a sua
-  própria meta, inclusive os dias que ainda vêm.
-
-Cada dia guarda a meta que valia nele, então trocar a meta hoje não reescreve o
-julgamento dos dias antigos: no histórico, cada dia continua sendo comparado com
-a meta que estava valendo naquele dia. O botão "Voltar hoje para a padrão"
-remove a meta específica do dia.
-
-### Ritmos necessários
-
-O painel "Ritmos necessários" mostra, e recalcula a cada lançamento e a cada
-troca de meta:
-
-- **Ritmo ideal do dia** — a meta dividida pelos 10 blocos entre 9h e 19h.
-- **Ritmo necessário agora** — quanto por hora é preciso vender no tempo que
-  ainda resta para fechar o que falta.
-- **A cada 30 e a cada 15 minutos** — o mesmo ritmo em pedaços menores.
-- **Ritmo realizado** — o ritmo que a equipe está mantendo de fato.
-- **Quanto cada bloco que ainda vem precisa trazer** — o que falta distribuído
-  pelos blocos restantes, com o bloco corrente entrando só pelos minutos que
-  ainda sobram nele.
+O quadro "Meta do mês" tem um campo só. O que for salvo ali passa a valer no
+lugar do `META_MES` da configuração, e todo o resto do painel — ritmo
+necessário, quanto falta, meta de hoje — sai dele.
 
 ## Configuração
 
@@ -52,8 +48,8 @@ A configuração fica no início da tag `<script>` do arquivo, em `var CONFIG`:
 
 | Chave | O que faz |
 | --- | --- |
-| `META` | Meta padrão do dia, em reais (padrão: `40000`). O que for salvo no painel "Metas" manda nisto. |
-| `API_URL` | Endpoint que guarda os lançamentos. Vazio: cada navegador guarda os seus no `localStorage`. Preenchido: todo mundo vê o mesmo número. |
+| `META_MES` | Meta do mês, em reais (padrão: `250000`). O que for salvo no painel manda nisto. |
+| `API_URL` | Endpoint que guarda o estado. Vazio: cada navegador guarda o seu no `localStorage`. Preenchido: todo mundo vê o mesmo número. |
 | `API_TOKEN` | Opcional, enviado como `Authorization: Bearer ...`. |
 | `SYNC_SEGUNDOS` | Intervalo de sincronização com a API (padrão: `15`). |
 
@@ -61,34 +57,26 @@ A configuração fica no início da tag `<script>` do arquivo, em `var CONFIG`:
 
 Dois métodos na mesma URL:
 
-- `GET` devolve `{"meta":40000,"metas":{...},"lancamentos":[ ... ]}` (ou só o array).
-- `POST` recebe `{"meta":40000,"metas":{...},"lancamentos":[ ... ]}` e grava tudo.
+- `GET` devolve `{"metaMes":250000,"lancamentos":[ ... ]}` (ou só o array).
+- `POST` recebe `{"metaMes":250000,"lancamentos":[ ... ]}` e grava tudo.
 
-Onde:
-
-- `meta` é a meta padrão, usada em todo dia sem meta própria.
-- `metas` guarda as metas de dias específicos: `{"2026-08-31": 45000}`.
-- cada lançamento tem o formato
-  `{id, ts, dia:"AAAA-MM-DD", hora, min, valor, vendedor, cliente}` — basta
-  devolver `id`, `ts` e `valor`, já que `dia`, `hora` e `min` são deduzidos do `ts`.
+Cada lançamento tem o formato
+`{id, ts, dia:"AAAA-MM-DD", hora, min, valor, vendedor, cliente}` — basta
+devolver `id`, `ts` e `valor`, já que `dia`, `hora` e `min` são deduzidos do `ts`.
 
 > Não versione tokens: deixe `API_TOKEN` vazio no arquivo publicado.
 
 ## Publicação
 
-O painel está no **GitHub Pages**, o mesmo caminho do `relatorio-semanal-vetor`:
+O painel está no **GitHub Pages**, servindo a branch `main` a partir da raiz —
+o mesmo caminho do `relatorio-semanal-vetor`. Cada `git push` na `main`
+republica em cerca de um minuto. O `.nojekyll` desliga o processamento Jekyll,
+que não tem serventia num site de arquivo único.
 
-**https://vetorsst.github.io/painel-diario/**
+## Duas versões
 
-A publicação sai da branch `main`, a partir da raiz do repositório — o
-`index.html` responde direto na raiz do site. Cada `git push` na `main`
-republica o painel automaticamente, em cerca de um minuto.
-
-O arquivo `.nojekyll` desliga o processamento Jekyll, que não tem serventia aqui
-e só atrasaria o build de um site de arquivo único.
-
-> Com `API_URL` vazio, cada navegador guarda os seus próprios lançamentos no
-> `localStorage`. Quem abrir o site vê os lançamentos que estão embutidos no
-> `index.html` como ponto de partida e, a partir daí, os seus próprios. Para a
-> equipe inteira ver o mesmo número é preciso um endpoint no `API_URL` — o
-> painel já fala o contrato descrito acima.
+Existe também uma versão deste painel como Artifact do Claude, que é a cópia
+usada no dia a dia. As duas têm **persistências diferentes e não são
+intercambiáveis**: o Artifact salva republicando a si mesmo, enquanto esta
+versão usa `localStorage` e a camada opcional de `API_URL`. Copiar o arquivo de
+um lado para o outro quebra o que foi copiado — mudanças precisam ser portadas.
