@@ -23,6 +23,13 @@ para leitura a 3–6 metros, e o layout inteiro cabe numa tela sem rolagem.
 Sem o `?tv`, o mesmo arquivo abre o painel completo. Com a planilha ligada, ele
 deixa de ser o lugar onde se digita venda e passa a ser a régua:
 
+- **Atualizar** — relê a planilha na hora, sem recarregar a página. O F5 jogaria
+  fora o estado da tela (o que está sendo digitado, a edição aberta, o dia
+  expandido no histórico) só para buscar um CSV de poucos kB. Sozinho, o painel
+  relê a cada `CSV_SEGUNDOS`. O Google guarda o CSV publicado em cache por
+  alguns minutos, então uma alteração recém-salva pode demorar a aparecer mesmo
+  clicando — o botão pede uma URL diferente a cada vez para tentar furar isso,
+  mas nem sempre funciona.
 - **Meta do mês** — o único campo que ainda precisa de gente. O ritmo necessário
   e a meta do dia saem dele.
 - **Corrigir** (✎) uma linha que veio errada da planilha: o pagador não é o

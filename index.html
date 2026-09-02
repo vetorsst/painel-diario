@@ -167,6 +167,8 @@ body:not(.tv) .barra{margin-top:26px}
 .link{background:rgba(255,255,255,.05);border:1px solid var(--line-forte);color:var(--ink-2);border-radius:999px;padding:9px 16px;font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:.15s}
 .link:hover{color:var(--ink);border-color:var(--ink-3)}
 .link.forte{background:var(--amarelo);border-color:var(--amarelo);color:#04151d}
+.link:disabled{opacity:.5;cursor:progress}
+.link:disabled:hover{color:var(--ink-2);border-color:var(--line-forte)}
 .hist-topo{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:26px 0 18px}
 .hist-topo h2{margin:0;font-size:clamp(1.6rem,3.4vw,2.4rem);font-weight:800;letter-spacing:-.03em}
 .hist-topo p{margin:6px 0 0;font-size:.84rem;color:var(--ink-3)}
@@ -392,6 +394,7 @@ body.festa #fx{display:block}
   var somenteLeitura = false, semSalvar = false, vendedorSel = "", aviso = "", avisoOk = false, confirmarId = "", rascunho = null;
   var festaVista = false, tela = "painel", filtro = "", diasAbertos = {}, avisoHist = "";
   var editandoId = "", avisoEd = "", avisoMeta = "", avisoMetaOk = false, focarEdicao = false, recarregarMetas = false;
+  var atualizando = false;
   /* ?tv na URL: tela de parede — nada em que clicar, tudo lido de longe */
   var modoTV = /(^|[?&#])tv(?:[=&#]|$)/i.test(location.search + location.hash);
   if(modoTV) somenteLeitura = true;
@@ -585,7 +588,11 @@ body.festa #fx{display:block}
     var h = [];
     h.push('<div class="wrap">');
     h.push('<header class="topo">' + logoHTML()
-      + '<div class="acoes-topo"><button class="link" id="ir-historico">Histórico</button>'
+      + '<div class="acoes-topo">'
+      + (CONFIG.CSV_RECEITAS || CONFIG.API_URL
+          ? '<button class="link" id="atualizar"' + (atualizando ? ' disabled' : '') + '>'
+            + (atualizando ? "Buscando…" : "Atualizar") + '</button>' : '')
+      + '<button class="link" id="ir-historico">Histórico</button>'
       + '<div class="relogio"><span class="dia">' + esc(dataExtenso()) + '</span>'
       + '<span class="hora tab">' + pad(d.ag.h) + ':' + pad(d.ag.m) + '<span style="font-size:.55em;color:var(--ink-3)">:' + pad(d.ag.s) + '</span></span></div></div></header>');
 
@@ -1182,6 +1189,19 @@ body.festa #fx{display:block}
       salvar(estado.lancamentos.filter(function(l){ return !fora[l.id]; }));
     });
 
+    /* relê a planilha sem recarregar a página: o F5 joga fora o estado da tela
+       (o que estava sendo digitado, a edição aberta, o dia expandido no
+       histórico) para buscar um CSV de poucos kB */
+    var at = document.getElementById("atualizar");
+    if(at) at.addEventListener("click", function(){
+      if(atualizando) return;
+      atualizando = true; aviso = ""; render();
+      var fim = function(){ atualizando = false; render(); };
+      buscarCSV()
+        .then(function(){ return CONFIG.API_URL ? buscarAPI().catch(function(){}) : null; })
+        .then(fim, fim);
+    });
+
     var ih = document.getElementById("ir-historico");
     if(ih) ih.addEventListener("click", function(){ irPara("historico"); });
     var ip = document.getElementById("ir-painel");
@@ -1500,9 +1520,17 @@ body.festa #fx{display:block}
     });
     return mudou ? saida : null;
   }
+  /* cache: "no-store" só manda no cache do navegador. O Google guarda o CSV
+     publicado do lado dele por alguns minutos, e a única forma de tentar furar
+     isso é pedir uma URL diferente a cada leitura. Nem sempre funciona — às
+     vezes a versão nova demora a aparecer mesmo assim. */
+  function urlCSV(){
+    var u = CONFIG.CSV_RECEITAS;
+    return u + (u.indexOf("?") > -1 ? "&" : "?") + "_=" + Date.now();
+  }
   function buscarCSV(){
     if(!CONFIG.CSV_RECEITAS) return Promise.resolve();
-    return fetch(CONFIG.CSV_RECEITAS, { cache: "no-store" })
+    return fetch(urlCSV(), { cache: "no-store" })
       .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
       .then(function(t){
         var novos = lancamentosDoCSV(t);
