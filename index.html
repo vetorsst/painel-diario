@@ -202,19 +202,25 @@ body{
 /* ---------- modo TV (?tv) ----------
    Tela de parede: ninguém clica, ninguém chega perto. Tudo é lido de 3 a 6
    metros, então os tamanhos saem de vw — a TV é 16:9 e a largura manda. */
+/* TODA medida sai de --u. Em 16:9 exato 1vw e 1,78vh valem o mesmo, então a TV
+   cheia fica idêntica ao desenhado; numa janela mais baixa o vh assume e a
+   composição encolhe em bloco, em proporção. Antes as fontes vinham de vw e os
+   espaços de vh: em janela baixa o texto continuava grande, o respiro sumia, e
+   a lista — único bloco elástico — absorvia todo o déficit e ficava com duas
+   linhas. Era esse o "tá feio". */
 /* Numa TV de escritório (gama ~2,4, black crush agressivo) as diferenças sutis
    somem: o cartão contra o fundo dava 1,24:1 e a borda 1,31:1 — a 4 metros
    nenhum dos dois existia. Aqui o painel troca sutileza por separação real. */
-body.tv{overflow:hidden;background:#072230;background-image:none}
-.tv{--card:#12384c;--line:rgba(255,255,255,.22);--line-forte:rgba(255,255,255,.3);--ink-3:#93aebc}
+body.tv{overflow:hidden}
+.tv{--u:min(1vw,1.7778vh);--card:#12384c;--line:rgba(255,255,255,.22);--line-forte:rgba(255,255,255,.3);--ink-3:#93aebc}
 /* o degradê do preenchimento lê como "a barra está apagando" de longe */
 /* altura fixa, não mínima: com min-height a lista empurrava o rodapé para fora
    da tela, e numa TV o que passa da dobra simplesmente não existe */
-.tv .wrap{max-width:none;height:100vh;overflow:hidden;display:flex;flex-direction:column;padding:2.4vh 2.6vw 2vh}
-.tv .topo{padding-bottom:1.6vh}
-.tv .marca-vetor{width:clamp(150px,14vw,540px)}
-.tv .logo{gap:clamp(14px,1.4vw,54px)}
-.tv .logo .kicker{font-size:clamp(.6rem,.78vw,2.3rem);padding-left:clamp(14px,1.4vw,54px)}
+.tv .wrap{max-width:none;height:100vh;overflow:hidden;display:flex;flex-direction:column;padding:calc(1.4*var(--u)) calc(2.6*var(--u)) calc(1*var(--u))}
+.tv .topo{padding-bottom:calc(.85*var(--u))}
+.tv .marca-vetor{width:max(150px,calc(11.5*var(--u)))}
+.tv .logo{gap:max(14px,calc(1.3*var(--u)))}
+.tv .logo .kicker{font-size:max(9px,calc(1.15*var(--u)));padding-left:max(14px,calc(1.3*var(--u)));line-height:1.35}
 /* Burn-in: o número muda, mas o logo amarelo e os rótulos ocupam os mesmos
    pixels por semanas. Um passeio de poucos pixels ao longo de meia hora não se
    percebe de longe e quebra a permanência da imagem. */
@@ -227,53 +233,84 @@ body.tv{overflow:hidden;background:#072230;background-image:none}
   50%{transform:translate(-2px,3px)}
   75%{transform:translate(2px,-3px)}
 }
-.tv .relogio .hora{font-size:clamp(1.6rem,2.9vw,8.36rem)}
-.tv .relogio .dia{font-size:clamp(.72rem,1vw,2.85rem)}
+.tv .relogio .hora{font-size:max(26px,calc(3.5*var(--u)));font-weight:700}
+.tv .relogio .dia{font-size:max(11px,calc(1.45*var(--u)))}
 
-.tv-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:3vw;padding:2.6vh 0 1.4vh}
-.tv-hero .rot{font-size:clamp(.75rem,1.05vw,3.04rem);letter-spacing:.2em}
-.tv-big{margin:.6vh 0 0;font-size:clamp(4rem,9.6vw,28.5rem);font-weight:900;letter-spacing:-.05em;line-height:.82;color:var(--amarelo);font-variant-numeric:tabular-nums}
+/* Escala em sete degraus, todos >= 1,24x. Antes eram doze tamanhos, dez deles
+   apertados numa faixa de 1,8x — diferença de 3% não lê como hierarquia, lê
+   como desalinhamento. */
+.tv-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:calc(3*var(--u));padding:calc(.85*var(--u)) 0 calc(.5*var(--u))}
+.tv-hero .rot{font-size:max(11px,calc(1.45*var(--u)));letter-spacing:.18em;line-height:1.1}
+/* peso 800, não 900: amarelo saturado sobre azul escuro na gama de uma TV
+   engorda opticamente e a contraforma borra — o número parecia pastoso.
+   O -.055em de margem corrige a sidebearing do "R" do Poppins Black, que
+   deixava o número recuado em relação ao rótulo acima dele. */
+.tv-big{margin:calc(.3*var(--u)) 0 0 -.055em;font-size:max(56px,calc(9*var(--u)));font-weight:800;letter-spacing:-.035em;line-height:.84;color:var(--amarelo);font-variant-numeric:tabular-nums}
 .tv-big.zerado{color:var(--ink)}
-.tv-sub{margin:1.4vh 0 0;font-size:clamp(1rem,1.85vw,5.51rem);color:var(--ink-2);font-weight:400;line-height:1.25}
+.tv-sub{margin:calc(.55*var(--u)) 0 0;font-size:max(15px,calc(2.35*var(--u)));color:var(--ink-2);font-weight:400;line-height:1.25}
 .tv-sub b{color:var(--ink);font-weight:700}
-.tv-dir{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:1.4vh;padding-bottom:1vh;flex:none}
-.tv .pill{font-size:clamp(.8rem,1.35vw,3.99rem);padding:.9vh 1.6vw;letter-spacing:.14em}
-.tv .pill::before{width:clamp(8px,.75vw,34.2px);height:clamp(8px,.75vw,34.2px)}
-.tv-dir .nota{margin:0;font-size:clamp(.8rem,1.15vw,3.42rem);color:var(--ink-3)}
-.tv-dir .nota b{color:var(--ink-2);font-weight:600}
+.tv-dir{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:calc(.8*var(--u));padding-bottom:calc(.5*var(--u));flex:none}
+.tv .pill{font-size:max(12px,calc(1.8*var(--u)));padding:calc(.55*var(--u)) calc(1.3*var(--u));letter-spacing:.1em}
+.tv .pill::before{width:max(8px,calc(.75*var(--u)));height:max(8px,calc(.75*var(--u)))}
+.tv-dir .nota{margin:0;font-size:max(12px,calc(1.45*var(--u)));line-height:1.3}
+.tv-dir .nota b{color:var(--ink-2);font-weight:700}
 
-.tv .track{height:clamp(22px,2.2vw,98.8px);border-radius:999px}
+.tv .track{height:max(16px,calc(1.5*var(--u)));border-radius:999px}
 /* o marcador de 2px do painel dá 1,3 mm numa TV de 55" — invisível */
-.tv .marca{width:clamp(4px,.42vw,18px);top:-.9vh;bottom:-.9vh;border-radius:999px;background:var(--ink-2)}
-.tv .marca span{top:calc(100% + .7vh);bottom:auto;font-size:clamp(.6rem,.8vw,2.3rem);color:var(--ink-2);letter-spacing:.16em}
+.tv .marca{width:max(4px,calc(.4*var(--u)));top:calc(-.4*var(--u));bottom:calc(-.4*var(--u));border-radius:999px;background:var(--ink-2)}
+.tv .marca span{top:calc(100% + .45*var(--u));bottom:auto;font-size:max(9px,calc(1.15*var(--u)));letter-spacing:.18em}
 /* amarelo chapado: o degradê perde 40% de contraste na ponta esquerda e, na
    gama de uma TV, a barra parece estar apagando em vez de cheia */
 .tv .fill{border-radius:999px;background:var(--amarelo)}
-.tv .ticks{font-size:clamp(.62rem,.86vw,2.47rem);margin-top:1vh}
+.tv .ticks{font-size:max(10px,calc(1.15*var(--u)));margin-top:calc(.5*var(--u));letter-spacing:.18em}
 
-.tv-faixa{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2vw;margin-top:2.4vh}
-.tv-faixa .bloco{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1.8vh 1.6vw}
-.tv-faixa .rot{font-size:clamp(.66rem,.92vw,2.66rem)}
-.tv-faixa .val{margin:.9vh 0 0;font-size:clamp(1.3rem,2.9vw,8.36rem);font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
-.tv-faixa .val.acc{color:var(--amarelo)}
-.tv-faixa .nota{margin:.8vh 0 0;font-size:clamp(.72rem,1vw,2.85rem);color:var(--ink-3)}
+/* ---- corpo: a lista manda, o mês acompanha ----
+   minmax(0,...) não é enfeite: sem ele um item de grade tem min-width:auto e
+   "Consultorio de Neurologia Dra Denise Leal" estoura a coluna. */
+.tv-corpo{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);gap:calc(1.1*var(--u));margin-top:calc(1.1*var(--u))}
+.tv-lista,.tv-lado .bloco{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.tv-lista{min-height:0;overflow:hidden;padding:calc(1.2*var(--u)) calc(1.5*var(--u));display:flex;flex-direction:column}
+.tv-lista h3{margin:0 0 calc(.7*var(--u));display:flex;justify-content:space-between;align-items:baseline;gap:calc(1*var(--u));font-size:max(10px,calc(1.45*var(--u)));font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2);line-height:1.1}
+.tv-lista h3 .conta{font-weight:600;letter-spacing:.06em;text-transform:none;color:var(--ink-3);flex:none}
+.tv-linhas{position:relative;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+/* zebra no lugar do filete: rgba(255,255,255,.06) simplesmente não existe a 4m */
+.tv-linha{flex:none;display:flex;align-items:baseline;gap:calc(1.1*var(--u));padding:calc(.5*var(--u)) calc(.6*var(--u));margin-inline:calc(-.6*var(--u));border-radius:calc(.3*var(--u));font-size:max(14px,calc(2.05*var(--u)));line-height:1.15}
+/* display:flex é regra de autor e vence o [hidden] da folha do navegador: sem
+   esta linha, ajustarLista() marca a linha como escondida e ela desenha assim
+   mesmo, cortada pelo overflow */
+.tv-linha[hidden]{display:none}
+.tv-linha:nth-child(even){background:rgba(255,255,255,.032)}
+.tv-linha .quando{font-size:.72em;font-variant-numeric:tabular-nums;flex:none;min-width:4.2em}
+.tv-linha .quem{flex:1;min-width:0;color:var(--ink);font-weight:600;letter-spacing:-.008em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tv-linha .val{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--amarelo);flex:none}
+.tv-linha .cent{font-size:.68em;color:rgba(255,205,28,.62);letter-spacing:0}
+.tv-lista .vazio{font-size:max(13px,calc(1.8*var(--u)))}
 
-.tv-lista{flex:1;min-height:0;overflow:hidden;margin-top:1.6vh;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1.8vh 1.6vw;display:flex;flex-direction:column}
-.tv-lista h3{margin:0 0 1.4vh;font-size:clamp(.68rem,.95vw,2.76rem);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)}
-.tv-linha{display:flex;align-items:baseline;gap:1.4vw;padding:1vh 0;border-top:1px solid rgba(255,255,255,.06);font-size:clamp(.95rem,1.55vw,4.56rem)}
-.tv-linha:first-of-type{border-top:0}
-.tv-linha .quando{color:var(--ink-3);font-size:.78em;font-variant-numeric:tabular-nums;flex:none;min-width:4.2em}
-.tv-linha .quem{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tv-linha .val{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--amarelo)}
-.tv-lista .vazio{font-size:clamp(.9rem,1.35vw,3.8rem)}
-.tv-alerta{margin-top:1.6vh;border:1px solid rgba(255,125,99,.5);background:rgba(255,125,99,.14);color:var(--alerta);border-radius:12px;padding:1.2vh 1.6vw;font-size:clamp(.9rem,1.5vw,4.18rem);font-weight:700;letter-spacing:.04em}
-.tv .rodape{margin-top:1.4vh;font-size:clamp(.72rem,1vw,2.85rem)}
+/* linhas iguais: com altura automática os blocos viravam cartões achatados
+   quando sobra altura numa TV cheia */
+.tv-lado{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:calc(1.1*var(--u));min-height:0}
+.tv-lado .bloco{display:flex;flex-direction:column;justify-content:center;padding:calc(1*var(--u)) calc(1.3*var(--u));min-height:0}
+/* um só bloco em destaque, como o painel de computador faz */
+.tv-lado .bloco.destaque{background:linear-gradient(160deg,rgba(255,205,28,.15),rgba(255,205,28,.03));border-color:rgba(255,205,28,.3)}
+.tv-lado .rot{font-size:max(10px,calc(1.45*var(--u)));line-height:1.1}
+.tv-lado .val{margin:calc(.45*var(--u)) 0 0;font-size:max(20px,calc(3.5*var(--u)));font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.tv-lado .val.acc{color:var(--amarelo)}
+.tv-lado .nota{margin:calc(.45*var(--u)) 0 0;font-size:max(11px,calc(1.45*var(--u)));line-height:1.3}
+.tv-lado .nota b{color:var(--ink);font-weight:700}
+.tv-lado .mini{margin-top:calc(.6*var(--u))}
+.tv-lado .mini .track{position:relative;height:max(5px,calc(.42*var(--u)));border-radius:999px;background:rgba(255,255,255,.12);border:0;overflow:hidden}
+.tv-lado .mini .fill{position:absolute;inset:0 auto 0 0;border-radius:999px}
+
+.tv-alerta{margin-top:calc(.9*var(--u));border:1px solid rgba(255,125,99,.5);background:rgba(255,125,99,.14);color:var(--alerta);border-radius:12px;padding:calc(.7*var(--u)) calc(1.4*var(--u));font-size:max(14px,calc(2.05*var(--u)));font-weight:700;letter-spacing:.02em}
+.tv .rodape{margin-top:calc(.7*var(--u));font-size:max(10px,calc(1.45*var(--u)))}
 /* na TV, rótulo cinza-claro some: --ink-3 dá 4,19:1 sobre o card, abaixo do
    mínimo legível. Tudo que é rótulo sobe um nível de contraste. */
 .tv .rot,.tv .nota,.tv .ticks,.tv .rodape,.tv .vazio,.tv-linha .quando{color:var(--ink-2)}
 /* na TV ninguém clica: o botão de sair da festa não tem serventia */
 .tv .btn-ghost{display:none}
-.tv .party-title{font-size:clamp(3rem,10vw,30.4rem)}
+.tv .party-title{font-size:max(48px,calc(10*var(--u)))}
+/* rótulo fino sobre fundo escuro perde peso aparente: sobe de 600 para 700 */
+.tv .rot,.tv-lista h3{font-weight:700}
 
 /* ---------- festa ---------- */
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:78;display:none}
@@ -516,7 +553,9 @@ body.festa #fx{display:block}
       ? ((comFesta ? festaHTML(d) : "") + tvHTML(d))
       : (tela === "historico" ? historicoHTML(d) : ((comFesta ? festaHTML(d) : "") + painelHTML(d)));
     ligarEventos(d);
-    if(modoTV) ajustarLista();
+    /* duas passadas: a primeira mede antes da fonte assentar e erra por uma
+       linha na primeira abertura da tela */
+    if(modoTV){ ajustarLista(); requestAnimationFrame(ajustarLista); }
     /* na TV ninguém clica em "ver o painel", e os fogos rodariam a 60fps até
        o fim do mês: a festa toca por um minuto e meio e sai de cena sozinha */
     if(comFesta && modoTV) agendarFimDaFesta();
@@ -672,17 +711,27 @@ body.festa #fx{display:block}
      no rodapé faz a tela parecer que travou no meio do carregamento, então a
      conta é feita depois de desenhar, não chutada no CSS. */
   function ajustarLista(){
-    var lista = document.querySelector(".tv-lista");
-    if(!lista) return;
-    var h3 = lista.querySelector("h3"), linhas = lista.querySelectorAll(".tv-linha");
-    if(!h3 || !linhas.length) return;
-    var cs = getComputedStyle(lista);
-    var util = lista.clientHeight - h3.offsetHeight
-      - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
-      - parseFloat(getComputedStyle(h3).marginBottom);
-    var alt = linhas[0].offsetHeight;
-    var cabem = alt > 0 ? Math.max(Math.floor(util / alt), 1) : linhas.length;
-    for(var i = 0; i < linhas.length; i++) linhas[i].hidden = i >= cabem;
+    var caixa = document.querySelector(".tv-linhas");
+    if(!caixa) return;
+    var linhas = caixa.querySelectorAll(".tv-linha"), i, j;
+    if(!linhas.length) return;
+    /* Mede cada linha em vez de dividir a altura por uma média: dividir errava
+       por um pixel e deixava a última linha cortada ao meio, que é justamente
+       o que faz a tela parecer travada no meio do carregamento. */
+    for(i = 0; i < linhas.length; i++) linhas[i].hidden = false;
+    for(i = 1; i < linhas.length; i++){
+      if(linhas[i].offsetTop + linhas[i].offsetHeight > caixa.clientHeight + 1){
+        for(j = i; j < linhas.length; j++) linhas[j].hidden = true;
+        break;
+      }
+    }
+  }
+
+  /* Centavos rebaixados: o olho compara reais, o centavo é detalhe. É o gesto
+     que mais aproxima a lista de uma tela financeira e menos de um cardápio. */
+  function valorTV(v){
+    var p = brlc(v).split(",");
+    return esc(p[0]) + (p[1] ? '<span class="cent">,' + esc(p[1]) + '</span>' : "");
   }
 
   function tvHTML(d){
@@ -707,36 +756,45 @@ body.festa #fx{display:block}
     var agora = d.hojeUtil && !d.batida ? fracaoExpediente(d.ag.h, d.ag.m) * 100 : 0;
     h.push('<div class="barra"><div class="track" role="progressbar" aria-label="Progresso da meta de hoje">'
       + '<div class="fill" style="width:calc(' + pctDia.toFixed(2) + '% - 2px)"></div>'
-      + (agora > 1 && agora < 99 ? '<div class="marca" style="left:' + agora.toFixed(2) + '%"><span>agora</span></div>' : '')
-      + '</div></div>');
+      + (agora > 0.5 && agora < 96 ? '<div class="marca" style="left:' + agora.toFixed(2) + '%"><span>agora</span></div>' : '')
+      + '</div><div class="ticks"><span>0</span><span>' + brl(d.metaHoje/2) + '</span><span>' + brl(d.metaHoje) + '</span></div></div>');
 
-    h.push('<section class="tv-faixa">'
-      + '<div class="bloco"><p class="rot">' + esc(nomeMes(d.mes)) + '</p>'
-      + '<p class="val acc tab">' + brl(d.acumulado) + '</p>'
-      + '<p class="nota">de ' + brl(d.metaMes) + ' &middot; ' + (d.pct*100).toFixed(0) + '% da meta</p></div>'
-      + '<div class="bloco"><p class="rot">Falta para bater</p>'
-      + '<p class="val tab">' + brl(d.falta) + '</p>'
-      + '<p class="nota">' + (d.batida ? "meta do mês batida" : plural(d.uteisRestantes, "dia útil", "dias úteis") + " até o fim do mês") + '</p></div>'
-      + '<div class="bloco"><p class="rot">Recebimentos hoje</p>'
-      + '<p class="val tab">' + d.doDia.length + '</p>'
-      + '<p class="nota">' + (d.doDia.length ? "ticket médio de " + brl(d.hojeTotal/d.doDia.length) : "nenhum ainda") + '</p></div>'
-      + '</section>');
+    /* Mesma divisão do painel de computador: a lista manda, o mês acompanha na
+       coluna estreita. Empilhado, o herói comia a tela e sobravam duas linhas
+       de entrada — justamente a parte viva do painel. */
+    h.push('<div class="tv-corpo">');
 
-    /* 5 cabem inteiras em 1080p — com mais, a última aparece cortada ao meio e
-       a tela passa a impressão de que faltou carregar alguma coisa */
     /* desenha com folga: ajustarLista() apaga depois as que não couberam */
-    var ult = d.doMes.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,10);
+    var ult = d.doMes.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,14);
     /* "hoje" repetido em toda linha é ruído: a data só aparece quando muda */
     var soDeHoje = ult.every(function(l){ return l.dia === d.hoje; });
-    h.push('<section class="tv-lista"><h3>' + (soDeHoje ? "Entrou hoje" : "Últimas entradas") + '</h3>'
-      + (ult.length ? ult.map(function(l){
+    h.push('<section class="tv-lista"><h3><span>' + (soDeHoje ? "Entrou hoje" : "Últimas entradas") + '</span>'
+      + '<span class="conta">' + (d.doDia.length ? plural(d.doDia.length, "recebimento", "recebimentos") + " hoje" : "") + '</span></h3>'
+      + (ult.length ? '<div class="tv-linhas">' + ult.map(function(l){
           return '<div class="tv-linha">'
             + (soDeHoje ? "" : '<span class="quando tab">'
                 + (l.dia === d.hoje ? "hoje" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7)) + '</span>')
             + '<span class="quem">' + esc(nomeCurto(l.cliente) || "sem identificação") + '</span>'
-            + '<span class="val tab">' + brlc(l.valor) + '</span></div>';
-        }).join("") : '<p class="vazio">Nenhuma entrada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>')
+            + '<span class="val tab">' + valorTV(l.valor) + '</span></div>';
+        }).join("") + '</div>' : '<p class="vazio">Nenhuma entrada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>')
       + '</section>');
+
+    var pctMes = Math.min(Math.max(d.pct, 0), 1) * 100;
+    h.push('<aside class="tv-lado">'
+      + '<div class="bloco"><p class="rot">' + esc(nomeMes(d.mes)) + '</p>'
+      + '<p class="val acc tab">' + brl(d.acumulado) + '</p>'
+      + '<div class="mini"><div class="track"><div class="fill" style="width:' + pctMes.toFixed(2) + '%"></div></div></div>'
+      + '<p class="nota">de ' + brl(d.metaMes) + ' &middot; <b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b> da meta</p></div>'
+      /* um só bloco em destaque, como o painel de computador faz */
+      + '<div class="bloco destaque"><p class="rot">Falta para bater</p>'
+      + '<p class="val acc tab">' + brl(d.falta) + '</p>'
+      + '<p class="nota">' + (d.batida ? "meta do mês batida" : "em " + plural(d.uteisRestantes, "dia útil", "dias úteis")) + '</p></div>'
+      + '<div class="bloco"><p class="rot">Ritmo necessário</p>'
+      + '<p class="val tab">' + (d.uteisRestantes > 0 && !d.batida ? brl(d.ritmoNec) : "—") + '</p>'
+      + '<p class="nota">' + (d.doDia.length ? "ticket médio hoje de " + brl(d.hojeTotal/d.doDia.length) : "por dia útil até fechar") + '</p></div>'
+      + '</aside>');
+
+    h.push('</div>');
 
     h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
       + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + '</span>'
