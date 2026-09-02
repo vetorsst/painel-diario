@@ -127,6 +127,11 @@ body{
 .mini:hover{color:var(--alerta);background:rgba(255,125,99,.12)}
 .mini.confirma{color:var(--alerta);font-size:.7rem;font-weight:700;letter-spacing:.08em}
 .vazio{margin:6px 0 0;font-size:.8rem;color:var(--ink-3)}
+.tag-fonte{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:5px;border:1px solid rgba(255,205,28,.32);background:rgba(255,205,28,.1);color:var(--amarelo);font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;vertical-align:1px}
+.alerta-dupla{width:100%;margin:14px 0 0;border:1px solid rgba(255,125,99,.4);background:rgba(255,125,99,.1);color:var(--ink-2);border-radius:12px;padding:12px 16px;font-size:.78rem;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.alerta-dupla b{color:var(--alerta)}
+.alerta-dupla button{margin-left:auto;background:none;border:1px solid rgba(255,125,99,.5);color:var(--alerta);border-radius:8px;padding:6px 12px;font:inherit;font-size:.74rem;font-weight:600;cursor:pointer}
+.alerta-dupla button:hover{background:rgba(255,125,99,.16)}
 .rodape{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.7rem;color:var(--ink-3);letter-spacing:.04em}
 
 /* ---------- meta do mês ---------- */
@@ -192,6 +197,63 @@ body{
 .banner{width:100%;margin:0 0 14px;border:1px solid rgba(255,205,28,.4);background:linear-gradient(90deg,rgba(255,205,28,.2),rgba(255,205,28,.05));color:var(--amarelo);border-radius:12px;padding:13px 18px;font:inherit;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-align:left}
 .banner:hover{background:rgba(255,205,28,.24)}
 
+/* ---------- modo TV (?tv) ----------
+   Tela de parede: ninguém clica, ninguém chega perto. Tudo é lido de 3 a 6
+   metros, então os tamanhos saem de vw — a TV é 16:9 e a largura manda. */
+body.tv{overflow:hidden}
+/* altura fixa, não mínima: com min-height a lista empurrava o rodapé para fora
+   da tela, e numa TV o que passa da dobra simplesmente não existe */
+.tv .wrap{max-width:none;height:100vh;overflow:hidden;display:flex;flex-direction:column;padding:2.4vh 2.6vw 2vh}
+.tv .topo{padding-bottom:1.6vh}
+.tv .logo svg{width:clamp(26px,2.2vw,102.6px);height:clamp(26px,2.2vw,102.6px)}
+.tv .logo b{font-size:clamp(1rem,1.35vw,3.99rem)}
+.tv .logo span{font-size:clamp(.6rem,.72vw,2.09rem);margin-top:5px}
+.tv .relogio .hora{font-size:clamp(1.6rem,2.9vw,8.36rem)}
+.tv .relogio .dia{font-size:clamp(.72rem,1vw,2.85rem)}
+
+.tv-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:3vw;padding:2.6vh 0 1.4vh}
+.tv-hero .rot{font-size:clamp(.75rem,1.05vw,3.04rem);letter-spacing:.2em}
+.tv-big{margin:.6vh 0 0;font-size:clamp(4rem,9.6vw,28.5rem);font-weight:900;letter-spacing:-.05em;line-height:.82;color:var(--amarelo);font-variant-numeric:tabular-nums}
+.tv-big.zerado{color:var(--ink)}
+.tv-sub{margin:1.4vh 0 0;font-size:clamp(1rem,1.85vw,5.51rem);color:var(--ink-2);font-weight:400;line-height:1.25}
+.tv-sub b{color:var(--ink);font-weight:700}
+.tv-dir{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:1.4vh;padding-bottom:1vh;flex:none}
+.tv .pill{font-size:clamp(.8rem,1.35vw,3.99rem);padding:.9vh 1.6vw;letter-spacing:.14em}
+.tv .pill::before{width:clamp(8px,.75vw,34.2px);height:clamp(8px,.75vw,34.2px)}
+.tv-dir .nota{margin:0;font-size:clamp(.8rem,1.15vw,3.42rem);color:var(--ink-3)}
+.tv-dir .nota b{color:var(--ink-2);font-weight:600}
+
+.tv .track{height:clamp(22px,2.2vw,98.8px);border-radius:999px}
+/* amarelo chapado: o degradê perde 40% de contraste na ponta esquerda e, na
+   gama de uma TV, a barra parece estar apagando em vez de cheia */
+.tv .fill{border-radius:999px;background:var(--amarelo)}
+.tv .ticks{font-size:clamp(.62rem,.86vw,2.47rem);margin-top:1vh}
+
+.tv-faixa{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2vw;margin-top:2.4vh}
+.tv-faixa .bloco{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1.8vh 1.6vw}
+.tv-faixa .rot{font-size:clamp(.66rem,.92vw,2.66rem)}
+.tv-faixa .val{margin:.9vh 0 0;font-size:clamp(1.3rem,2.9vw,8.36rem);font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.tv-faixa .val.acc{color:var(--amarelo)}
+.tv-faixa .nota{margin:.8vh 0 0;font-size:clamp(.72rem,1vw,2.85rem);color:var(--ink-3)}
+
+.tv-lista{flex:1;min-height:0;overflow:hidden;margin-top:1.6vh;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1.8vh 1.6vw;display:flex;flex-direction:column}
+.tv-lista h3{margin:0 0 1.4vh;font-size:clamp(.68rem,.95vw,2.76rem);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)}
+.tv-linha{display:flex;align-items:baseline;gap:1.4vw;padding:1.15vh 0;border-top:1px solid rgba(255,255,255,.06);font-size:clamp(.95rem,1.55vw,4.56rem)}
+.tv-linha:first-of-type{border-top:0}
+.tv-linha .quando{color:var(--ink-3);font-size:.78em;font-variant-numeric:tabular-nums;flex:none;min-width:4.2em}
+.tv-linha .quem{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tv-linha .val{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--amarelo)}
+.tv-lista .vazio{font-size:clamp(.9rem,1.35vw,3.8rem)}
+.tv-alerta{margin-top:1.6vh;border:1px solid rgba(255,125,99,.5);background:rgba(255,125,99,.14);color:var(--alerta);border-radius:12px;padding:1.2vh 1.6vw;font-size:clamp(.9rem,1.5vw,4.18rem);font-weight:700;letter-spacing:.04em}
+.tv .rodape{margin-top:1.4vh;font-size:clamp(.72rem,1vw,2.85rem)}
+/* na TV, rótulo cinza-claro some: --ink-3 dá 4,19:1 sobre o card, abaixo do
+   mínimo legível. Tudo que é rótulo sobe um nível de contraste. */
+.tv .rot,.tv .nota,.tv .ticks,.tv .rodape,.tv .vazio,.tv-linha .quando{color:var(--ink-2)}
+.tv .bloco,.tv-lista{border-color:rgba(255,255,255,.2);background:#12384c}
+/* na TV ninguém clica: o botão de sair da festa não tem serventia */
+.tv .btn-ghost{display:none}
+.tv .party-title{font-size:clamp(3rem,10vw,30.4rem)}
+
 /* ---------- festa ---------- */
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:78;display:none}
 body.festa #fx{display:block}
@@ -230,8 +292,7 @@ body.festa #fx{display:block}
 <body>
 <div id="app"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
-<script type="application/json" id="estado">{"metaMes":250000,"lancamentos":[{"id":"mth8ekzy8ywf1","ts":1788180340174,"dia":"2026-08-31","hora":9,"min":45,"valor":1019,"vendedor":"","cliente":"LUMO SOLUTIONS"},{"id":"mth8ivpxmg3g6","ts":1788180540693,"dia":"2026-08-31","hora":9,"min":49,"valor":1870.79,"vendedor":"","cliente":"STK"},{"id":"mth8j89muoog1","ts":1788180556954,"dia":"2026-08-31","hora":9,"min":49,"valor":5714.05,"vendedor":"","cliente":"Asaas"},{"id":"mth8qnoel204f","ts":1788180903518,"dia":"2026-08-31","hora":9,"min":55,"valor":759.81,"vendedor":"","cliente":"AG FORROS"},{"id":"mth9ct436hdn2","ts":1788181936995,"dia":"2026-08-31","hora":10,"min":12,"valor":1235.28,"vendedor":"","cliente":"Edson Ramos"},{"id":"mthaqblt2wyjz","ts":1788184247105,"dia":"2026-08-31","hora":10,"min":50,"valor":60,"vendedor":"","cliente":"Exames"},{"id":"mthbgmd6q4inu","ts":1788185474106,"dia":"2026-08-31","hora":11,"min":11,"valor":999.8,"vendedor":"Felipe","cliente":"CIAA"},{"id":"mthcm2ivea5k6","ts":1788187407943,"dia":"2026-08-31","hora":11,"min":43,"valor":99.9,"vendedor":"","cliente":"GLIKO"},{"id":"mthe6znastjid","ts":1788190063606,"dia":"2026-08-31","hora":12,"min":27,"valor":300,"vendedor":"","cliente":"André aparecido"},{"id":"mthg6r1vuka1t","ts":1788193411699,"dia":"2026-08-31","hora":13,"min":23,"valor":500,"vendedor":"","cliente":"Robson godoy"},{"id":"mthj5v2l19km3","ts":1788198409101,"dia":"2026-08-31","hora":14,"min":46,"valor":360,"vendedor":"","cliente":"Jeferson Fernandes"},{"id":"mthkz7ryi66ey","ts":1788201458206,"dia":"2026-08-31","hora":15,"min":37,"valor":1060,"vendedor":"","cliente":"ghedini"},{"id":"mthl1f1i74z1b","ts":1788201560934,"dia":"2026-08-31","hora":15,"min":39,"valor":199,"vendedor":"","cliente":"S & R"},{"id":"mthltr02wbu3x","ts":1788202882802,"dia":"2026-08-31","hora":16,"min":1,"valor":649.95,"vendedor":"","cliente":"J camargo"},{"id":"mthn3edrs2w5t","ts":1788205012623,"dia":"2026-08-31","hora":16,"min":36,"valor":2100,"vendedor":"","cliente":"Cotecons"},{"id":"mthndm43fi3e4","ts":1788205489203,"dia":"2026-08-31","hora":16,"min":44,"valor":100,"vendedor":"","cliente":"Castro de borda"},{"id":"mthnirsmjzrtt","ts":1788205729847,"dia":"2026-08-31","hora":16,"min":48,"valor":400,"vendedor":"","cliente":"armazem do granel"},{"id":"mthoywm0bns7n","ts":1788208162200,"dia":"2026-08-31","hora":17,"min":29,"valor":550,"vendedor":"","cliente":"Adubos real"},{"id":"mthp91yao8rjo","ts":1788208635682,"dia":"2026-08-31","hora":17,"min":37,"valor":229,"vendedor":"","cliente":""},{"id":"mthpmcs8mfdy6","ts":1788209256248,"dia":"2026-08-31","hora":17,"min":47,"valor":821.51,"vendedor":"","cliente":"padaria reis"},{"id":"mthpn358u1kmj","ts":1788209290412,"dia":"2026-08-31","hora":17,"min":48,"valor":462.88,"vendedor":"","cliente":"Souza"},{"id":"mthqmsy3khilh","ts":1788210956811,"dia":"2026-08-31","hora":18,"min":15,"valor":297,"vendedor":"","cliente":"escola da vida"},{"id":"mths4p79wco7q","ts":1788213471381,"dia":"2026-08-31","hora":18,"min":57,"valor":712.5,"vendedor":"","cliente":"Bernadete"}]}
-</script>
+<script type="application/json" id="estado">{"metaMes":250000,"lancamentos":[],"ocultos":[]}</script>
 <script id="app-script">
 (function(){
   "use strict";
@@ -247,6 +308,10 @@ body.festa #fx{display:block}
                     Preenchido -> todo mundo vê o mesmo número
      API_TOKEN      (opcional) enviado como "Authorization: Bearer ..."
      SYNC_SEGUNDOS  de quanto em quanto tempo busca o que os outros lançaram
+     CSV_RECEITAS   (opcional) URL do CSV publicado da conciliação bancária.
+                    Preenchido -> as receitas entram sozinhas, com o nome de
+                    quem pagou, e ninguém precisa lançar uma a uma.
+     CSV_SEGUNDOS   de quanto em quanto tempo relê a planilha
 
      Contrato da API (dois métodos na mesma URL):
        GET  -> {"metaMes":250000,"lancamentos":[ ... ]}   (ou só o array)
@@ -258,7 +323,9 @@ body.festa #fx{display:block}
     META_MES: 250000,
     API_URL: "",
     API_TOKEN: "",
-    SYNC_SEGUNDOS: 15
+    SYNC_SEGUNDOS: 15,
+    CSV_RECEITAS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQUoDMOQjexi5qaS6f9GhYnmZebauOguIJoym1n9TdS3ITBAwdyEcCAnOKbSUJLsQ5nFdQocDAtSxOP/pub?gid=818195436&single=true&output=csv",
+    CSV_SEGUNDOS: 300
   };
   /* ====== estado ====== */
   var META_MES_PADRAO = CONFIG.META_MES || 250000;
@@ -267,20 +334,31 @@ body.festa #fx{display:block}
   var somenteLeitura = false, semSalvar = false, vendedorSel = "", aviso = "", avisoOk = false, confirmarId = "", rascunho = null;
   var festaVista = false, tela = "painel", filtro = "", diasAbertos = {}, avisoHist = "";
   var editandoId = "", avisoEd = "", avisoMeta = "", avisoMetaOk = false, focarEdicao = false, recarregarMetas = false;
-  try { festaVista = sessionStorage.getItem("festa-vista") === mesDe(hojeSP()); } catch(e){}
+  /* ?tv na URL: tela de parede — nada em que clicar, tudo lido de longe */
+  var modoTV = /(^|[?&#])tv(?:[=&#]|$)/i.test(location.search + location.hash);
+  if(modoTV) somenteLeitura = true;
+  /* a festa mora no localStorage, não no sessionStorage: na TV o PC reinicia
+     toda manhã, e os fogos voltavam a explodir todo dia do mês já batido */
+  var festaMes = "", avisoGrave = "";
+  try { festaMes = localStorage.getItem("festa-vista") || ""; } catch(e){}
   try { tela = sessionStorage.getItem("tela") === "historico" ? "historico" : "painel"; } catch(e){}
+  /* festaVista só é resolvido lá no ciclo, no fim do arquivo: FMT (o fuso de
+     São Paulo) nasce depois deste bloco, e hojeSP() aqui estourava. O try/catch
+     que existia engolia a exceção em silêncio — e o efeito era a festa
+     recomeçando do zero a cada vez que a página abria. */
 
   function lerEstado(){
     try {
       var s = JSON.parse(document.getElementById("estado").textContent);
       if(!s || typeof s !== "object") throw 0;
       if(!Array.isArray(s.lancamentos)) s.lancamentos = [];
+      if(!Array.isArray(s.ocultos)) s.ocultos = [];
       if(typeof s.metaMes !== "number" || !(s.metaMes > 0)) s.metaMes = META_MES_PADRAO;
       /* formato antigo: meta diária fixa e metas por dia. A meta do dia agora
          sai da meta do mês, então esses campos deixam de ser lidos e gravados. */
       delete s.meta; delete s.metas;
       return s;
-    } catch(e){ return { metaMes: META_MES_PADRAO, lancamentos: [] }; }
+    } catch(e){ return { metaMes: META_MES_PADRAO, lancamentos: [], ocultos: [] }; }
   }
   /* ====== tempo (America/Sao_Paulo) ====== */
   var FMT = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
@@ -368,6 +446,15 @@ body.festa #fx{display:block}
     var ritmoNec = uteisRestantes > 0 ? falta / uteisRestantes : 0;
     var esperado = uteisTotal > 0 ? metaMes * (uteisDecorridos / uteisTotal) : 0;
 
+    /* A meta do dia é o ritmo necessário congelado no realizado de ONTEM. O
+       ritmo necessário se recalcula a cada venda e por isso encolhe durante o
+       expediente — bom como bússola do mês, péssimo como alvo do dia, porque o
+       alvo fugiria junto com o dinheiro que entra. Congelada, a barra do dia
+       enche de verdade e o número não muda debaixo de quem está olhando. */
+    var ateOntem = acumulado - hojeTotal;
+    var metaHoje = uteisRestantes > 0 ? Math.max(metaMes - ateOntem, 0) / uteisRestantes : 0;
+    var pctHoje = metaHoje > 0 ? hojeTotal / metaHoje : (hojeTotal > 0 ? 1 : 0);
+
     var situacao;
     if(batida) situacao = { txt:"META BATIDA", cls:"ok" };
     else if(uteisRestantes <= 0) situacao = { txt:"MÊS ENCERRADO", cls:"ruim" };
@@ -380,6 +467,7 @@ body.festa #fx{display:block}
       acumulado:acumulado, hojeTotal:hojeTotal, metaMes:metaMes, falta:falta, batida:batida,
       uteisTotal:uteisTotal, uteisDecorridos:uteisDecorridos, uteisRestantes:uteisRestantes, hojeUtil:hojeUtil,
       ritmoAtual:ritmoAtual, ritmoNec:ritmoNec, esperado:esperado,
+      metaHoje:metaHoje, pctHoje:pctHoje,
       projecao: ritmoAtual * uteisTotal,
       pct: metaMes > 0 ? acumulado/metaMes : 0,
       situacao:situacao
@@ -397,16 +485,33 @@ body.festa #fx{display:block}
     if(recarregarMetas){ delete vals["meta-mes"]; recarregarMetas = false; }
 
     var d = calcular();
-    var comFesta = tela === "painel" && d.batida && !festaVista;
+    /* a aba da TV atravessa a virada do mês sem nunca recarregar: sem isto, a
+       festa do mês novo ficaria marcada como já vista desde o mês passado */
+    if(festaVista && festaMes !== d.mes) festaVista = false;
+    var comFesta = (tela === "painel" || modoTV) && d.batida && !festaVista;
     document.body.classList.toggle("festa", comFesta);
     var app = document.getElementById("app");
-    app.innerHTML = tela === "historico" ? historicoHTML(d) : ((comFesta ? festaHTML(d) : "") + painelHTML(d));
+    app.innerHTML = modoTV
+      ? ((comFesta ? festaHTML(d) : "") + tvHTML(d))
+      : (tela === "historico" ? historicoHTML(d) : ((comFesta ? festaHTML(d) : "") + painelHTML(d)));
     ligarEventos(d);
+    /* na TV ninguém clica em "ver o painel", e os fogos rodariam a 60fps até
+       o fim do mês: a festa toca por um minuto e meio e sai de cena sozinha */
+    if(comFesta && modoTV) agendarFimDaFesta();
 
     Object.keys(vals).forEach(function(id){ var e = document.getElementById(id); if(e && e.value !== vals[id]) e.value = vals[id]; });
     if(foco){ var f = document.getElementById(foco); if(f && f.focus){ f.focus(); try { if(sel != null && f.setSelectionRange) f.setSelectionRange(sel, sel); } catch(e){} } }
 
     if(comFesta) iniciarFogos(); else pararFogos();
+  }
+  var fimFesta = 0;
+  function agendarFimDaFesta(){
+    if(fimFesta) return;
+    fimFesta = setTimeout(function(){
+      fimFesta = 0; festaVista = true;
+      festaMes = mesDe(hojeSP()); try { localStorage.setItem("festa-vista", mesDe(hojeSP())); } catch(e){}
+      render();
+    }, 90000);
   }
   function irPara(t){
     tela = t; filtro = t === "historico" ? filtro : "";
@@ -428,6 +533,9 @@ body.festa #fx{display:block}
     if(d.batida && festaVista){
       h.push('<button class="banner" id="revive" style="margin-top:16px">🎉 Meta do mês batida — PIX maluco pra todo mundo · clique pra comemorar de novo</button>');
     }
+
+    /* antes do número grande: se houver contagem dobrada, é ele que está errado */
+    h.push(alertaDuplicataHTML());
 
     h.push('<section class="hero"><div><p class="rot">Realizado em ' + esc(nomeMes(d.mes)) + '</p>'
       + '<p class="big' + (d.acumulado ? "" : " zerado") + ' tab">' + brl(d.acumulado) + '</p>'
@@ -454,7 +562,7 @@ body.festa #fx{display:block}
       + kpi("Hoje", brl(d.hojeTotal),
             !d.hojeUtil ? "hoje não é dia útil"
               : (d.batida || d.uteisRestantes <= 0 ? plural(d.doDia.length, "venda lançada", "vendas lançadas")
-                 : "de " + brl(d.ritmoNec) + " que hoje precisa trazer"))
+                 : "de " + brl(d.metaHoje) + " que hoje precisa trazer"))
       + '</section>');
 
     h.push('<div class="colunas">' + lancamentosHTML(d)
@@ -462,12 +570,141 @@ body.festa #fx{display:block}
 
     h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
       + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' (seg–sex, sem descontar feriados)</span>'
-      + '<span>' + statusArmazenamento() + '</span></footer>');
+      + '<span>' + statusArmazenamento() + statusPlanilha() + '</span></footer>');
+    h.push('</div>');
+    return h.join("");
+  }
+
+  /* ====== tela da TV ======
+     Display puro: sem formulário, sem editar, sem apagar, sem histórico. O
+     número grande é a meta do dia, que é o que a equipe consegue mudar hoje. */
+
+  /* Às 8h ninguém está atrasado por ter R$ 0 na conta. O esperado sobe junto
+     com o relógio ao longo do expediente, e a pill compara contra ele. */
+  function fracaoExpediente(h, m){
+    var t = h*60 + m, ini = 8*60, fim = 18*60;
+    return t <= ini ? 0 : (t >= fim ? 1 : (t - ini) / (fim - ini));
+  }
+  function situacaoHoje(d){
+    if(!d.hojeUtil) return { txt:"SEM META HOJE", cls:"neutro" };
+    if(d.batida) return { txt:"MÊS BATIDO", cls:"ok" };
+    if(d.pctHoje >= 1) return { txt:"DIA BATIDO", cls:"ok" };
+    /* zero hoje pode ser dia fraco ou conciliação que ainda não chegou. O
+       painel não sabe a diferença, então não acusa a equipe de atraso por uma
+       planilha que ninguém atualizou ainda. */
+    if(d.hojeTotal <= 0 && CONFIG.CSV_RECEITAS) return { txt:"AGUARDANDO PLANILHA", cls:"neutro" };
+    var f = fracaoExpediente(d.ag.h, d.ag.m);
+    if(f <= 0) return { txt:"COMEÇANDO", cls:"neutro" };
+    var r = d.pctHoje / f;
+    if(r >= 1) return { txt:"ADIANTADO", cls:"ok" };
+    return r >= 0.7 ? { txt:"NO RITMO", cls:"at" } : { txt:"ATRASADO", cls:"ruim" };
+  }
+  /* a nota ao lado da pill fala do DIA — notaSituacao() fala do mês, e os dois
+     juntos no mesmo canto faziam a tela dizer duas coisas diferentes */
+  function notaHoje(d){
+    if(!d.hojeUtil || d.batida) return notaSituacao(d);
+    if(d.pctHoje >= 1) return "<b>" + brl(d.hojeTotal - d.metaHoje) + "</b> acima da meta de hoje";
+    return "faltam <b>" + brl(d.metaHoje - d.hojeTotal) + "</b> para a meta de hoje";
+  }
+  /* A conciliação chega em lote — às vezes só no fim do dia. Quando ainda não
+     entrou nada hoje, mostrar um "R$ 0" gigante faz o painel parecer quebrado,
+     então o número grande vira a meta e a última entrada real vira a legenda. */
+  function ultimaEntrada(){
+    var maior = "", total = 0;
+    estado.lancamentos.forEach(function(l){
+      if(l.dia > maior){ maior = l.dia; total = l.valor; }
+      else if(l.dia === maior) total += l.valor;
+    });
+    return maior ? { dia: maior, total: total } : null;
+  }
+  function diaCurto(dia){
+    var p = String(dia).split("-");
+    var s = new Intl.DateTimeFormat("pt-BR",{timeZone:"UTC",weekday:"short"})
+      .format(new Date(Date.UTC(+p[0], +p[1]-1, +p[2], 12))).replace(/\.?$/,"");
+    return s + " " + p[2] + "/" + p[1];
+  }
+  function tvHeroHTML(d){
+    var sit = situacaoHoje(d), h = [];
+    /* fim de semana não tem meta: o mês assume o número grande */
+    if(!d.hojeUtil){
+      h.push('<div><p class="rot">Realizado em ' + esc(nomeMes(d.mes)) + '</p>'
+        + '<p class="tv-big tab">' + brl(d.acumulado) + '</p>'
+        + '<p class="tv-sub">de <b>' + brl(d.metaMes) + '</b> &middot; hoje não é dia útil</p></div>');
+    } else if(d.hojeTotal > 0){
+      h.push('<div><p class="rot">Entrou hoje</p>'
+        + '<p class="tv-big tab">' + brl(d.hojeTotal) + '</p>'
+        + '<p class="tv-sub">de <b>' + brl(d.metaHoje) + '</b> que hoje precisa trazer &middot; <b>'
+        + (d.pctHoje*100).toFixed(0) + '%</b></p></div>');
+    } else {
+      var u = ultimaEntrada();
+      h.push('<div><p class="rot">Hoje precisa trazer</p>'
+        + '<p class="tv-big tab">' + brl(d.metaHoje) + '</p>'
+        + '<p class="tv-sub">ainda não entrou nada hoje'
+        + (u && u.dia !== d.hoje ? ' &middot; última entrada <b>' + esc(diaCurto(u.dia)) + '</b>, ' + brl(u.total) : '')
+        + '</p></div>');
+    }
+    h.push('<div class="tv-dir"><span class="pill ' + sit.cls + '">' + sit.txt + '</span>'
+      + '<p class="nota">' + notaHoje(d) + '</p></div>');
+    return '<section class="tv-hero">' + h.join("") + '</section>';
+  }
+  function tvHTML(d){
+    var h = [];
+    h.push('<div class="wrap">');
+    h.push('<header class="topo"><div class="logo">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 3.4h5.3L12 12.9l4.5-9.5h5.3L12 21.4z" fill="#FFCD1C"/></svg>'
+      + '<div><b>VETOR<i> SST</i></b><span>PAINEL COMERCIAL</span></div></div>'
+      + '<div class="relogio"><span class="dia">' + esc(dataExtenso()) + '</span>'
+      + '<span class="hora tab">' + pad(d.ag.h) + ':' + pad(d.ag.m) + '</span></div></header>');
+
+    /* leitura da planilha falhando é a única coisa que interrompe a tela: o
+       número fica velho e ninguém tem como desconfiar olhando de longe */
+    var alerta = avisoGrave ? avisoGrave
+      : (CONFIG.CSV_RECEITAS && !csvOk ? "Planilha não lida" + (csvStatus ? " · " + csvStatus : "")
+        : (planilhaVelha() ? "Planilha sem resposta há mais de 20 minutos" : ""));
+    if(alerta) h.push('<div class="tv-alerta">' + esc(alerta) + ' — os números podem estar velhos</div>');
+
+    h.push(tvHeroHTML(d));
+
+    var pctDia = Math.min(Math.max(d.pctHoje, 0), 1) * 100;
+    h.push('<div class="barra"><div class="track" role="progressbar" aria-label="Progresso da meta de hoje">'
+      + '<div class="fill" style="width:calc(' + pctDia.toFixed(2) + '% - 2px)"></div></div></div>');
+
+    h.push('<section class="tv-faixa">'
+      + '<div class="bloco"><p class="rot">' + esc(nomeMes(d.mes)) + '</p>'
+      + '<p class="val acc tab">' + brl(d.acumulado) + '</p>'
+      + '<p class="nota">de ' + brl(d.metaMes) + ' &middot; ' + (d.pct*100).toFixed(0) + '% da meta</p></div>'
+      + '<div class="bloco"><p class="rot">Falta para bater</p>'
+      + '<p class="val tab">' + brl(d.falta) + '</p>'
+      + '<p class="nota">' + (d.batida ? "meta do mês batida" : plural(d.uteisRestantes, "dia útil", "dias úteis") + " até o fim do mês") + '</p></div>'
+      + '<div class="bloco"><p class="rot">Recebimentos hoje</p>'
+      + '<p class="val tab">' + d.doDia.length + '</p>'
+      + '<p class="nota">' + (d.doDia.length ? "ticket médio de " + brl(d.hojeTotal/d.doDia.length) : "nenhum ainda") + '</p></div>'
+      + '</section>');
+
+    /* 5 cabem inteiras em 1080p — com mais, a última aparece cortada ao meio e
+       a tela passa a impressão de que faltou carregar alguma coisa */
+    var ult = d.doMes.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,5);
+    h.push('<section class="tv-lista"><h3>Últimas entradas</h3>'
+      + (ult.length ? ult.map(function(l){
+          return '<div class="tv-linha">'
+            + '<span class="quando tab">' + (l.dia === d.hoje ? "hoje" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7)) + '</span>'
+            + '<span class="quem">' + esc(l.cliente || "sem identificação") + '</span>'
+            + '<span class="val tab">' + brlc(l.valor) + '</span></div>';
+        }).join("") : '<p class="vazio">Nenhuma entrada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>')
+      + '</section>');
+
+    h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
+      + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + '</span>'
+      + '<span>' + (CONFIG.CSV_RECEITAS ? statusPlanilha().replace(/^ &middot; /, "") : statusArmazenamento()) + '</span></footer>');
     h.push('</div>');
     return h.join("");
   }
 
   function pad(n){ return (n < 10 ? "0" : "") + n; }
+  /* a conciliação guarda o dia, não a hora — então a linha que veio dela mostra
+     um traço no lugar do relógio, em vez de fingir uma hora que ninguém marcou */
+  function horaDe(l){ return l.origem === "csv" ? "—" : pad(l.hora) + ":" + pad(l.min); }
+  function selo(l){ return l.origem === "csv" ? ' <span class="tag-fonte">planilha</span>' : ""; }
   function porDia(){ return '<span style="font-size:.5em;font-weight:600;color:var(--ink-3)">/dia</span>'; }
   function notaSituacao(d){
     if(d.batida) return "<b>" + brl(d.acumulado - d.metaMes) + "</b> acima da meta do mês";
@@ -504,6 +741,30 @@ body.festa #fx{display:block}
       + '<p class="meta-atual">' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' no mês &middot; '
       + brl(d.uteisTotal > 0 ? d.metaMes/d.uteisTotal : 0) + ' por dia se dividida por igual.</p>'
       + '<p class="aviso' + (avisoMetaOk ? " ok" : "") + '" role="status">' + esc(avisoMeta) + '</p></form></div>';
+  }
+
+  /* ---- planilha e mão contando o mesmo dinheiro ----
+     Enquanto a conciliação não cobria o dia, tudo era lançado à mão. Quando a
+     planilha passa a cobrir esse mesmo dia, os dois somam e o mês incha. O
+     painel não escolhe sozinho o que apagar: avisa e deixa o botão à mão. */
+  function manuaisNaFaixaDaPlanilha(){
+    if(!CONFIG.CSV_RECEITAS) return [];
+    var dias = {};
+    estado.lancamentos.forEach(function(l){ if(l.origem === "csv") dias[l.dia] = 1; });
+    return estado.lancamentos.filter(function(l){ return l.origem !== "csv" && dias[l.dia]; });
+  }
+  function alertaDuplicataHTML(){
+    if(somenteLeitura) return "";
+    var m = manuaisNaFaixaDaPlanilha();
+    if(!m.length) return "";
+    var dias = {};
+    m.forEach(function(l){ dias[l.dia] = 1; });
+    var total = m.reduce(function(a,l){ return a + l.valor; }, 0);
+    return '<div class="alerta-dupla"><span><b>Contando duas vezes?</b> '
+      + plural(m.length, "lançamento digitado à mão", "lançamentos digitados à mão")
+      + ' (' + brl(total) + ') caem em ' + plural(Object.keys(dias).length, "dia", "dias")
+      + ' que a planilha já cobre.</span>'
+      + '<button id="limpar-manuais">apagar os manuais desses dias</button></div>';
   }
 
   /* ---- editar e remover um lançamento ---- */
@@ -551,9 +812,9 @@ body.festa #fx{display:block}
       + (somenteLeitura ? "" : " &middot; ✎ corrige, × apaga") + '</p>'
       + (itens.length ? '<ul class="lista">' + itens.map(function(l){
           if(editandoId === l.id) return '<li class="editando">' + edicaoHTML(l) + '</li>';
-          var q = (l.dia === d.hoje ? "" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7) + " ") + pad(l.hora) + ":" + pad(l.min);
-          var quem = [l.vendedor, l.cliente].filter(Boolean).join(" · ") || "sem identificação";
-          return '<li><span class="quando tab">' + q + '</span><span class="quem">' + esc(quem) + '</span>'
+          var q = (l.dia === d.hoje ? "" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7) + " ") + horaDe(l);
+          var quem = esc([l.vendedor, l.cliente].filter(Boolean).join(" · ") || "sem identificação") + selo(l);
+          return '<li><span class="quando tab">' + q + '</span><span class="quem">' + quem + '</span>'
             + '<span class="qtd tab">' + brlc(l.valor) + '</span>' + acoesHTML(l) + '</li>';
         }).join("") + '</ul>' : '<p class="vazio">Nenhuma venda lançada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>') + '</div>';
   }
@@ -628,8 +889,8 @@ body.festa #fx{display:block}
           h.push('<div class="dia-corpo">' + g.itens.map(function(l){
             if(editandoId === l.id) return '<div class="hist-edit">' + edicaoHTML(l) + '</div>';
             var quem = l.cliente ? '<b>' + esc(l.cliente) + '</b>' + (l.vendedor ? ' · ' + esc(l.vendedor) : '') : (l.vendedor ? esc(l.vendedor) : '<span style="color:var(--ink-3)">sem identificação</span>');
-            return '<div class="hist-linha"><span class="hora tab">' + pad(l.hora) + ':' + pad(l.min) + '</span>'
-              + '<span class="quem">' + quem + '</span>'
+            return '<div class="hist-linha"><span class="hora tab">' + horaDe(l) + '</span>'
+              + '<span class="quem">' + quem + selo(l) + '</span>'
               + '<span class="val tab">' + brlc(l.valor) + '</span>'
               + '<span class="acao">' + acoesHTML(l) + '</span></div>';
           }).join("") + '</div>');
@@ -706,7 +967,13 @@ body.festa #fx{display:block}
     });
     Array.prototype.forEach.call(document.querySelectorAll("[data-del]"), function(b){
       b.addEventListener("click", function(){
-        var id = b.dataset.del; confirmarId = ""; editandoId = "";
+        var id = b.dataset.del, alvo = null;
+        confirmarId = ""; editandoId = "";
+        estado.lancamentos.forEach(function(l){ if(l.id === id) alvo = l; });
+        /* linha da planilha voltaria na próxima leitura: fica no oculto */
+        if(alvo && alvo.origem === "csv" && (estado.ocultos || []).indexOf(id) < 0){
+          estado.ocultos = (estado.ocultos || []).concat([id]);
+        }
         salvar(estado.lancamentos.filter(function(l){ return l.id !== id; }));
       });
     });
@@ -762,10 +1029,18 @@ body.festa #fx{display:block}
         }
         /* meta nova: a festa pode valer de novo se o mês passar a estar batido */
         festaVista = false;
-        try { sessionStorage.removeItem("festa-vista"); } catch(e){}
+        festaMes = ""; try { localStorage.removeItem("festa-vista"); } catch(e){}
         salvarMetas(Math.round(m*100)/100, "Meta do mês salva.");
       });
     }
+    var lm = document.getElementById("limpar-manuais");
+    if(lm) lm.addEventListener("click", function(){
+      var fora = {};
+      manuaisNaFaixaDaPlanilha().forEach(function(l){ fora[l.id] = 1; });
+      confirmarId = ""; editandoId = "";
+      salvar(estado.lancamentos.filter(function(l){ return !fora[l.id]; }));
+    });
+
     var ih = document.getElementById("ir-historico");
     if(ih) ih.addEventListener("click", function(){ irPara("historico"); });
     var ip = document.getElementById("ir-painel");
@@ -810,13 +1085,13 @@ body.festa #fx{display:block}
     var vp = document.getElementById("ver-painel");
     if(vp) vp.addEventListener("click", function(){
       festaVista = true;
-      try { sessionStorage.setItem("festa-vista", mesDe(hojeSP())); } catch(e){}
+      festaMes = mesDe(hojeSP()); try { localStorage.setItem("festa-vista", mesDe(hojeSP())); } catch(e){}
       render();
     });
     var rv = document.getElementById("revive");
     if(rv) rv.addEventListener("click", function(){
       festaVista = false;
-      try { sessionStorage.removeItem("festa-vista"); } catch(e){}
+      festaMes = ""; try { localStorage.removeItem("festa-vista"); } catch(e){}
       render();
     });
   }
@@ -860,7 +1135,9 @@ body.festa #fx{display:block}
       min: typeof l.min === "number" ? l.min : p.m,
       valor: Math.round(v*100)/100,
       vendedor: l.vendedor || "",
-      cliente: l.cliente || ""
+      cliente: l.cliente || "",
+      /* "csv" = veio da conciliação; vazio = digitado à mão neste painel */
+      origem: l.origem === "csv" ? "csv" : ""
     };
   }
   function buscarAPI(){
@@ -875,6 +1152,7 @@ body.festa #fx{display:block}
         if(!novos.length && estado.lancamentos.length){ ultimaSync = Date.now(); syncOk = true; return enviarAPI(); }
         var mudou = JSON.stringify(novos) !== JSON.stringify(estado.lancamentos);
         if(j && typeof j.metaMes === "number" && j.metaMes > 0 && j.metaMes !== estado.metaMes){ estado.metaMes = j.metaMes; mudou = true; }
+        if(j && Array.isArray(j.ocultos)) estado.ocultos = j.ocultos;
         if(mudou){ estado.lancamentos = novos; gravarLocal(); render(); }
         ultimaSync = Date.now(); syncOk = true;
       })
@@ -884,7 +1162,7 @@ body.festa #fx{display:block}
     return fetch(CONFIG.API_URL, {
       method: "POST",
       headers: cabecalhos(),
-      body: JSON.stringify({ metaMes: estado.metaMes, lancamentos: estado.lancamentos })
+      body: JSON.stringify({ metaMes: estado.metaMes, lancamentos: estado.lancamentos, ocultos: estado.ocultos || [] })
     }).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
       ultimaSync = Date.now(); syncOk = true;
@@ -902,9 +1180,14 @@ body.festa #fx{display:block}
     render();
     if(!gravarLocal() && !CONFIG.API_URL){
       estado.lancamentos = anterior;
-      aviso = "Não deu para salvar neste navegador."; avisoOk = false; render();
+      aviso = "Não deu para salvar neste navegador."; avisoOk = false;
+      /* na TV não existe quadro de aviso nem quem leia: sem isto, a leitura da
+         planilha seria descartada em silêncio a cada 5 minutos, para sempre */
+      avisoGrave = "O navegador recusou salvar";
+      render();
       return;
     }
+    avisoGrave = "";
     if(!CONFIG.API_URL) return;
     enviarAPI().catch(function(){
       aviso = "Sem conexão com o servidor. O lançamento ficou salvo neste navegador e vai junto na próxima tentativa.";
@@ -943,6 +1226,200 @@ body.festa #fx{display:block}
     buscarAPI().catch(function(){ render(); });
     setInterval(function(){ buscarAPI().catch(function(){}); }, Math.max(CONFIG.SYNC_SEGUNDOS || 15, 5) * 1000);
   }
+
+  /* ====== conciliação bancária ======
+     A planilha de conciliação vira a fonte das receitas: cada linha com
+     Categoria "Receita" entra como um lançamento, com o nome de quem pagou.
+
+     O id de cada lançamento sai do conteúdo da própria linha (dia, banco,
+     nome, descrição e valor), então reler a planilha mil vezes não duplica
+     nada e não depende da ordem das linhas. Linha que sai da planilha some do
+     painel; linha corrigida à mão descola da planilha e para de ser mexida;
+     linha apagada à mão fica na lista de ocultos e não volta na próxima
+     leitura. Lançamento digitado no painel nunca é tocado. */
+  var csvStatus = "", csvOk = false, csvUltima = 0, csvQtd = 0;
+
+  /* parser tolerante: aspas, vírgula ou ponto-e-vírgula, CRLF e quebra dentro
+     de aspas (a descrição do Nubank vem com quebra de linha no meio) */
+  function csvLinhas(txt){
+    var s = String(txt);
+    if(s.charCodeAt(0) === 65279) s = s.slice(1);   /* BOM que o Sheets manda */
+    var prim = s.split("\n")[0];
+    var sep = prim.split(";").length > prim.split(",").length ? ";" : ",";
+    var linhas = [], linha = [], campo = "", aspas = false;
+    for(var i = 0; i < s.length; i++){
+      var c = s.charAt(i);
+      if(aspas){
+        if(c !== '"') campo += c;
+        else if(s.charAt(i+1) === '"'){ campo += '"'; i++; }
+        else aspas = false;
+      }
+      else if(c === '"') aspas = true;
+      else if(c === sep){ linha.push(campo); campo = ""; }
+      else if(c === "\n"){ linha.push(campo); linhas.push(linha); linha = []; campo = ""; }
+      else if(c !== "\r") campo += c;
+    }
+    if(campo !== "" || linha.length){ linha.push(campo); linhas.push(linha); }
+    return linhas.filter(function(r){
+      return r.some(function(c){ return String(c).trim() !== ""; });
+    });
+  }
+  /* "DESCRIÇÃO" e "Descricao" são a mesma coluna. O intervalo de acentos é
+     montado por código para o arquivo seguir só com ASCII nesta parte. */
+  var ACENTOS = new RegExp("[" + String.fromCharCode(768) + "-" + String.fromCharCode(879) + "]", "g");
+  function chaveCol(s){
+    return String(s).toLowerCase().normalize("NFD").replace(ACENTOS,"").replace(/[^a-z]/g,"");
+  }
+  /* paraNumero() joga fora o sinal, e aqui o sinal é o que separa receita de
+     taxa: o menos pode vir antes do número ou antes do "R$" */
+  function valorPlanilha(txt){
+    var t = String(txt).trim();
+    var i = t.search(/\d/);
+    var neg = (i > -1 && t.slice(0,i).indexOf("-") > -1) || (t.charAt(0) === "(" && t.slice(-1) === ")");
+    var n = paraNumero(t);
+    if(!isFinite(n)) return NaN;
+    return neg ? -n : n;
+  }
+  function diaPlanilha(txt){
+    var t = String(txt).trim();
+    var m = t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+    if(m) return (m[3].length === 2 ? "20" + m[3] : m[3]) + "-" + pad(+m[2]) + "-" + pad(+m[1]);
+    m = t.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? m[1] + "-" + m[2] + "-" + m[3] : "";
+  }
+  /* dois hashes de 32 bits concatenados: com um só, 2.500 linhas já dão ~0,08%
+     de chance de duas colidirem — e a linha colidida sumiria sem aviso */
+  function hashLinha(s){
+    var a = 5381, b = 52711;
+    for(var i = 0; i < s.length; i++){
+      var c = s.charCodeAt(i);
+      a = ((a * 33) ^ c) >>> 0;
+      b = ((b * 31) + c) >>> 0;
+    }
+    return a.toString(36) + b.toString(36);
+  }
+  /* devolve null quando o CSV não tem cara de conciliação — assim uma URL
+     errada vira aviso na tela em vez de apagar o mês inteiro */
+  function lancamentosDoCSV(txt){
+    var linhas = csvLinhas(txt);
+    if(linhas.length < 2) return null;
+    var col = {};
+    linhas[0].forEach(function(nome, i){
+      var k = chaveCol(nome);
+      if(col[k] === undefined) col[k] = i;
+    });
+    if(col.data === undefined || col.valor === undefined) return null;
+    /* aba já filtrada pode vir sem a coluna Categoria: aí toda entrada positiva
+       que sobrou é receita, que é justamente o que a aba se propôs a listar */
+    var temCat = col.categoria !== undefined;
+    function cel(r, k){ return col[k] === undefined ? "" : String(r[col[k]] || "").trim(); }
+
+    var vistos = {}, ordem = {}, out = [];
+    for(var i = 1; i < linhas.length; i++){
+      var r = linhas[i];
+      if(temCat && chaveCol(cel(r, "categoria")) !== "receita") continue;
+      var v = valorPlanilha(cel(r, "valor"));
+      if(!isFinite(v) || v <= 0) continue;
+      var dia = diaPlanilha(cel(r, "data"));
+      if(!dia) continue;
+      var base = [dia, cel(r, "banco"), cel(r, "nome"), cel(r, "descricao"), v.toFixed(2)].join("|");
+      vistos[base] = (vistos[base] || 0) + 1;
+      ordem[dia] = (ordem[dia] || 0) + 1;
+      var p = dia.split("-");
+      out.push({
+        id: "csv" + hashLinha(base + "#" + vistos[base]),
+        /* meio-dia de Brasília, com um segundo por linha só para a ordem do
+           dia sair igual à da planilha */
+        ts: Date.UTC(+p[0], +p[1]-1, +p[2], 15, 0, 0) + ordem[dia] * 1000,
+        dia: dia, hora: 12, min: 0,
+        valor: Math.round(v*100)/100,
+        vendedor: "", cliente: cel(r, "nome").slice(0,60), origem: "csv"
+      });
+    }
+    return out;
+  }
+  /* casa a planilha com o que já está no painel; null = nada mudou */
+  function casarComPlanilha(novos){
+    var ocultos = {}, porId = {}, tem = {};
+    (estado.ocultos || []).forEach(function(id){ ocultos[id] = 1; });
+    novos.forEach(function(l){ porId[l.id] = l; });
+
+    var saida = [], mudou = false;
+    estado.lancamentos.forEach(function(l){
+      if(l.origem !== "csv"){ saida.push(l); return; }
+      var n = porId[l.id];
+      if(!n){ mudou = true; return; }
+      if(n.valor !== l.valor || n.cliente !== l.cliente || n.dia !== l.dia){ mudou = true; saida.push(n); }
+      else saida.push(l);
+    });
+    saida.forEach(function(l){ tem[l.id] = 1; });
+    novos.forEach(function(l){
+      if(tem[l.id] || ocultos[l.id]) return;
+      saida.push(l); mudou = true;
+    });
+    return mudou ? saida : null;
+  }
+  function buscarCSV(){
+    if(!CONFIG.CSV_RECEITAS) return Promise.resolve();
+    return fetch(CONFIG.CSV_RECEITAS, { cache: "no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+      .then(function(t){
+        var novos = lancamentosDoCSV(t);
+        if(!novos) throw new Error("faltam as colunas DATA e VALOR");
+        /* CSV cortado no meio do download, ou a =QUERY virando #REF!, devolve
+           um lote válido e curto — e o casamento apagaria o mês inteiro sem
+           ninguém perceber, porque na TV não há quem confira. Sumiu muita
+           coisa de uma vez: recusa a leitura e acende o alerta. */
+        var vistos = {};
+        novos.forEach(function(l){ vistos[l.id] = 1; });
+        var atuais = estado.lancamentos.filter(function(l){ return l.origem === "csv"; });
+        var perdidos = atuais.filter(function(l){ return !vistos[l.id]; }).length;
+        if(atuais.length >= 20 && perdidos > atuais.length * 0.3){
+          throw new Error("a planilha veio com " + perdidos + " receitas a menos — leitura recusada");
+        }
+        csvOk = true; csvUltima = Date.now(); csvQtd = novos.length; csvStatus = "";
+        var saida = casarComPlanilha(novos);
+        if(saida) salvar(saida); else render();
+      })
+      .catch(function(e){
+        csvOk = false;
+        csvStatus = String((e && e.message) || e);
+        render();
+      });
+  }
+  /* a leitura pode "dar certo" e mesmo assim parar de acontecer: aba de fundo
+     estrangulada pelo Chrome, timer congelado, máquina suspensa. Aí a TV segue
+     confiante mostrando o número de ontem, que é o pior desfecho possível. */
+  function planilhaVelha(){
+    return !!(CONFIG.CSV_RECEITAS && csvUltima && Date.now() - csvUltima > 20 * 60 * 1000);
+  }
+  function statusPlanilha(){
+    if(!CONFIG.CSV_RECEITAS) return "";
+    if(!csvOk) return " &middot; planilha não lida" + (csvStatus ? " (" + esc(csvStatus) + ")" : "");
+    var p = partesSP(new Date(csvUltima));
+    return " &middot; " + plural(csvQtd, "receita lida", "receitas lidas")
+      + " da planilha às " + pad(p.h) + ":" + pad(p.m);
+  }
+  function iniciarPlanilha(){
+    if(!CONFIG.CSV_RECEITAS) return;
+    buscarCSV();
+    setInterval(buscarCSV, Math.max(CONFIG.CSV_SEGUNDOS || 300, 30) * 1000);
+    /* o Chrome estrangula o timer de aba que não está à frente: ao voltar a
+       aparecer, relê em vez de confiar no que ficou congelado na tela */
+    document.addEventListener("visibilitychange", function(){
+      if(document.visibilityState === "visible") buscarCSV();
+    });
+  }
+  /* A TV passa semanas na mesma aba. Sem uma recarga marcada, versão nova do
+     painel nunca chega à tela e um erro de render congela tudo até alguém
+     subir lá — com o relógio ainda andando, o que faz parecer que está viva. */
+  function agendarRecarga(){
+    if(!modoTV) return;
+    var p = partesSP(), agora = p.h * 60 + p.m, alvo = 3 * 60 + 30;
+    var faltam = (agora < alvo ? alvo - agora : 24 * 60 - agora + alvo) * 60000;
+    setTimeout(function(){ location.reload(); }, faltam);
+  }
+
   /* ====== fogos e balões ====== */
   var cv = document.getElementById("fx"), ctx = cv.getContext("2d"), anim = 0, parts = [], baloes = [], ultimoFogo = 0, ultimoBalao = 0;
   var CORES = ["#FFCD1C","#FFFFFF","#FF6B8B","#4AD6FF","#7CF58F","#C89BFF","#FFA23A"];
@@ -1022,14 +1499,23 @@ body.festa #fx{display:block}
   var salvo = carregarLocal();
   if(salvo){
     estado.lancamentos = salvo.lancamentos.map(normalizar).filter(Boolean);
+    if(Array.isArray(salvo.ocultos)) estado.ocultos = salvo.ocultos;
     if(typeof salvo.metaMes === "number" && salvo.metaMes > 0) estado.metaMes = salvo.metaMes;
   }
+  if(modoTV) document.body.classList.add("tv");
+  festaVista = !!festaMes && festaMes === mesDe(hojeSP());
   render();
   iniciarSync();
+  iniciarPlanilha();
+  agendarRecarga();
+  /* na TV os segundos piscam 86.400 vezes por dia sem informar nada, e ainda
+     puxam o olho de quem passa: lá o relógio anda de minuto em minuto */
   setInterval(function(){
     var el = document.querySelector(".relogio .hora");
     var p = partesSP();
-    if(el) el.innerHTML = pad(p.h) + ":" + pad(p.m) + '<span style="font-size:.55em;color:var(--ink-3)">:' + pad(p.s) + '</span>';
+    if(!el) return;
+    el.innerHTML = modoTV ? pad(p.h) + ":" + pad(p.m)
+      : pad(p.h) + ":" + pad(p.m) + '<span style="font-size:.55em;color:var(--ink-3)">:' + pad(p.s) + '</span>';
   }, 1000);
   setInterval(render, 30000);
 })();
