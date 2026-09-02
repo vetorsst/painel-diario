@@ -51,11 +51,13 @@ body{
 
 /* ---------- topo ---------- */
 .topo{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--line)}
-.logo{display:flex;align-items:center;gap:11px}
-.logo svg{width:26px;height:26px;flex:none}
-.logo b{font-weight:800;letter-spacing:.2em;font-size:1.02rem;line-height:1}
-.logo b i{font-style:normal;color:var(--amarelo)}
-.logo span{display:block;font-size:.6rem;letter-spacing:.28em;color:var(--ink-3);font-weight:500;margin-top:3px}
+.logo{display:flex;align-items:center;gap:14px}
+/* o PNG da marca traz margem morta em volta: a arte ocupa 1649x504 dentro de
+   2546x1215. A janela recorta e a imagem é posicionada dentro dela, então o
+   arquivo original segue intocado e serve para qualquer outro uso. */
+.marca-vetor{position:relative;overflow:hidden;display:block;flex:none;width:150px;aspect-ratio:1649/504}
+.marca-vetor img{position:absolute;display:block;width:154.4%;left:-28.56%;top:-70.44%}
+.logo .kicker{font-size:.58rem;line-height:1.35;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding-left:14px;border-left:1px solid var(--line-forte)}
 .relogio{display:flex;align-items:baseline;gap:14px}
 .relogio .hora{font-size:clamp(1.3rem,2.4vw,1.9rem);font-weight:700;letter-spacing:-.01em;line-height:1}
 .relogio .dia{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
@@ -200,14 +202,31 @@ body{
 /* ---------- modo TV (?tv) ----------
    Tela de parede: ninguém clica, ninguém chega perto. Tudo é lido de 3 a 6
    metros, então os tamanhos saem de vw — a TV é 16:9 e a largura manda. */
-body.tv{overflow:hidden}
+/* Numa TV de escritório (gama ~2,4, black crush agressivo) as diferenças sutis
+   somem: o cartão contra o fundo dava 1,24:1 e a borda 1,31:1 — a 4 metros
+   nenhum dos dois existia. Aqui o painel troca sutileza por separação real. */
+body.tv{overflow:hidden;background:#072230;background-image:none}
+.tv{--card:#12384c;--line:rgba(255,255,255,.22);--line-forte:rgba(255,255,255,.3);--ink-3:#93aebc}
+/* o degradê do preenchimento lê como "a barra está apagando" de longe */
 /* altura fixa, não mínima: com min-height a lista empurrava o rodapé para fora
    da tela, e numa TV o que passa da dobra simplesmente não existe */
 .tv .wrap{max-width:none;height:100vh;overflow:hidden;display:flex;flex-direction:column;padding:2.4vh 2.6vw 2vh}
 .tv .topo{padding-bottom:1.6vh}
-.tv .logo svg{width:clamp(26px,2.2vw,102.6px);height:clamp(26px,2.2vw,102.6px)}
-.tv .logo b{font-size:clamp(1rem,1.35vw,3.99rem)}
-.tv .logo span{font-size:clamp(.6rem,.72vw,2.09rem);margin-top:5px}
+.tv .marca-vetor{width:clamp(150px,14vw,540px)}
+.tv .logo{gap:clamp(14px,1.4vw,54px)}
+.tv .logo .kicker{font-size:clamp(.6rem,.78vw,2.3rem);padding-left:clamp(14px,1.4vw,54px)}
+/* Burn-in: o número muda, mas o logo amarelo e os rótulos ocupam os mesmos
+   pixels por semanas. Um passeio de poucos pixels ao longo de meia hora não se
+   percebe de longe e quebra a permanência da imagem. */
+@media (prefers-reduced-motion: no-preference){
+  .tv .wrap{animation:passeio 1800s linear infinite}
+}
+@keyframes passeio{
+  0%,100%{transform:translate(0,0)}
+  25%{transform:translate(3px,2px)}
+  50%{transform:translate(-2px,3px)}
+  75%{transform:translate(2px,-3px)}
+}
 .tv .relogio .hora{font-size:clamp(1.6rem,2.9vw,8.36rem)}
 .tv .relogio .dia{font-size:clamp(.72rem,1vw,2.85rem)}
 
@@ -224,6 +243,9 @@ body.tv{overflow:hidden}
 .tv-dir .nota b{color:var(--ink-2);font-weight:600}
 
 .tv .track{height:clamp(22px,2.2vw,98.8px);border-radius:999px}
+/* o marcador de 2px do painel dá 1,3 mm numa TV de 55" — invisível */
+.tv .marca{width:clamp(4px,.42vw,18px);top:-.9vh;bottom:-.9vh;border-radius:999px;background:var(--ink-2)}
+.tv .marca span{top:calc(100% + .7vh);bottom:auto;font-size:clamp(.6rem,.8vw,2.3rem);color:var(--ink-2);letter-spacing:.16em}
 /* amarelo chapado: o degradê perde 40% de contraste na ponta esquerda e, na
    gama de uma TV, a barra parece estar apagando em vez de cheia */
 .tv .fill{border-radius:999px;background:var(--amarelo)}
@@ -238,7 +260,7 @@ body.tv{overflow:hidden}
 
 .tv-lista{flex:1;min-height:0;overflow:hidden;margin-top:1.6vh;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1.8vh 1.6vw;display:flex;flex-direction:column}
 .tv-lista h3{margin:0 0 1.4vh;font-size:clamp(.68rem,.95vw,2.76rem);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)}
-.tv-linha{display:flex;align-items:baseline;gap:1.4vw;padding:1.15vh 0;border-top:1px solid rgba(255,255,255,.06);font-size:clamp(.95rem,1.55vw,4.56rem)}
+.tv-linha{display:flex;align-items:baseline;gap:1.4vw;padding:1vh 0;border-top:1px solid rgba(255,255,255,.06);font-size:clamp(.95rem,1.55vw,4.56rem)}
 .tv-linha:first-of-type{border-top:0}
 .tv-linha .quando{color:var(--ink-3);font-size:.78em;font-variant-numeric:tabular-nums;flex:none;min-width:4.2em}
 .tv-linha .quem{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -249,7 +271,6 @@ body.tv{overflow:hidden}
 /* na TV, rótulo cinza-claro some: --ink-3 dá 4,19:1 sobre o card, abaixo do
    mínimo legível. Tudo que é rótulo sobe um nível de contraste. */
 .tv .rot,.tv .nota,.tv .ticks,.tv .rodape,.tv .vazio,.tv-linha .quando{color:var(--ink-2)}
-.tv .bloco,.tv-lista{border-color:rgba(255,255,255,.2);background:#12384c}
 /* na TV ninguém clica: o botão de sair da festa não tem serventia */
 .tv .btn-ghost{display:none}
 .tv .party-title{font-size:clamp(3rem,10vw,30.4rem)}
@@ -495,6 +516,7 @@ body.festa #fx{display:block}
       ? ((comFesta ? festaHTML(d) : "") + tvHTML(d))
       : (tela === "historico" ? historicoHTML(d) : ((comFesta ? festaHTML(d) : "") + painelHTML(d)));
     ligarEventos(d);
+    if(modoTV) ajustarLista();
     /* na TV ninguém clica em "ver o painel", e os fogos rodariam a 60fps até
        o fim do mês: a festa toca por um minuto e meio e sai de cena sozinha */
     if(comFesta && modoTV) agendarFimDaFesta();
@@ -523,9 +545,7 @@ body.festa #fx{display:block}
   function painelHTML(d){
     var h = [];
     h.push('<div class="wrap">');
-    h.push('<header class="topo"><div class="logo">'
-      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 3.4h5.3L12 12.9l4.5-9.5h5.3L12 21.4z" fill="#FFCD1C"/></svg>'
-      + '<div><b>VETOR<i> SST</i></b><span>PAINEL COMERCIAL</span></div></div>'
+    h.push('<header class="topo">' + logoHTML()
       + '<div class="acoes-topo"><button class="link" id="ir-historico">Histórico</button>'
       + '<div class="relogio"><span class="dia">' + esc(dataExtenso()) + '</span>'
       + '<span class="hora tab">' + pad(d.ag.h) + ':' + pad(d.ag.m) + '<span style="font-size:.55em;color:var(--ink-3)">:' + pad(d.ag.s) + '</span></span></div></div></header>');
@@ -647,12 +667,28 @@ body.festa #fx{display:block}
       + '<p class="nota">' + notaHoje(d) + '</p></div>');
     return '<section class="tv-hero">' + h.join("") + '</section>';
   }
+  /* Quantas entradas cabem depende da TV e do que está acima delas — a tarja de
+     alerta some e aparece, e o cartão muda de altura junto. Meia linha cortada
+     no rodapé faz a tela parecer que travou no meio do carregamento, então a
+     conta é feita depois de desenhar, não chutada no CSS. */
+  function ajustarLista(){
+    var lista = document.querySelector(".tv-lista");
+    if(!lista) return;
+    var h3 = lista.querySelector("h3"), linhas = lista.querySelectorAll(".tv-linha");
+    if(!h3 || !linhas.length) return;
+    var cs = getComputedStyle(lista);
+    var util = lista.clientHeight - h3.offsetHeight
+      - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
+      - parseFloat(getComputedStyle(h3).marginBottom);
+    var alt = linhas[0].offsetHeight;
+    var cabem = alt > 0 ? Math.max(Math.floor(util / alt), 1) : linhas.length;
+    for(var i = 0; i < linhas.length; i++) linhas[i].hidden = i >= cabem;
+  }
+
   function tvHTML(d){
     var h = [];
     h.push('<div class="wrap">');
-    h.push('<header class="topo"><div class="logo">'
-      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 3.4h5.3L12 12.9l4.5-9.5h5.3L12 21.4z" fill="#FFCD1C"/></svg>'
-      + '<div><b>VETOR<i> SST</i></b><span>PAINEL COMERCIAL</span></div></div>'
+    h.push('<header class="topo">' + logoHTML()
       + '<div class="relogio"><span class="dia">' + esc(dataExtenso()) + '</span>'
       + '<span class="hora tab">' + pad(d.ag.h) + ':' + pad(d.ag.m) + '</span></div></header>');
 
@@ -666,8 +702,13 @@ body.festa #fx{display:block}
     h.push(tvHeroHTML(d));
 
     var pctDia = Math.min(Math.max(d.pctHoje, 0), 1) * 100;
+    /* onde a barra deveria estar a esta hora do expediente: sem essa marca, 33%
+       às 10h e 33% às 17h são o mesmo desenho e contam histórias opostas */
+    var agora = d.hojeUtil && !d.batida ? fracaoExpediente(d.ag.h, d.ag.m) * 100 : 0;
     h.push('<div class="barra"><div class="track" role="progressbar" aria-label="Progresso da meta de hoje">'
-      + '<div class="fill" style="width:calc(' + pctDia.toFixed(2) + '% - 2px)"></div></div></div>');
+      + '<div class="fill" style="width:calc(' + pctDia.toFixed(2) + '% - 2px)"></div>'
+      + (agora > 1 && agora < 99 ? '<div class="marca" style="left:' + agora.toFixed(2) + '%"><span>agora</span></div>' : '')
+      + '</div></div>');
 
     h.push('<section class="tv-faixa">'
       + '<div class="bloco"><p class="rot">' + esc(nomeMes(d.mes)) + '</p>'
@@ -683,12 +724,16 @@ body.festa #fx{display:block}
 
     /* 5 cabem inteiras em 1080p — com mais, a última aparece cortada ao meio e
        a tela passa a impressão de que faltou carregar alguma coisa */
-    var ult = d.doMes.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,5);
-    h.push('<section class="tv-lista"><h3>Últimas entradas</h3>'
+    /* desenha com folga: ajustarLista() apaga depois as que não couberam */
+    var ult = d.doMes.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,10);
+    /* "hoje" repetido em toda linha é ruído: a data só aparece quando muda */
+    var soDeHoje = ult.every(function(l){ return l.dia === d.hoje; });
+    h.push('<section class="tv-lista"><h3>' + (soDeHoje ? "Entrou hoje" : "Últimas entradas") + '</h3>'
       + (ult.length ? ult.map(function(l){
           return '<div class="tv-linha">'
-            + '<span class="quando tab">' + (l.dia === d.hoje ? "hoje" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7)) + '</span>'
-            + '<span class="quem">' + esc(l.cliente || "sem identificação") + '</span>'
+            + (soDeHoje ? "" : '<span class="quando tab">'
+                + (l.dia === d.hoje ? "hoje" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7)) + '</span>')
+            + '<span class="quem">' + esc(nomeCurto(l.cliente) || "sem identificação") + '</span>'
             + '<span class="val tab">' + brlc(l.valor) + '</span></div>';
         }).join("") : '<p class="vazio">Nenhuma entrada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>')
       + '</section>');
@@ -698,6 +743,48 @@ body.festa #fx{display:block}
       + '<span>' + (CONFIG.CSV_RECEITAS ? statusPlanilha().replace(/^ &middot; /, "") : statusArmazenamento()) + '</span></footer>');
     h.push('</div>');
     return h.join("");
+  }
+
+  /* A marca é a mesma nas três telas. O PNG vem com margem morta em volta — a
+     marca ocupa 1649x504 dentro de 2546x1215 — então o recorte é feito por CSS
+     e o arquivo original fica intacto. */
+  function logoHTML(){
+    return '<div class="logo"><span class="marca-vetor">'
+      + '<img src="logo-escuro.png" alt="Vetor Saúde e Segurança do Trabalho"></span>'
+      + '<span class="kicker">Painel<br>comercial</span></div>';
+  }
+
+  /* O nome vem cru do extrato: às vezes com CNPJ na frente, quase sempre com o
+     tipo societário no fim e gritado em caixa alta. Na TV isso é ruído — o olho
+     precisa achar o cliente, não a razão social inteira. */
+  var MINUSCULAS = ["de","da","do","das","dos","e","em","na","no","para","com"];
+  function nomeCurto(s){
+    var t = String(s || "").trim();
+    if(!t) return "";
+    /* documento na frente do nome só sai quando é documento mesmo, senão
+       "336 Hamburgueria" perderia o próprio nome */
+    t = t.replace(/^((?:\d[\d.\/-]*\s+)+)/, function(m){
+      return m.replace(/\D/g,"").length >= 8 ? "" : m;
+    });
+    /* LTDA, EIRELI e EPP são inequívocos e saem de qualquer posição — em
+       "Gliko Cantina Escolar LTDA - Matriz" o tipo societário está no meio.
+       ME e CIA podem fazer parte do nome, então só saem no fim. */
+    t = t.replace(/\s*\b(?:ltda|eireli|epp)\b\.?/gi, " ");
+    for(var i = 0; i < 3; i++){
+      var n = t.replace(/[\s,.-]*\b(?:mei|me|cia|s\/a|s\.?\s?a)\b\.?\s*$/i, "");
+      if(n === t) break;
+      t = n;
+    }
+    t = t.replace(/\s{2,}/g," ").replace(/\s+-\s*$/,"").replace(/[\s.,;&-]+$/,"").trim();
+    return t.split(" ").map(function(p, i){
+      var baixo = p.toLowerCase();
+      if(i > 0 && MINUSCULAS.indexOf(baixo) > -1) return baixo;
+      /* sigla curta continua sigla: STK e AG não viram Stk e Ag */
+      if(!/[a-zà-ÿ]/.test(p) && p.replace(/[^A-ZÀ-Ý]/g,"").length >= 4){
+        return baixo.charAt(0).toUpperCase() + baixo.slice(1);
+      }
+      return p;
+    }).join(" ");
   }
 
   function pad(n){ return (n < 10 ? "0" : "") + n; }
@@ -813,7 +900,7 @@ body.festa #fx{display:block}
       + (itens.length ? '<ul class="lista">' + itens.map(function(l){
           if(editandoId === l.id) return '<li class="editando">' + edicaoHTML(l) + '</li>';
           var q = (l.dia === d.hoje ? "" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7) + " ") + horaDe(l);
-          var quem = esc([l.vendedor, l.cliente].filter(Boolean).join(" · ") || "sem identificação") + selo(l);
+          var quem = esc([l.vendedor, nomeCurto(l.cliente)].filter(Boolean).join(" · ") || "sem identificação") + selo(l);
           return '<li><span class="quando tab">' + q + '</span><span class="quem">' + quem + '</span>'
             + '<span class="qtd tab">' + brlc(l.valor) + '</span>' + acoesHTML(l) + '</li>';
         }).join("") + '</ul>' : '<p class="vazio">Nenhuma venda lançada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>') + '</div>';
@@ -851,9 +938,7 @@ body.festa #fx{display:block}
     var topo = melhor && melhor.totalDia > 0 ? melhor.totalDia : 1;
 
     var h = ['<div class="wrap">'];
-    h.push('<header class="topo"><div class="logo">'
-      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 3.4h5.3L12 12.9l4.5-9.5h5.3L12 21.4z" fill="#FFCD1C"/></svg>'
-      + '<div><b>VETOR<i> SST</i></b><span>PAINEL COMERCIAL</span></div></div>'
+    h.push('<header class="topo">' + logoHTML()
       + '<div class="acoes-topo"><button class="link" id="baixar-csv">Baixar CSV</button>'
       + '<button class="link forte" id="ir-painel">Voltar ao painel</button></div></header>');
 
@@ -888,7 +973,7 @@ body.festa #fx{display:block}
         if(aberto){
           h.push('<div class="dia-corpo">' + g.itens.map(function(l){
             if(editandoId === l.id) return '<div class="hist-edit">' + edicaoHTML(l) + '</div>';
-            var quem = l.cliente ? '<b>' + esc(l.cliente) + '</b>' + (l.vendedor ? ' · ' + esc(l.vendedor) : '') : (l.vendedor ? esc(l.vendedor) : '<span style="color:var(--ink-3)">sem identificação</span>');
+            var quem = l.cliente ? '<b>' + esc(nomeCurto(l.cliente)) + '</b>' + (l.vendedor ? ' · ' + esc(l.vendedor) : '') : (l.vendedor ? esc(l.vendedor) : '<span style="color:var(--ink-3)">sem identificação</span>');
             return '<div class="hist-linha"><span class="hora tab">' + horaDe(l) + '</span>'
               + '<span class="quem">' + quem + selo(l) + '</span>'
               + '<span class="val tab">' + brlc(l.valor) + '</span>'

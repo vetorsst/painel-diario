@@ -8,6 +8,35 @@ pagou.
 
 **No ar em https://vetorsst.github.io/painel-diario/**
 
+## Dois endereços, duas funções
+
+| | |
+| --- | --- |
+| `…/painel-diario/?tv` | **A televisão.** Só leitura. Fica aberta o dia inteiro no PC ligado na TV. |
+| `…/painel-diario/` | **O computador.** Mesmo painel, com o que dá para mexer. |
+
+O `?tv` é tela de parede: some o formulário de lançar venda, somem os botões ✎ e
+×, some o campo de meta e o botão de histórico. Sobra o número grande, a barra
+do dia, três indicadores do mês e a lista de quem pagou. Tipografia dimensionada
+para leitura a 3–6 metros, e o layout inteiro cabe numa tela sem rolagem.
+
+Sem o `?tv`, o mesmo arquivo abre o painel completo. Com a planilha ligada, ele
+deixa de ser o lugar onde se digita venda e passa a ser a régua:
+
+- **Meta do mês** — o único campo que ainda precisa de gente. O ritmo necessário
+  e a meta do dia saem dele.
+- **Corrigir** (✎) uma linha que veio errada da planilha: o pagador não é o
+  cliente, o valor veio bruto, o nome está impossível. A linha corrigida descola
+  da planilha e para de ser sobrescrita.
+- **Apagar** (×) uma linha que não deveria contar como venda. Ela não volta na
+  próxima leitura.
+- **Histórico** — todos os dias, com busca por cliente ou valor e exportação em
+  CSV. É onde se confere o mês fechado.
+- **Lançar venda** — continua existindo, mas com a conciliação ligada quase
+  nunca é o certo: o painel mede dinheiro que caiu na conta, e o que for
+  digitado à mão vai contar em dobro quando a mesma receita chegar pela
+  planilha. Use só para o que nunca vai passar pelo banco.
+
 ## Como usar
 
 Abra `index.html` direto no navegador — não precisa build, servidor nem
