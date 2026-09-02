@@ -79,7 +79,10 @@ body{
 .hero-dir .nota b{color:var(--ink-2);font-weight:600}
 
 /* ---------- barra ---------- */
+/* o rótulo do marcador sobe 19px do trilho e batia no "de R$ 250.000 · 1,5%"
+   logo acima — no primeiro dia útil do mês os dois caem no mesmo ponto */
 .barra{margin-top:6px}
+body:not(.tv) .barra{margin-top:26px}
 .track{position:relative;height:22px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid var(--line);overflow:visible}
 .fill{position:absolute;inset:1px auto 1px 1px;border-radius:10px;background:linear-gradient(90deg,var(--amarelo-esc),var(--amarelo));transition:width .6s cubic-bezier(.2,.7,.3,1);min-width:0}
 .marca{position:absolute;top:-7px;bottom:-7px;width:2px;background:var(--ink);border-radius:2px;transition:left .6s cubic-bezier(.2,.7,.3,1)}
@@ -245,7 +248,7 @@ body.tv{overflow:hidden}
    engorda opticamente e a contraforma borra — o número parecia pastoso.
    O -.055em de margem corrige a sidebearing do "R" do Poppins Black, que
    deixava o número recuado em relação ao rótulo acima dele. */
-.tv-big{margin:calc(.3*var(--u)) 0 0 -.055em;font-size:max(56px,calc(9*var(--u)));font-weight:800;letter-spacing:-.035em;line-height:.84;color:var(--amarelo);font-variant-numeric:tabular-nums}
+.tv-big{margin:calc(.3*var(--u)) 0 0 -.055em;font-size:max(56px,calc(8.4*var(--u)));font-weight:800;letter-spacing:-.035em;line-height:.84;color:var(--amarelo);font-variant-numeric:tabular-nums}
 .tv-big.zerado{color:var(--ink)}
 .tv-sub{margin:calc(.55*var(--u)) 0 0;font-size:max(15px,calc(2.35*var(--u)));color:var(--ink-2);font-weight:400;line-height:1.25}
 .tv-sub b{color:var(--ink);font-weight:700}
@@ -288,18 +291,15 @@ body.tv{overflow:hidden}
 
 /* linhas iguais: com altura automática os blocos viravam cartões achatados
    quando sobra altura numa TV cheia */
-.tv-lado{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:calc(1.1*var(--u));min-height:0}
-.tv-lado .bloco{display:flex;flex-direction:column;justify-content:center;padding:calc(1*var(--u)) calc(1.3*var(--u));min-height:0}
+.tv-lado{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:calc(.85*var(--u));min-height:0;overflow:hidden}
+.tv-lado .bloco{display:flex;flex-direction:column;justify-content:center;padding:calc(.55*var(--u)) calc(1.2*var(--u));min-height:0;overflow:hidden}
 /* um só bloco em destaque, como o painel de computador faz */
 .tv-lado .bloco.destaque{background:linear-gradient(160deg,rgba(255,205,28,.15),rgba(255,205,28,.03));border-color:rgba(255,205,28,.3)}
-.tv-lado .rot{font-size:max(10px,calc(1.45*var(--u)));line-height:1.1}
-.tv-lado .val{margin:calc(.45*var(--u)) 0 0;font-size:max(20px,calc(3.5*var(--u)));font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.tv-lado .rot{font-size:max(10px,calc(1.32*var(--u)));line-height:1.1}
+.tv-lado .val{margin:calc(.35*var(--u)) 0 0;font-size:max(20px,calc(2.95*var(--u)));font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
 .tv-lado .val.acc{color:var(--amarelo)}
-.tv-lado .nota{margin:calc(.45*var(--u)) 0 0;font-size:max(11px,calc(1.45*var(--u)));line-height:1.3}
+.tv-lado .nota{margin:calc(.35*var(--u)) 0 0;font-size:max(11px,calc(1.35*var(--u)));line-height:1.25}
 .tv-lado .nota b{color:var(--ink);font-weight:700}
-.tv-lado .mini{margin-top:calc(.6*var(--u))}
-.tv-lado .mini .track{position:relative;height:max(5px,calc(.42*var(--u)));border-radius:999px;background:rgba(255,255,255,.12);border:0;overflow:hidden}
-.tv-lado .mini .fill{position:absolute;inset:0 auto 0 0;border-radius:999px}
 
 .tv-alerta{margin-top:calc(.9*var(--u));border:1px solid rgba(255,125,99,.5);background:rgba(255,125,99,.14);color:var(--alerta);border-radius:12px;padding:calc(.7*var(--u)) calc(1.4*var(--u));font-size:max(14px,calc(2.05*var(--u)));font-weight:700;letter-spacing:.02em}
 .tv .rodape{margin-top:calc(.7*var(--u));font-size:max(10px,calc(1.45*var(--u)))}
@@ -779,11 +779,9 @@ body.festa #fx{display:block}
         }).join("") + '</div>' : '<p class="vazio">Nenhuma entrada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>')
       + '</section>');
 
-    var pctMes = Math.min(Math.max(d.pct, 0), 1) * 100;
     h.push('<aside class="tv-lado">'
       + '<div class="bloco"><p class="rot">' + esc(nomeMes(d.mes)) + '</p>'
       + '<p class="val acc tab">' + brl(d.acumulado) + '</p>'
-      + '<div class="mini"><div class="track"><div class="fill" style="width:' + pctMes.toFixed(2) + '%"></div></div></div>'
       + '<p class="nota">de ' + brl(d.metaMes) + ' &middot; <b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b> da meta</p></div>'
       /* um só bloco em destaque, como o painel de computador faz */
       + '<div class="bloco destaque"><p class="rot">Falta para bater</p>'
