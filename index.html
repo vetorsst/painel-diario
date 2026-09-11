@@ -100,7 +100,7 @@ body:not(.tv) .barra{margin-top:26px}
 /* ---------- projeção do mês ---------- */
 /* título no topo e números embaixo, como os outros quadros do painel: com o
    título numa coluna própria as três colunas não liam como uma linha só */
-.projecao{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 24px;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.projecao{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
 .proj-cab{grid-column:1/-1}
 .projecao h3{margin:0 0 2px;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
 .projecao .legenda{margin:0;font-size:.72rem;color:var(--ink-3)}
@@ -353,6 +353,7 @@ body.festa #fx{display:block}
 }
 @media (max-width:560px){
   .kpis{grid-template-columns:1fr 1fr;gap:8px}
+  .projecao{grid-template-columns:1fr}
   .hero-dir{align-items:flex-start;text-align:left}
   .ticks span:nth-child(even){visibility:hidden}
   .resumo{grid-template-columns:1fr 1fr;gap:8px}
@@ -376,6 +377,11 @@ body.festa #fx{display:block}
      ------------------------------------------------------------
      META_MES       meta do mês em reais. Dá para trocar pelo painel, no
                     quadro "Meta do mês" — o que for salvo ali manda nisto.
+     CUSTO_MES      custo total do mês em reais; dele sai o lucro projetado.
+                    0 = sem custo informado, e o lucro não aparece. Também dá
+                    para trocar no quadro "Meta do mês". A TV só lê daqui.
+     FERIADOS_EXTRAS  dias sem expediente além dos nacionais, carnaval e
+                    Corpus Christi, como ["2026-11-30"]
      API_URL        (opcional) endpoint que guarda o estado.
                     Vazio  -> cada navegador guarda o seu (localStorage)
                     Preenchido -> todo mundo vê o mesmo número
@@ -394,6 +400,8 @@ body.festa #fx{display:block}
      ============================================================ */
   var CONFIG = {
     META_MES: 250000,
+    CUSTO_MES: 0,
+    FERIADOS_EXTRAS: [],
     API_URL: "",
     API_TOKEN: "",
     SYNC_SEGUNDOS: 15,
@@ -428,11 +436,15 @@ body.festa #fx{display:block}
       if(!Array.isArray(s.lancamentos)) s.lancamentos = [];
       if(!Array.isArray(s.ocultos)) s.ocultos = [];
       if(typeof s.metaMes !== "number" || !(s.metaMes > 0)) s.metaMes = META_MES_PADRAO;
+      /* custo nulo = vale o da configuração. O padrão não é gravado no estado,
+         de propósito: se fosse, o 0 de hoje ficaria no localStorage da TV e
+         ganharia do custo que alguém puser na configuração depois */
+      if(typeof s.custoMes !== "number" || !(s.custoMes >= 0)) s.custoMes = null;
       /* formato antigo: meta diária fixa e metas por dia. A meta do dia agora
          sai da meta do mês, então esses campos deixam de ser lidos e gravados. */
       delete s.meta; delete s.metas;
       return s;
-    } catch(e){ return { metaMes: META_MES_PADRAO, lancamentos: [], ocultos: [] }; }
+    } catch(e){ return { metaMes: META_MES_PADRAO, custoMes: null, lancamentos: [], ocultos: [] }; }
   }
   /* ====== tempo (America/Sao_Paulo) ====== */
   var FMT = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
@@ -475,7 +487,7 @@ body.festa #fx{display:block}
      Tudo gira em torno da meta do mês. A meta do dia deixou de ser um número
      fixo: é o que falta dividido pelos dias úteis que ainda restam, então ela
      se reajusta sozinha a cada venda lançada e a cada dia que passa.
-     Dia útil = segunda a sexta. Feriados não são descontados. */
+     Dia útil = segunda a sexta, tirando os feriados. */
   function mesDe(dia){ return String(dia).slice(0,7); }
   function nomeMes(mes){
     var p = String(mes).split("-");
@@ -486,10 +498,38 @@ body.festa #fx{display:block}
     var p = String(mes).split("-");
     return new Date(Date.UTC(+p[0], +p[1], 0)).getUTCDate();
   }
+  /* Feriados que o painel desconta. A lista não foi chutada: na conciliação de
+     2026, carnaval (segunda e terça), Tiradentes, 1º de maio, Corpus Christi e
+     7 de setembro não tiveram nenhuma receita, e a Sexta-feira Santa teve uma
+     só. A quarta de cinzas teve dia normal e continua útil. Contado como útil,
+     um feriado entra no divisor sem venda nenhuma e puxa o ritmo para baixo —
+     o 7 de setembro tirava R$ 11,8 mil da projeção do mês.
+     Os móveis saem da Páscoa, então o calendário vale para qualquer ano. */
+  var feriadosCache = {};
+  function pascoa(ano){  /* algoritmo de Meeus/Jones/Butcher, calendário gregoriano */
+    var a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4;
+    var f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19*a + b - d - g + 15) % 30;
+    var i = Math.floor(c / 4), k = c % 4, l = (32 + 2*e + 2*i - h - k) % 7, m = Math.floor((a + 11*h + 22*l) / 451);
+    var n = h + l - 7*m + 114;
+    return Date.UTC(ano, Math.floor(n / 31) - 1, (n % 31) + 1, 12);
+  }
+  function feriadosDo(ano){
+    if(feriadosCache[ano]) return feriadosCache[ano];
+    var f = {}, p = pascoa(ano), DIA = 864e5;
+    function marca(ms){ f[new Date(ms).toISOString().slice(0,10)] = true; }
+    ["01-01","04-21","05-01","09-07","10-12","11-02","11-15","11-20","12-25"]
+      .forEach(function(md){ f[ano + "-" + md] = true; });
+    marca(p - 48*DIA); marca(p - 47*DIA);   /* carnaval, segunda e terça */
+    marca(p - 2*DIA);                        /* sexta-feira santa */
+    marca(p + 60*DIA);                       /* corpus christi */
+    (CONFIG.FERIADOS_EXTRAS || []).forEach(function(k){ if(String(k).slice(0,4) === String(ano)) f[k] = true; });
+    return (feriadosCache[ano] = f);
+  }
+  function ehFeriado(dia){ return !!feriadosDo(+String(dia).slice(0,4))[dia]; }
   function ehUtil(mes, dia){
     var p = String(mes).split("-");
     var s = new Date(Date.UTC(+p[0], +p[1]-1, dia, 12)).getUTCDay();
-    return s >= 1 && s <= 5;
+    return s >= 1 && s <= 5 && !ehFeriado(mes + "-" + pad(dia));
   }
   function contaUteis(mes, de, ate){
     var n = 0;
@@ -537,6 +577,13 @@ body.festa #fx{display:block}
     var uteisAposHoje = Math.max(uteisRestantes - (hojeUtil ? 1 : 0), 0);
     var projecao = acumulado + ritmoAtual * uteisAposHoje;
 
+    /* Resultado (lucro) projetado: o faturamento projetado menos o custo do
+       mês. O custo não tem ritmo — é o valor do mês inteiro, de uma vez. Sem
+       custo informado não há lucro a mostrar, e o painel diz isso em vez de
+       exibir o faturamento inteiro como se fosse lucro. */
+    var custoMes = custoDoMes();
+    var lucro = custoMes > 0 ? projecao - custoMes : null;
+
     var situacao;
     if(batida) situacao = { txt:"META BATIDA", cls:"ok" };
     else if(uteisRestantes <= 0) situacao = { txt:"MÊS ENCERRADO", cls:"ruim" };
@@ -550,7 +597,8 @@ body.festa #fx{display:block}
       uteisTotal:uteisTotal, uteisDecorridos:uteisDecorridos, uteisRestantes:uteisRestantes, hojeUtil:hojeUtil,
       ritmoAtual:ritmoAtual, ritmoNec:ritmoNec, esperado:esperado,
       metaHoje:metaHoje, pctHoje:pctHoje,
-      projecao:projecao, resultado:projecao - metaMes, uteisAposHoje:uteisAposHoje,
+      projecao:projecao, contraMeta:projecao - metaMes, uteisAposHoje:uteisAposHoje,
+      custoMes:custoMes, lucro:lucro,
       pct: metaMes > 0 ? acumulado/metaMes : 0,
       situacao:situacao
     };
@@ -561,10 +609,10 @@ body.festa #fx{display:block}
     /* preserva o que a pessoa está digitando entre renders (o painel se redesenha sozinho) */
     var foco = document.activeElement && document.activeElement.id, sel = null, vals = {};
     try { if(foco) sel = document.activeElement.selectionStart; } catch(e){}
-    ["valor","cliente","filtro","meta-mes","ed-valor","ed-hora","ed-vendedor","ed-cliente"]
+    ["valor","cliente","filtro","meta-mes","custo-mes","ed-valor","ed-hora","ed-vendedor","ed-cliente"]
       .forEach(function(id){ var e = document.getElementById(id); if(e) vals[id] = e.value; });
-    /* depois de salvar a meta o campo volta a nascer do estado, já formatado */
-    if(recarregarMetas){ delete vals["meta-mes"]; recarregarMetas = false; }
+    /* depois de salvar, os campos voltam a nascer do estado, já formatados */
+    if(recarregarMetas){ delete vals["meta-mes"]; delete vals["custo-mes"]; recarregarMetas = false; }
 
     var d = calcular();
     /* a aba da TV atravessa a virada do mês sem nunca recarregar: sem isto, a
@@ -658,7 +706,7 @@ body.festa #fx{display:block}
       + '<div style="display:flex;flex-direction:column;gap:12px">' + formHTML(d) + metasHTML(d) + '</div></div>');
 
     h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
-      + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' (seg–sex, sem descontar feriados)</span>'
+      + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' (seg–sex, sem feriados)</span>'
       + '<span>' + statusArmazenamento() + statusPlanilha() + '</span></footer>');
     h.push('</div>');
     return h.join("");
@@ -812,10 +860,10 @@ body.festa #fx{display:block}
     h.push('<aside class="tv-lado">'
       + '<div class="bloco"><p class="rot">' + esc(nomeMes(d.mes)) + '</p>'
       + '<p class="val acc tab">' + brl(d.acumulado) + '</p>'
-      /* a projeção entra na nota do mês e não num quarto bloco: a grade de três
-         foi medida para caber sem rolagem, e quatro blocos cortariam as notas */
-      + '<p class="nota"><b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b> da meta'
-      + (temProjecao(d) ? ' &middot; projeção <b>' + brl(d.projecao) + '</b>' : ' de ' + brl(d.metaMes)) + '</p></div>'
+      /* a projeção e o lucro entram na nota do mês e não em blocos próprios: a
+         grade de três foi medida para caber sem rolagem, e um quarto bloco
+         cortaria as notas */
+      + '<p class="nota">' + notaMesTV(d) + '</p></div>'
       /* um só bloco em destaque, como o painel de computador faz */
       + '<div class="bloco destaque"><p class="rot">Falta para bater</p>'
       + '<p class="val acc tab">' + brl(d.falta) + '</p>'
@@ -903,20 +951,33 @@ body.festa #fx{display:block}
       return '<section class="projecao"><div class="proj-cab"><h3>Projeção do mês</h3>'
         + '<p class="legenda">aparece depois do primeiro dia útil com venda</p></div></section>';
     }
-    var acima = d.resultado >= 0;
+    var acima = d.contraMeta >= 0;
     var conta = d.uteisAposHoje > 0
       ? brl(d.acumulado) + ' realizado + ' + brl(d.ritmoAtual) + '/dia × '
         + plural(d.uteisAposHoje, "dia útil", "dias úteis") + (d.hojeUtil ? ' depois de hoje' : ' que faltam')
-        + ' = ' + brl(d.projecao)
-      : 'não há dia útil depois de hoje: a projeção é o próprio realizado';
+        + ' = ' + brl(d.projecao) + ' de faturamento'
+      : 'não há dia útil depois de hoje: o faturamento projetado é o próprio realizado';
+    if(d.lucro !== null){
+      conta += ' &middot; ' + brl(d.projecao) + ' − ' + brl(d.custoMes) + ' de custo = '
+        + (d.lucro < 0 ? '− ' : '') + brl(Math.abs(d.lucro)) + ' de resultado';
+    }
     return '<section class="projecao">'
       + '<div class="proj-cab"><h3>Projeção do mês</h3><p class="legenda">mantido o ritmo atual até o último dia útil</p></div>'
       + '<div class="proj-num"><p class="rot">Faturamento projetado</p>'
       + '<p class="val tab">' + brl(d.projecao) + '</p>'
-      + '<p class="nota">' + (d.projecao / d.metaMes * 100).toFixed(0) + '% da meta de ' + brl(d.metaMes) + '</p></div>'
+      + '<p class="nota">' + (d.projecao / d.metaMes * 100).toFixed(0) + '% da meta &middot; '
+      + (acima ? brl(d.contraMeta) + ' acima' : 'faltam ' + brl(-d.contraMeta)) + '</p></div>'
+      + '<div class="proj-num"><p class="rot">Custo do mês</p>'
+      + '<p class="val tab">' + (d.custoMes > 0 ? brl(d.custoMes) : '—') + '</p>'
+      + '<p class="nota">' + (d.custoMes > 0 ? 'o mês inteiro, de uma vez' : 'informe no quadro Meta do mês') + '</p></div>'
       + '<div class="proj-num"><p class="rot">Resultado projetado</p>'
-      + '<p class="val tab ' + (acima ? "pos" : "neg") + '">' + (acima ? "+ " : "− ") + brl(Math.abs(d.resultado)) + '</p>'
-      + '<p class="nota">' + (acima ? "acima da meta: no ritmo, o mês fecha batido" : "abaixo da meta: no ritmo, o mês não fecha") + '</p></div>'
+      + (d.lucro === null
+          ? '<p class="val tab">—</p><p class="nota">precisa do custo do mês</p>'
+          : '<p class="val tab ' + (d.lucro >= 0 ? "pos" : "neg") + '">' + (d.lucro < 0 ? "− " : "") + brl(Math.abs(d.lucro)) + '</p>'
+            + '<p class="nota">' + (d.lucro >= 0
+                ? 'lucro &middot; margem de ' + (d.lucro / d.projecao * 100).toFixed(0) + '% sobre o faturamento'
+                : 'prejuízo, no ritmo atual') + '</p>')
+      + '</div>'
       + '<p class="proj-conta">' + conta + '</p>'
       + '</section>';
   }
@@ -934,16 +995,34 @@ body.festa #fx{display:block}
       + '<p class="aviso' + (avisoOk ? " ok" : "") + '" role="status">' + esc(aviso) + '</p></form></div>';
   }
 
+  /* custo nulo = vale o da configuração; um número = alguém salvou no painel */
+  function custoDoMes(){
+    return typeof estado.custoMes === "number" && estado.custoMes >= 0 ? estado.custoMes : (+CONFIG.CUSTO_MES || 0);
+  }
+  /* nota do bloco do mês na TV, sempre numa linha: com custo, a projeção e o
+     lucro; sem custo, o percentual da meta e a projeção */
+  function notaMesTV(d){
+    var pct = '<b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b> da meta';
+    if(!temProjecao(d)) return pct + ' de ' + brl(d.metaMes);
+    if(d.lucro === null) return pct + ' &middot; projeção <b>' + brl(d.projecao) + '</b>';
+    return 'projeção <b>' + brl(d.projecao) + '</b> &middot; '
+      + (d.lucro >= 0 ? 'lucro <b>' + brl(d.lucro) : 'prejuízo <b>' + brl(-d.lucro)) + '</b>';
+  }
+
   function metasHTML(d){
     if(somenteLeitura) return "";
+    var custoProprio = typeof estado.custoMes === "number", custoConfig = +CONFIG.CUSTO_MES || 0;
     return '<div class="painel"><h3>Meta do mês</h3>'
-      + '<p class="legenda">Vale para ' + esc(nomeMes(d.mes)) + '. O ritmo necessário sai dela.</p>'
+      + '<p class="legenda">Vale para ' + esc(nomeMes(d.mes)) + '. O ritmo necessário sai da meta; o lucro projetado, do custo.</p>'
       + '<form class="lanc metas-form" id="form-metas">'
       + '<div class="campo"><label class="rot" for="meta-mes" style="display:block;margin-bottom:6px">Meta do mês (R$)</label>'
       + '<input id="meta-mes" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(d.metaMes)) + '" aria-label="Meta do mês em reais"></div>'
-      + '<button class="btn" type="submit">Salvar meta</button>'
-      + '<p class="meta-atual">' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' no mês &middot; '
-      + brl(d.uteisTotal > 0 ? d.metaMes/d.uteisTotal : 0) + ' por dia se dividida por igual.</p>'
+      + '<div class="campo"><label class="rot" for="custo-mes" style="display:block;margin-bottom:6px">Custo do mês (R$)</label>'
+      + '<input id="custo-mes" inputmode="decimal" autocomplete="off" value="' + (custoProprio ? esc(numeroBR(estado.custoMes)) : '') + '"'
+      + ' placeholder="' + (custoConfig > 0 ? 'em branco: ' + esc(numeroBR(custoConfig)) + ', da configuração' : 'não informado') + '" aria-label="Custo do mês em reais"></div>'
+      + '<button class="btn" type="submit">Salvar</button>'
+      + '<p class="meta-atual">' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' no mês, sem feriados &middot; '
+      + brl(d.uteisTotal > 0 ? d.metaMes/d.uteisTotal : 0) + ' por dia se a meta fosse dividida por igual.</p>'
       + '<p class="aviso' + (avisoMetaOk ? " ok" : "") + '" role="status">' + esc(avisoMeta) + '</p></form></div>';
   }
 
@@ -1229,10 +1308,16 @@ body.festa #fx{display:block}
         if(!isFinite(m) || m <= 0){
           avisoMeta = "A meta precisa ser maior que zero."; avisoMetaOk = false; render(); return;
         }
+        /* custo em branco volta a valer o da configuração */
+        var ct = String(document.getElementById("custo-mes").value).trim();
+        var c = ct === "" ? null : paraNumero(ct);
+        if(c !== null && (!isFinite(c) || c < 0)){
+          avisoMeta = "O custo precisa ser um valor em reais, ou ficar em branco."; avisoMetaOk = false; render(); return;
+        }
         /* meta nova: a festa pode valer de novo se o mês passar a estar batido */
         festaVista = false;
         festaMes = ""; try { localStorage.removeItem("festa-vista"); } catch(e){}
-        salvarMetas(Math.round(m*100)/100, "Meta do mês salva.");
+        salvarMetas(Math.round(m*100)/100, c === null ? null : Math.round(c*100)/100, "Meta e custo salvos.");
       });
     }
     var lm = document.getElementById("limpar-manuais");
@@ -1367,6 +1452,7 @@ body.festa #fx{display:block}
         if(!novos.length && estado.lancamentos.length){ ultimaSync = Date.now(); syncOk = true; return enviarAPI(); }
         var mudou = JSON.stringify(novos) !== JSON.stringify(estado.lancamentos);
         if(j && typeof j.metaMes === "number" && j.metaMes > 0 && j.metaMes !== estado.metaMes){ estado.metaMes = j.metaMes; mudou = true; }
+        if(j && (typeof j.custoMes === "number" || j.custoMes === null) && j.custoMes !== estado.custoMes){ estado.custoMes = j.custoMes; mudou = true; }
         if(j && Array.isArray(j.ocultos)) estado.ocultos = j.ocultos;
         if(mudou){ estado.lancamentos = novos; gravarLocal(); render(); }
         ultimaSync = Date.now(); syncOk = true;
@@ -1377,7 +1463,7 @@ body.festa #fx{display:block}
     return fetch(CONFIG.API_URL, {
       method: "POST",
       headers: cabecalhos(),
-      body: JSON.stringify({ metaMes: estado.metaMes, lancamentos: estado.lancamentos, ocultos: estado.ocultos || [] })
+      body: JSON.stringify({ metaMes: estado.metaMes, custoMes: estado.custoMes, lancamentos: estado.lancamentos, ocultos: estado.ocultos || [] })
     }).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
       ultimaSync = Date.now(); syncOk = true;
@@ -1419,11 +1505,11 @@ body.festa #fx{display:block}
       if(avisoMeta || avisoEd){ avisoMeta = ""; avisoEd = ""; render(); }
     }, 5000);
   }
-  function salvarMetas(metaMes, ok){
-    var anterior = estado.metaMes;
-    estado.metaMes = metaMes;
+  function salvarMetas(metaMes, custoMes, ok){
+    var anterior = estado.metaMes, custoAnterior = estado.custoMes;
+    estado.metaMes = metaMes; estado.custoMes = custoMes;
     if(!gravarLocal() && !CONFIG.API_URL){
-      estado.metaMes = anterior;
+      estado.metaMes = anterior; estado.custoMes = custoAnterior;
       avisoMeta = "Não deu para salvar neste navegador."; avisoMetaOk = false; render();
       return;
     }
@@ -1724,6 +1810,7 @@ body.festa #fx{display:block}
     estado.lancamentos = salvo.lancamentos.map(normalizar).filter(Boolean);
     if(Array.isArray(salvo.ocultos)) estado.ocultos = salvo.ocultos;
     if(typeof salvo.metaMes === "number" && salvo.metaMes > 0) estado.metaMes = salvo.metaMes;
+    if(typeof salvo.custoMes === "number" && salvo.custoMes >= 0) estado.custoMes = salvo.custoMes;
   }
   if(modoTV) document.body.classList.add("tv");
   festaVista = !!festaMes && festaMes === mesDe(hojeSP());

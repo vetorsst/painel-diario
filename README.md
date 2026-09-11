@@ -31,8 +31,8 @@ deixa de ser o lugar onde se digita venda e passa a ser a régua:
   alguns minutos, então uma alteração recém-salva pode demorar a aparecer mesmo
   clicando — o botão pede uma URL diferente a cada vez para tentar furar isso,
   mas nem sempre funciona.
-- **Meta do mês** — o único campo que ainda precisa de gente. O ritmo necessário
-  e a meta do dia saem dele.
+- **Meta e custo do mês** — os únicos campos que ainda precisam de gente. Da
+  meta saem o ritmo necessário e a meta do dia; do custo, o lucro projetado.
 - **Corrigir** (✎) uma linha que veio errada da planilha: o pagador não é o
   cliente, o valor veio bruto, o nome está impossível. A linha corrigida descola
   da planilha e para de ser sobrescrita.
@@ -65,7 +65,7 @@ quatro números:
 
 Não existe meta diária fixa: **a meta do dia é o próprio ritmo necessário**, que
 se reajusta a cada venda lançada e a cada dia que passa. Dia útil é de segunda a
-sexta; feriados não são descontados.
+sexta, tirando os [feriados](#feriados).
 
 ### Projeção do mês
 
@@ -74,22 +74,44 @@ termina se o ritmo atual se mantiver até o último dia útil:
 
 | | |
 | --- | --- |
-| **Faturamento projetado** | o realizado mais o ritmo atual vezes os dias úteis que faltam depois de hoje |
-| **Resultado projetado** | a projeção contra a meta: quanto sobra ou quanto falta |
+| **Faturamento projetado** | o realizado mais o ritmo atual vezes os dias úteis que faltam depois de hoje; a nota diz quanto isso representa da meta |
+| **Custo do mês** | o custo total do mês, informado no quadro "Meta do mês" |
+| **Resultado projetado** | o lucro: faturamento projetado menos o custo do mês, com a margem sobre o faturamento |
 
 A conta vai aberta embaixo do quadro, para quem olha poder refazê-la — por
-exemplo, "R$ 65.225 realizado + R$ 7.247/dia × 13 dias úteis depois de hoje =
-R$ 159.440".
+exemplo, com um custo hipotético de R$ 150.000: "R$ 65.225 realizado +
+R$ 8.153/dia × 13 dias úteis depois de hoje = R$ 171.216 de faturamento −
+R$ 150.000 de custo = R$ 21.216 de resultado".
+
+Sem custo informado, o quadro mostra o faturamento projetado e pede o custo. O
+custo é um número só, sem nenhuma despesa linha a linha — mas, como o
+repositório e o site são públicos, quem tiver o link vê o custo e o lucro.
 
 Hoje não é contado duas vezes: o que entrou hoje já está no realizado, e hoje
 já está no divisor do ritmo atual, então a multiplicação usa só os dias úteis
 **depois** de hoje. Por isso, num dia útil, o quadro mostra um dia a menos que o
 "Falta para bater". A conta equivale a ritmo atual × dias úteis do mês.
 
-A projeção herda as limitações do ritmo atual. Feriado conta como dia útil sem
-venda e puxa o ritmo para baixo — em setembro de 2026, o dia 7 tira cerca de
-R$ 11,8 mil da projeção. E enquanto a conciliação do dia não chega, hoje entra
-no divisor com pouco ou nada no realizado.
+A projeção herda uma limitação do ritmo atual: enquanto a conciliação do dia
+não chega, hoje entra no divisor com pouco ou nada no realizado, e a projeção
+fica mais baixa até o lote do dia aparecer. E o custo não tem ritmo — é o valor
+do mês inteiro, descontado de uma vez do faturamento projetado.
+
+### Feriados
+
+Feriado não é dia útil: sai do ritmo atual, do ritmo necessário, da projeção e
+da meta do dia — na TV, feriado fica sem meta do dia, como o fim de semana. O
+painel desconta os feriados nacionais, o carnaval (segunda e terça) e Corpus
+Christi. Os de data móvel saem da Páscoa, então o calendário vale para qualquer
+ano sem manutenção.
+
+A lista não foi chutada. Na conciliação de 2026, carnaval, Tiradentes, 1º de
+maio, Corpus Christi e 7 de setembro não tiveram nenhuma receita, e a
+Sexta-feira Santa teve uma só. A quarta-feira de cinzas teve dia normal e
+continua útil.
+
+Feriado municipal ou dia sem expediente entra em `FERIADOS_EXTRAS`, na
+configuração, no formato `"AAAA-MM-DD"`.
 
 ### Lançar, corrigir e apagar
 
@@ -113,8 +135,10 @@ hoje. Abaixo dele, a barra do dia; depois, o mês contra a meta, quanto falta e
 quantos recebimentos entraram hoje; depois, quem pagou.
 
 A projeção do mês aparece na nota do bloco do mês, no lugar do valor da meta —
-que continua no rodapé. Ela não ganhou bloco próprio porque a grade de três foi
-medida para caber sem rolagem, e um quarto bloco cortaria as notas.
+que continua no rodapé. Com o custo do mês na configuração, a nota passa a
+trazer a projeção de faturamento e o lucro projetado. Nenhum dos dois ganhou
+bloco próprio porque a grade de três foi medida para caber sem rolagem, e um
+quarto bloco cortaria as notas.
 
 A meta do dia é o que falta dividido pelos dias úteis restantes, **congelada no
 realizado de ontem**. Congelar importa: o ritmo necessário se recalcula a cada
@@ -224,11 +248,16 @@ mostra um aviso acima do número grande, dizendo quantos lançamentos manuais
 caem em dias que a planilha já cobre e quanto isso representa, com um botão para
 apagar só esses.
 
-### Meta do mês
+### Meta e custo do mês
 
-O quadro "Meta do mês" tem um campo só. O que for salvo ali passa a valer no
-lugar do `META_MES` da configuração, e todo o resto do painel — ritmo
-necessário, quanto falta, meta de hoje — sai dele.
+O quadro "Meta do mês" tem dois campos. A **meta** passa a valer no lugar do
+`META_MES` da configuração, e dela saem o ritmo necessário, quanto falta e a
+meta de hoje. O **custo** passa a valer no lugar do `CUSTO_MES`, e dele sai o
+lucro projetado; deixado em branco, vale o da configuração.
+
+O que se salva no quadro fica guardado naquele navegador. A TV, que é só
+leitura, usa o que estiver na configuração — é lá que o custo precisa estar
+para o lucro aparecer na parede.
 
 ## Configuração
 
@@ -237,6 +266,8 @@ A configuração fica no início da tag `<script>` do arquivo, em `var CONFIG`:
 | Chave | O que faz |
 | --- | --- |
 | `META_MES` | Meta do mês, em reais (padrão: `250000`). O que for salvo no painel manda nisto. |
+| `CUSTO_MES` | Custo total do mês, em reais (padrão: `0`, sem custo). Dele sai o lucro projetado. O que for salvo no painel manda nisto. |
+| `FERIADOS_EXTRAS` | Dias sem expediente além dos feriados nacionais, carnaval e Corpus Christi, como `["2026-11-30"]`. |
 | `API_URL` | Endpoint que guarda o estado. Vazio: cada navegador guarda o seu no `localStorage`. Preenchido: todo mundo vê o mesmo número. |
 | `API_TOKEN` | Opcional, enviado como `Authorization: Bearer ...`. |
 | `SYNC_SEGUNDOS` | Intervalo de sincronização com a API (padrão: `15`). |
@@ -256,8 +287,9 @@ basta devolver `id`, `ts` e `valor`, já que `dia`, `hora` e `min` são deduzido
 do `ts`. `origem` vale `"csv"` na linha que veio da conciliação e vazio na
 digitada à mão.
 
-O corpo também carrega `ocultos`: os ids de linhas da planilha que foram
-apagadas no painel e não devem voltar na próxima leitura.
+O corpo também carrega `ocultos` — os ids de linhas da planilha que foram
+apagadas no painel e não devem voltar na próxima leitura — e `custoMes`, o
+custo do mês quando alguém o salvou no painel.
 
 > Não versione tokens: deixe `API_TOKEN` vazio no arquivo publicado.
 
