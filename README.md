@@ -1,7 +1,8 @@
 # Painel Comercial · Vetor SST
 
 Painel de ritmo comercial em arquivo único: mostra a meta do mês, quanto falta
-para bater, o ritmo atual e o ritmo diário necessário, com histórico completo de
+para bater, o ritmo atual, o ritmo diário necessário e onde o mês fecha nesse
+ritmo, com histórico completo de
 lançamentos e comemoração ao bater a meta. As receitas podem vir sozinhas da
 [planilha de conciliação bancária](#conciliação-bancária), com o nome de quem
 pagou.
@@ -66,6 +67,30 @@ Não existe meta diária fixa: **a meta do dia é o próprio ritmo necessário**
 se reajusta a cada venda lançada e a cada dia que passa. Dia útil é de segunda a
 sexta; feriados não são descontados.
 
+### Projeção do mês
+
+Abaixo dos quatro números, o quadro **Projeção do mês** responde onde o mês
+termina se o ritmo atual se mantiver até o último dia útil:
+
+| | |
+| --- | --- |
+| **Faturamento projetado** | o realizado mais o ritmo atual vezes os dias úteis que faltam depois de hoje |
+| **Resultado projetado** | a projeção contra a meta: quanto sobra ou quanto falta |
+
+A conta vai aberta embaixo do quadro, para quem olha poder refazê-la — por
+exemplo, "R$ 65.225 realizado + R$ 7.247/dia × 13 dias úteis depois de hoje =
+R$ 159.440".
+
+Hoje não é contado duas vezes: o que entrou hoje já está no realizado, e hoje
+já está no divisor do ritmo atual, então a multiplicação usa só os dias úteis
+**depois** de hoje. Por isso, num dia útil, o quadro mostra um dia a menos que o
+"Falta para bater". A conta equivale a ritmo atual × dias úteis do mês.
+
+A projeção herda as limitações do ritmo atual. Feriado conta como dia útil sem
+venda e puxa o ritmo para baixo — em setembro de 2026, o dia 7 tira cerca de
+R$ 11,8 mil da projeção. E enquanto a conciliação do dia não chega, hoje entra
+no divisor com pouco ou nada no realizado.
+
 ### Lançar, corrigir e apagar
 
 - **Lançar** uma venda pelo quadro "Lançar venda": valor, vendedor e cliente.
@@ -86,6 +111,10 @@ continua igual ao de sempre, para corrigir alguma coisa pelo computador.
 O número grande é a **meta do dia**, porque é o que a equipe consegue mudar
 hoje. Abaixo dele, a barra do dia; depois, o mês contra a meta, quanto falta e
 quantos recebimentos entraram hoje; depois, quem pagou.
+
+A projeção do mês aparece na nota do bloco do mês, no lugar do valor da meta —
+que continua no rodapé. Ela não ganhou bloco próprio porque a grade de três foi
+medida para caber sem rolagem, e um quarto bloco cortaria as notas.
 
 A meta do dia é o que falta dividido pelos dias úteis restantes, **congelada no
 realizado de ontem**. Congelar importa: o ritmo necessário se recalcula a cada

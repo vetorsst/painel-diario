@@ -97,6 +97,19 @@ body:not(.tv) .barra{margin-top:26px}
 .kpi .nota{margin:7px 0 0;font-size:.72rem;color:var(--ink-3)}
 .kpi.destaque{background:linear-gradient(160deg,rgba(255,205,28,.14),rgba(255,205,28,.03));border-color:rgba(255,205,28,.28)}
 
+/* ---------- projeção do mês ---------- */
+/* título no topo e números embaixo, como os outros quadros do painel: com o
+   título numa coluna própria as três colunas não liam como uma linha só */
+.projecao{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 24px;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.proj-cab{grid-column:1/-1}
+.projecao h3{margin:0 0 2px;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.projecao .legenda{margin:0;font-size:.72rem;color:var(--ink-3)}
+.proj-num .val{margin:8px 0 0;font-size:clamp(1.35rem,2.6vw,2rem);font-weight:800;letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums}
+.proj-num .val.pos{color:var(--ok)}
+.proj-num .val.neg{color:var(--alerta)}
+.proj-num .nota{margin:7px 0 0;font-size:.72rem;color:var(--ink-3)}
+.proj-conta{grid-column:1/-1;margin:0;padding-top:12px;border-top:1px solid var(--line);font-size:.74rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
 /* ---------- grid principal ---------- */
 .colunas{display:grid;grid-template-columns:1.45fr 1fr;gap:12px;margin-top:12px;align-items:start}
 .painel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
@@ -516,6 +529,14 @@ body.festa #fx{display:block}
     var metaHoje = uteisRestantes > 0 ? Math.max(metaMes - ateOntem, 0) / uteisRestantes : 0;
     var pctHoje = metaHoje > 0 ? hojeTotal / metaHoje : (hojeTotal > 0 ? 1 : 0);
 
+    /* Projeção: o realizado mais o ritmo atual vezes os dias úteis que ainda
+       vêm DEPOIS de hoje. Hoje não entra de novo — o que entrou hoje já está
+       no realizado, e hoje já está no divisor do ritmo atual. Contado duas
+       vezes, o dia de hoje inflaria a projeção em um ritmo inteiro. A conta
+       fecha igual a ritmo atual × dias úteis do mês. */
+    var uteisAposHoje = Math.max(uteisRestantes - (hojeUtil ? 1 : 0), 0);
+    var projecao = acumulado + ritmoAtual * uteisAposHoje;
+
     var situacao;
     if(batida) situacao = { txt:"META BATIDA", cls:"ok" };
     else if(uteisRestantes <= 0) situacao = { txt:"MÊS ENCERRADO", cls:"ruim" };
@@ -529,7 +550,7 @@ body.festa #fx{display:block}
       uteisTotal:uteisTotal, uteisDecorridos:uteisDecorridos, uteisRestantes:uteisRestantes, hojeUtil:hojeUtil,
       ritmoAtual:ritmoAtual, ritmoNec:ritmoNec, esperado:esperado,
       metaHoje:metaHoje, pctHoje:pctHoje,
-      projecao: ritmoAtual * uteisTotal,
+      projecao:projecao, resultado:projecao - metaMes, uteisAposHoje:uteisAposHoje,
       pct: metaMes > 0 ? acumulado/metaMes : 0,
       situacao:situacao
     };
@@ -630,6 +651,8 @@ body.festa #fx{display:block}
               : (d.batida || d.uteisRestantes <= 0 ? plural(d.doDia.length, "venda lançada", "vendas lançadas")
                  : "de " + brl(d.metaHoje) + " que hoje precisa trazer"))
       + '</section>');
+
+    h.push(projecaoHTML(d));
 
     h.push('<div class="colunas">' + lancamentosHTML(d)
       + '<div style="display:flex;flex-direction:column;gap:12px">' + formHTML(d) + metasHTML(d) + '</div></div>');
@@ -789,7 +812,10 @@ body.festa #fx{display:block}
     h.push('<aside class="tv-lado">'
       + '<div class="bloco"><p class="rot">' + esc(nomeMes(d.mes)) + '</p>'
       + '<p class="val acc tab">' + brl(d.acumulado) + '</p>'
-      + '<p class="nota">de ' + brl(d.metaMes) + ' &middot; <b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b> da meta</p></div>'
+      /* a projeção entra na nota do mês e não num quarto bloco: a grade de três
+         foi medida para caber sem rolagem, e quatro blocos cortariam as notas */
+      + '<p class="nota"><b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b> da meta'
+      + (temProjecao(d) ? ' &middot; projeção <b>' + brl(d.projecao) + '</b>' : ' de ' + brl(d.metaMes)) + '</p></div>'
       /* um só bloco em destaque, como o painel de computador faz */
       + '<div class="bloco destaque"><p class="rot">Falta para bater</p>'
       + '<p class="val acc tab">' + brl(d.falta) + '</p>'
@@ -865,6 +891,34 @@ body.festa #fx{display:block}
   }
   function kpi(rot, val, nota, cls, extra){
     return '<div class="kpi ' + (extra||"") + '"><p class="rot">' + rot + '</p><p class="val ' + (cls||"") + ' tab">' + val + '</p><p class="nota">' + nota + '</p></div>';
+  }
+
+  /* ---- projeção do mês ----
+     Mantido o ritmo atual até o último dia útil, quanto o mês fatura e quanto
+     sobra ou falta contra a meta. A conta vai aberta embaixo: uma projeção que
+     ninguém consegue refazer de cabeça não convence ninguém. */
+  function temProjecao(d){ return d.uteisDecorridos > 0 && d.acumulado > 0; }
+  function projecaoHTML(d){
+    if(!temProjecao(d)){
+      return '<section class="projecao"><div class="proj-cab"><h3>Projeção do mês</h3>'
+        + '<p class="legenda">aparece depois do primeiro dia útil com venda</p></div></section>';
+    }
+    var acima = d.resultado >= 0;
+    var conta = d.uteisAposHoje > 0
+      ? brl(d.acumulado) + ' realizado + ' + brl(d.ritmoAtual) + '/dia × '
+        + plural(d.uteisAposHoje, "dia útil", "dias úteis") + (d.hojeUtil ? ' depois de hoje' : ' que faltam')
+        + ' = ' + brl(d.projecao)
+      : 'não há dia útil depois de hoje: a projeção é o próprio realizado';
+    return '<section class="projecao">'
+      + '<div class="proj-cab"><h3>Projeção do mês</h3><p class="legenda">mantido o ritmo atual até o último dia útil</p></div>'
+      + '<div class="proj-num"><p class="rot">Faturamento projetado</p>'
+      + '<p class="val tab">' + brl(d.projecao) + '</p>'
+      + '<p class="nota">' + (d.projecao / d.metaMes * 100).toFixed(0) + '% da meta de ' + brl(d.metaMes) + '</p></div>'
+      + '<div class="proj-num"><p class="rot">Resultado projetado</p>'
+      + '<p class="val tab ' + (acima ? "pos" : "neg") + '">' + (acima ? "+ " : "− ") + brl(Math.abs(d.resultado)) + '</p>'
+      + '<p class="nota">' + (acima ? "acima da meta: no ritmo, o mês fecha batido" : "abaixo da meta: no ritmo, o mês não fecha") + '</p></div>'
+      + '<p class="proj-conta">' + conta + '</p>'
+      + '</section>';
   }
 
   function formHTML(d){
