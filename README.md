@@ -16,34 +16,29 @@ pagou.
 | `…/painel-diario/?tv` | **A televisão.** Só leitura. Fica aberta o dia inteiro no PC ligado na TV. |
 | `…/painel-diario/` | **O computador.** Mesmo painel, com o que dá para mexer. |
 
-O `?tv` é tela de parede: some o formulário de lançar venda, somem os botões ✎ e
-×, some o campo de meta e o botão de histórico. Sobra o número grande, a barra
-do dia, três indicadores do mês e a lista de quem pagou. Tipografia dimensionada
-para leitura a 3–6 metros, e o layout inteiro cabe numa tela sem rolagem.
+O `?tv` é tela de parede: some o campo de meta, some o custo e some o botão de
+histórico. Sobra o número grande, a barra do dia, três indicadores do mês e a
+lista de quem pagou. Tipografia dimensionada para leitura a 3–6 metros, e o
+layout inteiro cabe numa tela sem rolagem.
 
-Sem o `?tv`, o mesmo arquivo abre o painel completo. Com a planilha ligada, ele
-deixa de ser o lugar onde se digita venda e passa a ser a régua:
+Sem o `?tv`, o mesmo arquivo abre o painel completo. Ele não é onde se lança
+venda — é a régua:
 
 - **Atualizar** — relê a planilha na hora, sem recarregar a página. O F5 jogaria
-  fora o estado da tela (o que está sendo digitado, a edição aberta, o dia
-  expandido no histórico) só para buscar um CSV de poucos kB. Sozinho, o painel
+  fora o estado da tela (a meta sendo digitada, o filtro, o dia expandido no
+  histórico) só para buscar um CSV de poucos kB. Sozinho, o painel
   relê a cada `CSV_SEGUNDOS`. O Google guarda o CSV publicado em cache por
   alguns minutos, então uma alteração recém-salva pode demorar a aparecer mesmo
   clicando — o botão pede uma URL diferente a cada vez para tentar furar isso,
   mas nem sempre funciona.
 - **Meta e custo do mês** — os únicos campos que ainda precisam de gente. Da
   meta saem o ritmo necessário e a meta do dia; do custo, o lucro projetado.
-- **Corrigir** (✎) uma linha que veio errada da planilha: o pagador não é o
-  cliente, o valor veio bruto, o nome está impossível. A linha corrigida descola
-  da planilha e para de ser sobrescrita.
-- **Apagar** (×) uma linha que não deveria contar como venda. Ela não volta na
-  próxima leitura.
 - **Histórico** — todos os dias, com busca por cliente ou valor e exportação em
   CSV. É onde se confere o mês fechado.
-- **Lançar venda** — continua existindo, mas com a conciliação ligada quase
-  nunca é o certo: o painel mede dinheiro que caiu na conta, e o que for
-  digitado à mão vai contar em dobro quando a mesma receita chegar pela
-  planilha. Use só para o que nunca vai passar pelo banco.
+
+Receita, não. **Não se lança, corrige nem apaga recebimento pelo painel** — nem
+no computador, nem na TV. O que muda o número é a planilha financeira, e só
+ela. Uma linha errada se conserta lá, e na próxima leitura o painel acompanha.
 
 ## Como usar
 
@@ -113,20 +108,31 @@ continua útil.
 Feriado municipal ou dia sem expediente entra em `FERIADOS_EXTRAS`, na
 configuração, no formato `"AAAA-MM-DD"`.
 
-### Lançar, corrigir e apagar
+### A receita não se edita pelo painel
 
-- **Lançar** uma venda pelo quadro "Lançar venda": valor, vendedor e cliente.
-- **Corrigir** pelo botão ✎, tanto na lista do painel quanto no histórico. Dá
-  para mudar valor, hora, vendedor e cliente. Ao mudar a hora, o lançamento se
-  reposiciona sem trocar de dia.
-- **Apagar** pelo botão ×, que pede confirmação antes.
+O painel exibe recebimento; não o cria, não o corrige e não o apaga. Meta e
+custo do mês continuam sendo digitados, porque não saem de lugar nenhum — mas
+não são receita.
+
+Isso já foi diferente, e o motivo de ter mudado vale registrar. Enquanto dava
+para apagar uma linha pelo painel, o id dela ia para uma lista de *ocultos* no
+navegador e era pulado **em toda leitura seguinte, para sempre**. Uma linha
+corrigida pelo ✎ "descolava" da planilha e parava de ser atualizada. As duas
+coisas moravam só naquele navegador: a tela dizia "2.734 receitas lidas da
+planilha" e mostrava um total que a planilha nunca disse. Num painel pendurado
+na parede, ninguém tinha como desconfiar.
+
+Por isso a leitura passou a ser substituição, não mistura: o que está na tela é
+o que está na planilha. E, ao abrir, o painel descarta o que tiver ficado
+guardado de lançamento digitado, linha corrigida ou lista de ocultos — um
+navegador que já tenha sido mexido se conserta sozinho no primeiro acesso.
 
 ## Modo TV
 
 Acrescente `?tv` ao endereço — `https://vetorsst.github.io/painel-diario/?tv` — e
-o painel vira tela de parede: sem formulário de lançar venda, sem ✎ e ×, sem
-campo de meta, sem histórico. Só o que se lê de longe. Sem o `?tv`, o painel
-continua igual ao de sempre, para corrigir alguma coisa pelo computador.
+o painel vira tela de parede: sem campo de meta, sem custo, sem histórico. Só o
+que se lê de longe. Sem o `?tv`, o mesmo arquivo abre o painel completo, com
+meta, custo e histórico.
 
 ### O que a TV mostra
 
@@ -169,10 +175,9 @@ não há meta do dia: o mês assume o número grande.
 
 ## Conciliação bancária
 
-Com `CSV_RECEITAS` preenchido, o painel lê a planilha de conciliação sozinho e
-ninguém precisa lançar receita a receita. Cada linha com `Categoria = Receita`
-vira um lançamento, com o **nome de quem pagou** no lugar do cliente, e essas
-linhas aparecem com o selo **planilha**.
+A planilha de conciliação é a **única fonte de receita** do painel. Cada linha
+com `Categoria = Receita` vira um lançamento, com o **nome de quem pagou** no
+lugar do cliente. O painel lê e exibe; quem altera o número é a planilha.
 
 Como a conciliação guarda o dia e não a hora, o lançamento que vem dela mostra
 um traço no lugar do relógio, em vez de fingir uma hora que ninguém marcou.
@@ -227,9 +232,7 @@ descrição e valor — então:
 | Linha nova na planilha | entra sozinha |
 | Valor corrigido na planilha | se propaga para o painel |
 | Linha sai da planilha | some do painel |
-| Você apaga a linha no painel | ela não volta na próxima leitura |
-| Você corrige a linha pelo ✎ | ela descola da planilha e a sua versão manda |
-| Lançamento digitado à mão | nunca é tocado |
+| Linha apagada, corrigida ou digitada num navegador antigo | é descartada ao abrir |
 
 O rodapé mostra quantas receitas foram lidas e a que horas — ou o motivo, se a
 leitura falhar.
@@ -239,14 +242,6 @@ das linhas que vieram da planilha, o painel **recusa a leitura** e acende o
 alerta em vez de aplicar. Um CSV cortado no meio do download, ou a `=QUERY`
 virando `#REF!`, devolve um resultado válido e curto — e sem essa trava o mês
 inteiro evaporaria da tela sem ninguém perceber.
-
-### Contando duas vezes
-
-Quando a planilha passa a cobrir um dia em que já havia lançamento digitado à
-mão, os dois somam e o mês incha. O painel não escolhe sozinho o que apagar:
-mostra um aviso acima do número grande, dizendo quantos lançamentos manuais
-caem em dias que a planilha já cobre e quanto isso representa, com um botão para
-apagar só esses.
 
 ### Meta e custo do mês
 
@@ -268,28 +263,23 @@ A configuração fica no início da tag `<script>` do arquivo, em `var CONFIG`:
 | `META_MES` | Meta do mês, em reais (padrão: `250000`). O que for salvo no painel manda nisto. |
 | `CUSTO_MES` | Custo total do mês, em reais (padrão: `0`, sem custo). Dele sai o lucro projetado. O que for salvo no painel manda nisto. |
 | `FERIADOS_EXTRAS` | Dias sem expediente além dos feriados nacionais, carnaval e Corpus Christi, como `["2026-11-30"]`. |
-| `API_URL` | Endpoint que guarda o estado. Vazio: cada navegador guarda o seu no `localStorage`. Preenchido: todo mundo vê o mesmo número. |
+| `API_URL` | Endpoint que sincroniza **meta e custo** entre navegadores. Vazio: cada navegador guarda os seus no `localStorage`. Receita nunca passa por aqui. |
 | `API_TOKEN` | Opcional, enviado como `Authorization: Bearer ...`. |
 | `SYNC_SEGUNDOS` | Intervalo de sincronização com a API (padrão: `15`). |
-| `CSV_RECEITAS` | URL do CSV publicado da conciliação bancária. Vazio: nada muda e tudo é lançado à mão. Preenchido: as receitas entram sozinhas. |
+| `CSV_RECEITAS` | URL do CSV publicado da conciliação bancária. É a única fonte de receita do painel: vazio, o painel não tem o que mostrar. |
 | `CSV_SEGUNDOS` | Intervalo de leitura da planilha (padrão: `300`). |
 
 ### Contrato da API
 
+A API sincroniza **só meta e custo** entre navegadores. Receita não passa por
+ela: vem da planilha financeira e de mais lugar nenhum, nem de um servidor.
+
 Dois métodos na mesma URL:
 
-- `GET` devolve `{"metaMes":250000,"lancamentos":[ ... ]}` (ou só o array).
-- `POST` recebe `{"metaMes":250000,"lancamentos":[ ... ]}` e grava tudo.
+- `GET` devolve `{"metaMes":250000,"custoMes":150000}`.
+- `POST` recebe o mesmo corpo e grava.
 
-Cada lançamento tem o formato
-`{id, ts, dia:"AAAA-MM-DD", hora, min, valor, vendedor, cliente, origem}` —
-basta devolver `id`, `ts` e `valor`, já que `dia`, `hora` e `min` são deduzidos
-do `ts`. `origem` vale `"csv"` na linha que veio da conciliação e vazio na
-digitada à mão.
-
-O corpo também carrega `ocultos` — os ids de linhas da planilha que foram
-apagadas no painel e não devem voltar na próxima leitura — e `custoMes`, o
-custo do mês quando alguém o salvou no painel.
+`custoMes` pode vir `null`, e aí vale o `CUSTO_MES` da configuração.
 
 > Não versione tokens: deixe `API_TOKEN` vazio no arquivo publicado.
 

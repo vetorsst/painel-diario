@@ -120,14 +120,9 @@ body:not(.tv) .barra{margin-top:26px}
 .lanc{display:flex;flex-direction:column;gap:10px}
 .campo{position:relative}
 .campo input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line-forte);border-radius:10px;color:var(--ink);font:inherit;font-size:1rem;padding:12px 14px}
-.campo input#valor{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;padding:14px;font-variant-numeric:tabular-nums}
 .campo input::placeholder{color:var(--ink-3);font-weight:400;letter-spacing:0}
 .campo input:focus{outline:2px solid var(--amarelo);outline-offset:1px;border-color:transparent}
-.chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{background:rgba(255,255,255,.05);border:1px solid var(--line-forte);color:var(--ink-2);border-radius:999px;padding:7px 13px;font:inherit;font-size:.76rem;font-weight:600;cursor:pointer;transition:.15s}
-.chip:hover{border-color:var(--ink-3);color:var(--ink)}
-.chip[aria-pressed="true"]{background:var(--amarelo);border-color:var(--amarelo);color:#04151d}
-.chip:focus-visible,.btn:focus-visible,.btn-ghost:focus-visible,.mini:focus-visible{outline:2px solid var(--amarelo);outline-offset:2px}
+.btn:focus-visible,.btn-ghost:focus-visible{outline:2px solid var(--amarelo);outline-offset:2px}
 .btn{background:var(--amarelo);color:#04151d;border:0;border-radius:10px;padding:13px 18px;font:inherit;font-size:.92rem;font-weight:800;letter-spacing:.02em;cursor:pointer;transition:.15s}
 .btn:hover{filter:brightness(1.08)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
@@ -141,15 +136,7 @@ body:not(.tv) .barra{margin-top:26px}
 .lista .qtd{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .lista .quem{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lista .quando{color:var(--ink-3);font-size:.74rem;font-variant-numeric:tabular-nums;flex:none}
-.mini{background:none;border:0;color:var(--ink-3);cursor:pointer;font:inherit;font-size:.9rem;line-height:1;padding:4px 6px;border-radius:6px;flex:none}
-.mini:hover{color:var(--alerta);background:rgba(255,125,99,.12)}
-.mini.confirma{color:var(--alerta);font-size:.7rem;font-weight:700;letter-spacing:.08em}
 .vazio{margin:6px 0 0;font-size:.8rem;color:var(--ink-3)}
-.tag-fonte{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:5px;border:1px solid rgba(255,205,28,.32);background:rgba(255,205,28,.1);color:var(--amarelo);font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;vertical-align:1px}
-.alerta-dupla{width:100%;margin:14px 0 0;border:1px solid rgba(255,125,99,.4);background:rgba(255,125,99,.1);color:var(--ink-2);border-radius:12px;padding:12px 16px;font-size:.78rem;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.alerta-dupla b{color:var(--alerta)}
-.alerta-dupla button{margin-left:auto;background:none;border:1px solid rgba(255,125,99,.5);color:var(--alerta);border-radius:8px;padding:6px 12px;font:inherit;font-size:.74rem;font-weight:600;cursor:pointer}
-.alerta-dupla button:hover{background:rgba(255,125,99,.16)}
 .rodape{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.7rem;color:var(--ink-3);letter-spacing:.04em}
 
 /* ---------- meta do mês ---------- */
@@ -158,22 +145,6 @@ body:not(.tv) .barra{margin-top:26px}
 .meta-atual{margin:0;font-size:.72rem;color:var(--ink-3)}
 
 /* ---------- editar lançamento ---------- */
-.acoes{display:inline-flex;align-items:center;gap:1px;flex:none}
-.mini.editar:hover{color:var(--amarelo);background:rgba(255,205,28,.12)}
-.mini.manter:hover{color:var(--ink);background:rgba(255,255,255,.08)}
-.lista li.editando,.hist-edit{display:block;padding:12px 0;border-top:1px solid rgba(255,255,255,.05)}
-.lista li.editando:first-child,.hist-edit:first-child{border-top:0}
-.edicao{display:flex;flex-direction:column;gap:11px;background:rgba(255,255,255,.04);border:1px solid var(--line-forte);border-radius:12px;padding:14px}
-.edicao .rot{margin:0}
-.ed-grade{display:grid;grid-template-columns:auto 1fr;gap:9px 12px;align-items:center}
-.ed-grade input,.ed-grade select{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line-forte);border-radius:9px;color:var(--ink);font:inherit;font-size:.92rem;padding:9px 11px}
-.ed-grade input:focus,.ed-grade select:focus{outline:2px solid var(--amarelo);outline-offset:1px;border-color:transparent}
-.ed-grade input[type="time"]{color-scheme:dark}
-.ed-grade select{cursor:pointer}
-.ed-grade input#ed-valor{font-weight:700;font-variant-numeric:tabular-nums}
-.ed-botoes{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-.ed-botoes .btn{padding:10px 16px;font-size:.85rem}
-.ed-botoes .link{padding:9px 15px}
 
 /* ---------- histórico ---------- */
 .acoes-topo{display:flex;align-items:center;gap:10px}
@@ -205,12 +176,11 @@ body:not(.tv) .barra{margin-top:26px}
 .dia.batido .db i{background:var(--amarelo)}
 .selo{font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#04151d;background:var(--amarelo);border-radius:999px;padding:3px 9px}
 .dia-corpo{padding:0 18px 8px}
-.hist-linha{display:grid;grid-template-columns:56px 1fr 120px 62px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid rgba(255,255,255,.05);font-size:.86rem}
+.hist-linha{display:grid;grid-template-columns:56px 1fr 120px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid rgba(255,255,255,.05);font-size:.86rem}
 .hist-linha .hora{color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:.78rem}
 .hist-linha .quem{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hist-linha .quem b{color:var(--ink);font-weight:600}
 .hist-linha .val{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
-.hist-linha .acao{text-align:right}
 .sem-resultado{margin:26px 0;text-align:center;color:var(--ink-3);font-size:.88rem}
 
 /* banner meta batida */
@@ -357,16 +327,14 @@ body.festa #fx{display:block}
   .hero-dir{align-items:flex-start;text-align:left}
   .ticks span:nth-child(even){visibility:hidden}
   .resumo{grid-template-columns:1fr 1fr;gap:8px}
-  .hist-linha{grid-template-columns:48px 1fr 96px 56px;gap:8px}
-  .ed-grade{grid-template-columns:1fr;gap:5px 0}
-  .ed-grade .rot{margin-top:6px}
+  .hist-linha{grid-template-columns:48px 1fr 96px;gap:8px}
 }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
-<script type="application/json" id="estado">{"metaMes":250000,"lancamentos":[],"ocultos":[]}</script>
+<script type="application/json" id="estado">{"metaMes":250000,"lancamentos":[]}</script>
 <script id="app-script">
 (function(){
   "use strict";
@@ -410,18 +378,17 @@ body.festa #fx{display:block}
   };
   /* ====== estado ====== */
   var META_MES_PADRAO = CONFIG.META_MES || 250000;
-  var VENDEDORES = ["Felipe","Fran","Glauber","Outro"];
   var estado = lerEstado();
-  var somenteLeitura = false, semSalvar = false, vendedorSel = "", aviso = "", avisoOk = false, confirmarId = "", rascunho = null;
+  var somenteLeitura = false, avisoOk = false;
   var festaVista = false, tela = "painel", filtro = "", diasAbertos = {}, avisoHist = "";
-  var editandoId = "", avisoEd = "", avisoMeta = "", avisoMetaOk = false, focarEdicao = false, recarregarMetas = false;
+  var avisoMeta = "", avisoMetaOk = false, recarregarMetas = false;
   var atualizando = false;
   /* ?tv na URL: tela de parede — nada em que clicar, tudo lido de longe */
   var modoTV = /(^|[?&#])tv(?:[=&#]|$)/i.test(location.search + location.hash);
   if(modoTV) somenteLeitura = true;
   /* a festa mora no localStorage, não no sessionStorage: na TV o PC reinicia
      toda manhã, e os fogos voltavam a explodir todo dia do mês já batido */
-  var festaMes = "", avisoGrave = "";
+  var festaMes = "";
   try { festaMes = localStorage.getItem("festa-vista") || ""; } catch(e){}
   try { tela = sessionStorage.getItem("tela") === "historico" ? "historico" : "painel"; } catch(e){}
   /* festaVista só é resolvido lá no ciclo, no fim do arquivo: FMT (o fuso de
@@ -434,7 +401,9 @@ body.festa #fx{display:block}
       var s = JSON.parse(document.getElementById("estado").textContent);
       if(!s || typeof s !== "object") throw 0;
       if(!Array.isArray(s.lancamentos)) s.lancamentos = [];
-      if(!Array.isArray(s.ocultos)) s.ocultos = [];
+      /* ocultos eram as linhas da planilha apagadas pelo painel, que não se
+         apaga mais: o campo deixa de ser lido e some da próxima gravação */
+      delete s.ocultos;
       if(typeof s.metaMes !== "number" || !(s.metaMes > 0)) s.metaMes = META_MES_PADRAO;
       /* custo nulo = vale o da configuração. O padrão não é gravado no estado,
          de propósito: se fosse, o 0 de hoje ficaria no localStorage da TV e
@@ -444,7 +413,7 @@ body.festa #fx{display:block}
          sai da meta do mês, então esses campos deixam de ser lidos e gravados. */
       delete s.meta; delete s.metas;
       return s;
-    } catch(e){ return { metaMes: META_MES_PADRAO, custoMes: null, lancamentos: [], ocultos: [] }; }
+    } catch(e){ return { metaMes: META_MES_PADRAO, custoMes: null, lancamentos: [] }; }
   }
   /* ====== tempo (America/Sao_Paulo) ====== */
   var FMT = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
@@ -609,7 +578,7 @@ body.festa #fx{display:block}
     /* preserva o que a pessoa está digitando entre renders (o painel se redesenha sozinho) */
     var foco = document.activeElement && document.activeElement.id, sel = null, vals = {};
     try { if(foco) sel = document.activeElement.selectionStart; } catch(e){}
-    ["valor","cliente","filtro","meta-mes","custo-mes","ed-valor","ed-hora","ed-vendedor","ed-cliente"]
+    ["filtro","meta-mes","custo-mes"]
       .forEach(function(id){ var e = document.getElementById(id); if(e) vals[id] = e.value; });
     /* depois de salvar, os campos voltam a nascer do estado, já formatados */
     if(recarregarMetas){ delete vals["meta-mes"]; delete vals["custo-mes"]; recarregarMetas = false; }
@@ -669,9 +638,6 @@ body.festa #fx{display:block}
       h.push('<button class="banner" id="revive" style="margin-top:16px">🎉 Meta do mês batida — PIX maluco pra todo mundo · clique pra comemorar de novo</button>');
     }
 
-    /* antes do número grande: se houver contagem dobrada, é ele que está errado */
-    h.push(alertaDuplicataHTML());
-
     h.push('<section class="hero"><div><p class="rot">Realizado em ' + esc(nomeMes(d.mes)) + '</p>'
       + '<p class="big' + (d.acumulado ? "" : " zerado") + ' tab">' + brl(d.acumulado) + '</p>'
       + '<p class="sub">de <span class="metaval tab">' + brl(d.metaMes) + '</span> &middot; <b>' + (d.pct*100).toFixed(1).replace(".",",") + '%</b> da meta do mês</p></div>'
@@ -703,11 +669,11 @@ body.festa #fx{display:block}
     h.push(projecaoHTML(d));
 
     h.push('<div class="colunas">' + lancamentosHTML(d)
-      + '<div style="display:flex;flex-direction:column;gap:12px">' + formHTML(d) + metasHTML(d) + '</div></div>');
+      + '<div style="display:flex;flex-direction:column;gap:12px">' + metasHTML(d) + '</div></div>');
 
     h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
       + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' (seg–sex, sem feriados)</span>'
-      + '<span>' + statusArmazenamento() + statusPlanilha() + '</span></footer>');
+      + '<span>' + [statusArmazenamento(), statusPlanilha().replace(/^ &middot; /, "")].filter(Boolean).join(" &middot; ") + '</span></footer>');
     h.push('</div>');
     return h.join("");
   }
@@ -821,9 +787,8 @@ body.festa #fx{display:block}
 
     /* leitura da planilha falhando é a única coisa que interrompe a tela: o
        número fica velho e ninguém tem como desconfiar olhando de longe */
-    var alerta = avisoGrave ? avisoGrave
-      : (CONFIG.CSV_RECEITAS && !csvOk ? "Planilha não lida" + (csvStatus ? " · " + csvStatus : "")
-        : (planilhaVelha() ? "Planilha sem resposta há mais de 20 minutos" : ""));
+    var alerta = CONFIG.CSV_RECEITAS && !csvOk ? "Planilha não lida" + (csvStatus ? " · " + csvStatus : "")
+      : (planilhaVelha() ? "Planilha sem resposta há mais de 20 minutos" : "");
     if(alerta) h.push('<div class="tv-alerta">' + esc(alerta) + ' — os números podem estar velhos</div>');
 
     h.push(tvHeroHTML(d));
@@ -877,7 +842,7 @@ body.festa #fx{display:block}
 
     h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
       + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + '</span>'
-      + '<span>' + (CONFIG.CSV_RECEITAS ? statusPlanilha().replace(/^ &middot; /, "") : statusArmazenamento()) + '</span></footer>');
+      + '<span>' + statusPlanilha().replace(/^ &middot; /, "") + '</span></footer>');
     h.push('</div>');
     return h.join("");
   }
@@ -928,7 +893,6 @@ body.festa #fx{display:block}
   /* a conciliação guarda o dia, não a hora — então a linha que veio dela mostra
      um traço no lugar do relógio, em vez de fingir uma hora que ninguém marcou */
   function horaDe(l){ return l.origem === "csv" ? "—" : pad(l.hora) + ":" + pad(l.min); }
-  function selo(l){ return l.origem === "csv" ? ' <span class="tag-fonte">planilha</span>' : ""; }
   function porDia(){ return '<span style="font-size:.5em;font-weight:600;color:var(--ink-3)">/dia</span>'; }
   function notaSituacao(d){
     if(d.batida) return "<b>" + brl(d.acumulado - d.metaMes) + "</b> acima da meta do mês";
@@ -982,19 +946,6 @@ body.festa #fx{display:block}
       + '</section>';
   }
 
-  function formHTML(d){
-    if(somenteLeitura) return '<div class="painel"><h3>Lançar venda</h3><p class="vazio">Este acesso é somente leitura. Peça o link de edição para lançar vendas.</p></div>';
-    return '<div class="painel"><h3>Lançar venda</h3><p class="legenda">Some ao mês — todo mundo vê na hora.</p>'
-      + '<form class="lanc" id="form"><div class="campo"><label class="rot" for="valor" style="display:block;margin-bottom:6px">Valor</label>'
-      + '<input id="valor" inputmode="decimal" autocomplete="off" placeholder="0,00" aria-label="Valor da venda"></div>'
-      + '<div><p class="rot" style="margin-bottom:7px">Vendedor</p><div class="chips">'
-      + VENDEDORES.map(function(v){ return '<button type="button" class="chip" data-v="' + esc(v) + '" aria-pressed="' + (vendedorSel === v) + '">' + esc(v) + '</button>'; }).join("")
-      + '</div></div>'
-      + '<div class="campo"><input id="cliente" autocomplete="off" placeholder="Cliente (opcional)" aria-label="Cliente"></div>'
-      + '<button class="btn" type="submit">Lançar venda</button>'
-      + '<p class="aviso' + (avisoOk ? " ok" : "") + '" role="status">' + esc(aviso) + '</p></form></div>';
-  }
-
   /* custo nulo = vale o da configuração; um número = alguém salvou no painel */
   function custoDoMes(){
     return typeof estado.custoMes === "number" && estado.custoMes >= 0 ? estado.custoMes : (+CONFIG.CUSTO_MES || 0);
@@ -1026,80 +977,21 @@ body.festa #fx{display:block}
       + '<p class="aviso' + (avisoMetaOk ? " ok" : "") + '" role="status">' + esc(avisoMeta) + '</p></form></div>';
   }
 
-  /* ---- planilha e mão contando o mesmo dinheiro ----
-     Enquanto a conciliação não cobria o dia, tudo era lançado à mão. Quando a
-     planilha passa a cobrir esse mesmo dia, os dois somam e o mês incha. O
-     painel não escolhe sozinho o que apagar: avisa e deixa o botão à mão. */
-  function manuaisNaFaixaDaPlanilha(){
-    if(!CONFIG.CSV_RECEITAS) return [];
-    var dias = {};
-    estado.lancamentos.forEach(function(l){ if(l.origem === "csv") dias[l.dia] = 1; });
-    return estado.lancamentos.filter(function(l){ return l.origem !== "csv" && dias[l.dia]; });
-  }
-  function alertaDuplicataHTML(){
-    if(somenteLeitura) return "";
-    var m = manuaisNaFaixaDaPlanilha();
-    if(!m.length) return "";
-    var dias = {};
-    m.forEach(function(l){ dias[l.dia] = 1; });
-    var total = m.reduce(function(a,l){ return a + l.valor; }, 0);
-    return '<div class="alerta-dupla"><span><b>Contando duas vezes?</b> '
-      + plural(m.length, "lançamento digitado à mão", "lançamentos digitados à mão")
-      + ' (' + brl(total) + ') caem em ' + plural(Object.keys(dias).length, "dia", "dias")
-      + ' que a planilha já cobre.</span>'
-      + '<button id="limpar-manuais">apagar os manuais desses dias</button></div>';
-  }
-
-  /* ---- editar e remover um lançamento ---- */
-  function acoesHTML(l){
-    if(somenteLeitura) return "";
-    if(confirmarId === l.id){
-      return '<span class="acoes"><button class="mini confirma" data-del="' + esc(l.id) + '">apagar?</button>'
-        + '<button class="mini manter" data-mantem="1" aria-label="Manter o lançamento" title="Manter">✕</button></span>';
-    }
-    return '<span class="acoes">'
-      + '<button class="mini editar" data-edita="' + esc(l.id) + '" aria-label="Editar lançamento" title="Editar">✎</button>'
-      + '<button class="mini" data-pede="' + esc(l.id) + '" aria-label="Remover lançamento" title="Remover">×</button></span>';
-  }
-  function edicaoHTML(l){
-    var nomes = VENDEDORES.filter(function(v){ return v !== "Outro"; });
-    if(l.vendedor && nomes.indexOf(l.vendedor) < 0) nomes.push(l.vendedor);
-    return '<form class="edicao" id="form-edicao" data-id="' + esc(l.id) + '">'
-      + '<div class="ed-grade">'
-      + '<label class="rot" for="ed-valor">Valor</label>'
-      + '<input id="ed-valor" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(l.valor)) + '" aria-label="Valor da venda">'
-      + '<label class="rot" for="ed-hora">Hora</label>'
-      + '<input id="ed-hora" type="time" value="' + pad(l.hora) + ':' + pad(l.min) + '" aria-label="Hora da venda">'
-      + '<label class="rot" for="ed-vendedor">Vendedor</label>'
-      + '<select id="ed-vendedor" aria-label="Vendedor"><option value="">Sem vendedor</option>'
-      + nomes.map(function(v){
-          return '<option value="' + esc(v) + '"' + (l.vendedor === v ? ' selected' : '') + '>' + esc(v) + '</option>';
-        }).join("")
-      + '</select>'
-      + '<label class="rot" for="ed-cliente">Cliente</label>'
-      + '<input id="ed-cliente" autocomplete="off" value="' + esc(l.cliente || "") + '" placeholder="opcional" aria-label="Cliente">'
-      + '</div>'
-      + '<div class="ed-botoes"><button class="btn" type="submit">Salvar alteração</button>'
-      + '<button class="link" type="button" id="ed-cancela">Cancelar</button></div>'
-      + '<p class="aviso" role="status">' + esc(avisoEd) + '</p></form>';
-  }
-
+  /* Só leitura: a receita vem da planilha financeira e não se lança, corrige
+     nem apaga por aqui. Uma linha errada se conserta na planilha, e na
+     próxima leitura o painel acompanha. */
   function lancamentosHTML(d){
     var todos = d.doMes.slice().sort(function(a,b){ return b.ts - a.ts; });
     var itens = todos.slice(0,10);
-    if(editandoId && !itens.some(function(l){ return l.id === editandoId; })){
-      itens = itens.concat(todos.filter(function(l){ return l.id === editandoId; }));
-    }
     return '<div class="painel"><h3>Últimos lançamentos</h3><p class="legenda">'
-      + plural(todos.length, "venda", "vendas") + ' em ' + esc(nomeMes(d.mes))
-      + (somenteLeitura ? "" : " &middot; ✎ corrige, × apaga") + '</p>'
+      + plural(todos.length, "recebimento", "recebimentos") + ' em ' + esc(nomeMes(d.mes))
+      + ' &middot; direto da planilha financeira</p>'
       + (itens.length ? '<ul class="lista">' + itens.map(function(l){
-          if(editandoId === l.id) return '<li class="editando">' + edicaoHTML(l) + '</li>';
           var q = (l.dia === d.hoje ? "" : l.dia.slice(8,10) + "/" + l.dia.slice(5,7) + " ") + horaDe(l);
-          var quem = esc([l.vendedor, nomeCurto(l.cliente)].filter(Boolean).join(" · ") || "sem identificação") + selo(l);
+          var quem = esc([l.vendedor, nomeCurto(l.cliente)].filter(Boolean).join(" · ") || "sem identificação");
           return '<li><span class="quando tab">' + q + '</span><span class="quem">' + quem + '</span>'
-            + '<span class="qtd tab">' + brlc(l.valor) + '</span>' + acoesHTML(l) + '</li>';
-        }).join("") + '</ul>' : '<p class="vazio">Nenhuma venda lançada em ' + esc(nomeMes(d.mes)) + ' ainda.</p>') + '</div>';
+            + '<span class="qtd tab">' + brlc(l.valor) + '</span></li>';
+        }).join("") + '</ul>' : '<p class="vazio">Nenhum recebimento em ' + esc(nomeMes(d.mes)) + ' ainda.</p>') + '</div>';
   }
   /* ---- histórico completo ---- */
   function agrupaDias(){
@@ -1168,12 +1060,10 @@ body.festa #fx{display:block}
           + '<span class="tab">' + (g.totalDia/topo*100).toFixed(0) + '% do melhor dia</span></span></button>');
         if(aberto){
           h.push('<div class="dia-corpo">' + g.itens.map(function(l){
-            if(editandoId === l.id) return '<div class="hist-edit">' + edicaoHTML(l) + '</div>';
             var quem = l.cliente ? '<b>' + esc(nomeCurto(l.cliente)) + '</b>' + (l.vendedor ? ' · ' + esc(l.vendedor) : '') : (l.vendedor ? esc(l.vendedor) : '<span style="color:var(--ink-3)">sem identificação</span>');
             return '<div class="hist-linha"><span class="hora tab">' + horaDe(l) + '</span>'
-              + '<span class="quem">' + quem + selo(l) + '</span>'
-              + '<span class="val tab">' + brlc(l.valor) + '</span>'
-              + '<span class="acao">' + acoesHTML(l) + '</span></div>';
+              + '<span class="quem">' + quem + '</span>'
+              + '<span class="val tab">' + brlc(l.valor) + '</span></div>';
           }).join("") + '</div>');
         }
         h.push('</div>');
@@ -1211,94 +1101,6 @@ body.festa #fx{display:block}
 
   /* ====== eventos ====== */
   function ligarEventos(d){
-    var form = document.getElementById("form");
-    if(form){
-      form.addEventListener("submit", function(ev){
-        ev.preventDefault();
-        var v = paraNumero(document.getElementById("valor").value);
-        if(!isFinite(v) || v <= 0){ aviso = "Informe um valor maior que zero."; avisoOk = false; render(); return; }
-        var p = partesSP();
-        var novo = {
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-          ts: Date.now(), dia: p.dia, hora: p.h, min: p.m,
-          valor: Math.round(v*100)/100,
-          vendedor: vendedorSel === "Outro" ? "" : vendedorSel,
-          cliente: document.getElementById("cliente").value.trim().slice(0,60)
-        };
-        aviso = ""; avisoOk = false; confirmarId = "";
-        rascunho = { valor: document.getElementById("valor").value, cliente: document.getElementById("cliente").value };
-        document.getElementById("valor").value = "";
-        document.getElementById("cliente").value = "";
-        salvar(estado.lancamentos.concat([novo]));
-      });
-      Array.prototype.forEach.call(document.querySelectorAll(".chip"), function(c){
-        c.addEventListener("click", function(){
-          vendedorSel = vendedorSel === c.dataset.v ? "" : c.dataset.v;
-          var val = document.getElementById("valor").value, cli = document.getElementById("cliente").value;
-          render();
-          document.getElementById("valor").value = val; document.getElementById("cliente").value = cli;
-        });
-      });
-    }
-    Array.prototype.forEach.call(document.querySelectorAll("[data-pede]"), function(b){
-      b.addEventListener("click", function(){ confirmarId = b.dataset.pede; editandoId = ""; render(); });
-    });
-    Array.prototype.forEach.call(document.querySelectorAll("[data-mantem]"), function(b){
-      b.addEventListener("click", function(){ confirmarId = ""; render(); });
-    });
-    Array.prototype.forEach.call(document.querySelectorAll("[data-del]"), function(b){
-      b.addEventListener("click", function(){
-        var id = b.dataset.del, alvo = null;
-        confirmarId = ""; editandoId = "";
-        estado.lancamentos.forEach(function(l){ if(l.id === id) alvo = l; });
-        /* linha da planilha voltaria na próxima leitura: fica no oculto */
-        if(alvo && alvo.origem === "csv" && (estado.ocultos || []).indexOf(id) < 0){
-          estado.ocultos = (estado.ocultos || []).concat([id]);
-        }
-        salvar(estado.lancamentos.filter(function(l){ return l.id !== id; }));
-      });
-    });
-    Array.prototype.forEach.call(document.querySelectorAll("[data-edita]"), function(b){
-      b.addEventListener("click", function(){
-        editandoId = b.dataset.edita; confirmarId = ""; avisoEd = ""; focarEdicao = true;
-        render();
-      });
-    });
-
-    /* ---- edição de um lançamento ---- */
-    var fe = document.getElementById("form-edicao");
-    if(fe){
-      fe.addEventListener("submit", function(ev){
-        ev.preventDefault();
-        var id = fe.getAttribute("data-id");
-        var v = paraNumero(document.getElementById("ed-valor").value);
-        if(!isFinite(v) || v <= 0){ avisoEd = "Informe um valor maior que zero."; render(); return; }
-        var hm = String(document.getElementById("ed-hora").value || "").split(":");
-        var hh = parseInt(hm[0], 10), mm = parseInt(hm[1], 10);
-        if(!isFinite(hh) || !isFinite(mm) || hh < 0 || hh > 23 || mm < 0 || mm > 59){
-          avisoEd = "Informe a hora no formato 00:00."; render(); return;
-        }
-        var vend = document.getElementById("ed-vendedor").value;
-        var cli = document.getElementById("ed-cliente").value.trim().slice(0,60);
-        avisoEd = ""; editandoId = ""; confirmarId = "";
-        salvar(estado.lancamentos.map(function(l){
-          if(l.id !== id) return l;
-          /* move o ts o mesmo tanto que a hora andou: o dia continua o mesmo
-             e a ordem de chegada segue coerente com o relógio */
-          var novoTs = l.ts + ((hh*60 + mm) - (l.hora*60 + l.min)) * 60000;
-          return { id:l.id, ts:novoTs, dia:l.dia, hora:hh, min:mm,
-                   valor:Math.round(v*100)/100, vendedor:vend, cliente:cli };
-        }));
-      });
-      var ec = document.getElementById("ed-cancela");
-      if(ec) ec.addEventListener("click", function(){ editandoId = ""; avisoEd = ""; render(); });
-      if(focarEdicao){
-        focarEdicao = false;
-        var ev0 = document.getElementById("ed-valor");
-        if(ev0){ ev0.focus(); try { ev0.select(); } catch(e){} }
-      }
-    }
-
     /* ---- meta do mês ---- */
     var fm = document.getElementById("form-metas");
     if(fm){
@@ -1320,21 +1122,13 @@ body.festa #fx{display:block}
         salvarMetas(Math.round(m*100)/100, c === null ? null : Math.round(c*100)/100, "Meta e custo salvos.");
       });
     }
-    var lm = document.getElementById("limpar-manuais");
-    if(lm) lm.addEventListener("click", function(){
-      var fora = {};
-      manuaisNaFaixaDaPlanilha().forEach(function(l){ fora[l.id] = 1; });
-      confirmarId = ""; editandoId = "";
-      salvar(estado.lancamentos.filter(function(l){ return !fora[l.id]; }));
-    });
-
     /* relê a planilha sem recarregar a página: o F5 joga fora o estado da tela
-       (o que estava sendo digitado, a edição aberta, o dia expandido no
-       histórico) para buscar um CSV de poucos kB */
+       (a meta sendo digitada, o dia expandido no histórico, o filtro) para
+       buscar um CSV de poucos kB */
     var at = document.getElementById("atualizar");
     if(at) at.addEventListener("click", function(){
       if(atualizando) return;
-      atualizando = true; aviso = ""; render();
+      atualizando = true; render();
       var fim = function(){ atualizando = false; render(); };
       buscarCSV()
         .then(function(){ return CONFIG.API_URL ? buscarAPI().catch(function(){}) : null; })
@@ -1444,17 +1238,12 @@ body.festa #fx{display:block}
     return fetch(CONFIG.API_URL, { headers: cabecalhos(), cache: "no-store" })
       .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function(j){
-        var lancs = Array.isArray(j) ? j : (j && j.lancamentos);
-        if(!Array.isArray(lancs)) return;
-        var novos = lancs.map(normalizar).filter(Boolean);
-        /* servidor vazio e este navegador com histórico: sobe o que já existe
-           em vez de apagar (evita perder dados na primeira configuração) */
-        if(!novos.length && estado.lancamentos.length){ ultimaSync = Date.now(); syncOk = true; return enviarAPI(); }
-        var mudou = JSON.stringify(novos) !== JSON.stringify(estado.lancamentos);
+        /* a API sincroniza só o que ainda é digitado — meta e custo. Receita
+           vem da planilha e de mais lugar nenhum, nem de um servidor. */
+        var mudou = false;
         if(j && typeof j.metaMes === "number" && j.metaMes > 0 && j.metaMes !== estado.metaMes){ estado.metaMes = j.metaMes; mudou = true; }
         if(j && (typeof j.custoMes === "number" || j.custoMes === null) && j.custoMes !== estado.custoMes){ estado.custoMes = j.custoMes; mudou = true; }
-        if(j && Array.isArray(j.ocultos)) estado.ocultos = j.ocultos;
-        if(mudou){ estado.lancamentos = novos; gravarLocal(); render(); }
+        if(mudou){ gravarLocal(); render(); }
         ultimaSync = Date.now(); syncOk = true;
       })
       .catch(function(e){ syncOk = false; throw e; });
@@ -1463,37 +1252,27 @@ body.festa #fx{display:block}
     return fetch(CONFIG.API_URL, {
       method: "POST",
       headers: cabecalhos(),
-      body: JSON.stringify({ metaMes: estado.metaMes, custoMes: estado.custoMes, lancamentos: estado.lancamentos, ocultos: estado.ocultos || [] })
+      body: JSON.stringify({ metaMes: estado.metaMes, custoMes: estado.custoMes })
     }).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
       ultimaSync = Date.now(); syncOk = true;
     }).catch(function(e){ syncOk = false; throw e; });
   }
+  /* a receita não é salva em lugar nenhum pelo painel — ela é lida. O que
+     este aviso descreve é só onde ficam meta e custo. */
   function statusArmazenamento(){
-    if(!CONFIG.API_URL) return "os lançamentos ficam salvos neste navegador";
-    if(!syncOk) return "sem conexão com o servidor — salvo só neste navegador";
-    return "sincronizado com o servidor · todo mundo vê o mesmo número";
+    if(!CONFIG.API_URL) return "";
+    return syncOk ? "meta e custo sincronizados" : "meta e custo sem conexão com o servidor";
   }
 
+  /* Só a leitura da planilha chega aqui. O número da tela é o da planilha
+     mesmo que o navegador recuse guardar a cópia: antes, uma recusa desfazia a
+     leitura e deixava a TV mostrando receita velha. Guardar serve só para a
+     tela não abrir vazia na próxima vez. */
   function salvar(lancamentos){
-    var anterior = estado.lancamentos;
     estado.lancamentos = lancamentos;
+    gravarLocal();
     render();
-    if(!gravarLocal() && !CONFIG.API_URL){
-      estado.lancamentos = anterior;
-      aviso = "Não deu para salvar neste navegador."; avisoOk = false;
-      /* na TV não existe quadro de aviso nem quem leia: sem isto, a leitura da
-         planilha seria descartada em silêncio a cada 5 minutos, para sempre */
-      avisoGrave = "O navegador recusou salvar";
-      render();
-      return;
-    }
-    avisoGrave = "";
-    if(!CONFIG.API_URL) return;
-    enviarAPI().catch(function(){
-      aviso = "Sem conexão com o servidor. O lançamento ficou salvo neste navegador e vai junto na próxima tentativa.";
-      avisoOk = false; render();
-    });
   }
 
   /* a meta muda sem tocar nos lançamentos, então tem o seu próprio caminho de
@@ -1502,7 +1281,7 @@ body.festa #fx{display:block}
   function agendarLimpeza(){
     clearTimeout(limpezaAviso);
     limpezaAviso = setTimeout(function(){
-      if(avisoMeta || avisoEd){ avisoMeta = ""; avisoEd = ""; render(); }
+      if(avisoMeta){ avisoMeta = ""; render(); }
     }, 5000);
   }
   function salvarMetas(metaMes, custoMes, ok){
@@ -1534,10 +1313,9 @@ body.festa #fx{display:block}
 
      O id de cada lançamento sai do conteúdo da própria linha (dia, banco,
      nome, descrição e valor), então reler a planilha mil vezes não duplica
-     nada e não depende da ordem das linhas. Linha que sai da planilha some do
-     painel; linha corrigida à mão descola da planilha e para de ser mexida;
-     linha apagada à mão fica na lista de ocultos e não volta na próxima
-     leitura. Lançamento digitado no painel nunca é tocado. */
+     nada e não depende da ordem das linhas. Linha que entra na planilha
+     aparece; linha que sai some; linha corrigida lá é corrigida aqui. Pelo
+     painel não se lança, corrige nem apaga receita. */
   var csvStatus = "", csvOk = false, csvUltima = 0, csvQtd = 0;
 
   /* parser tolerante: aspas, vírgula ou ponto-e-vírgula, CRLF e quebra dentro
@@ -1639,26 +1417,17 @@ body.festa #fx{display:block}
     }
     return out;
   }
-  /* casa a planilha com o que já está no painel; null = nada mudou */
+  /* A planilha é a única fonte da receita: o painel mostra exatamente o que
+     ela diz, sem somar, tirar nem corrigir nada. Antes, uma linha apagada no
+     painel ia para uma lista de ocultos e era pulada em toda leitura, e uma
+     linha corrigida à mão parava de ser atualizada — as duas coisas moravam
+     no navegador e faziam o realizado divergir da planilha em silêncio.
+     Quem muda o número é a planilha financeira, e só ela. null = nada mudou. */
   function casarComPlanilha(novos){
-    var ocultos = {}, porId = {}, tem = {};
-    (estado.ocultos || []).forEach(function(id){ ocultos[id] = 1; });
-    novos.forEach(function(l){ porId[l.id] = l; });
-
-    var saida = [], mudou = false;
-    estado.lancamentos.forEach(function(l){
-      if(l.origem !== "csv"){ saida.push(l); return; }
-      var n = porId[l.id];
-      if(!n){ mudou = true; return; }
-      if(n.valor !== l.valor || n.cliente !== l.cliente || n.dia !== l.dia){ mudou = true; saida.push(n); }
-      else saida.push(l);
-    });
-    saida.forEach(function(l){ tem[l.id] = 1; });
-    novos.forEach(function(l){
-      if(tem[l.id] || ocultos[l.id]) return;
-      saida.push(l); mudou = true;
-    });
-    return mudou ? saida : null;
+    function assinatura(lista){
+      return lista.map(function(l){ return l.id + "|" + l.valor + "|" + l.dia + "|" + l.cliente; }).sort().join("\n");
+    }
+    return assinatura(novos) === assinatura(estado.lancamentos) ? null : novos;
   }
   /* cache: "no-store" só manda no cache do navegador. O Google guarda o CSV
      publicado do lado dele por alguns minutos, e a única forma de tentar furar
@@ -1807,8 +1576,14 @@ body.festa #fx{display:block}
   /* ====== ciclo ====== */
   var salvo = carregarLocal();
   if(salvo){
-    estado.lancamentos = salvo.lancamentos.map(normalizar).filter(Boolean);
-    if(Array.isArray(salvo.ocultos)) estado.ocultos = salvo.ocultos;
+    /* Do que ficou guardado no navegador, só a última cópia da planilha
+       sobrevive — ela serve para a tela não abrir vazia enquanto a leitura não
+       chega. Lançamento digitado ou corrigido à mão e a lista de ocultos, de
+       quando o painel ainda deixava mexer na receita, ficam para trás: é o que
+       conserta sozinho um navegador em que alguém apagou ou alterou linha. A
+       primeira leitura da planilha repõe o que tiver sido apagado. */
+    estado.lancamentos = salvo.lancamentos.map(normalizar)
+      .filter(function(l){ return l && l.origem === "csv"; });
     if(typeof salvo.metaMes === "number" && salvo.metaMes > 0) estado.metaMes = salvo.metaMes;
     if(typeof salvo.custoMes === "number" && salvo.custoMes >= 0) estado.custoMes = salvo.custoMes;
   }
