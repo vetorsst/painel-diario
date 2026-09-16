@@ -92,6 +92,22 @@ não chega, hoje entra no divisor com pouco ou nada no realizado, e a projeção
 fica mais baixa até o lote do dia aparecer. E o custo não tem ritmo — é o valor
 do mês inteiro, descontado de uma vez do faturamento projetado.
 
+### Dia a dia
+
+Na coluna da direita, um gráfico resume o mês numa imagem: uma coluna por dia
+útil, o recebimento do dia na altura, e uma linha de referência na meta
+dividida por igual pelos dias úteis. Passar o mouse — ou dar foco pelo teclado
+— mostra o dia e o valor. Só o maior dia vem com o valor escrito: número em
+cima de toda coluna vira ruído e ninguém lê.
+
+Dia útil que passou sem nada é um traço fino; dia que ainda não chegou é um
+traço mais apagado. As duas coisas não são a mesma, e juntas as colunas
+apagadas mostram quanto de mês ainda falta. A mesma informação em tabela é a
+tela de Histórico, então nada fica preso na dica.
+
+O gráfico fica só no computador: a grade da TV foi medida para caber numa tela
+sem rolagem, e um quadro a mais cortaria o resto.
+
 ### Feriados
 
 Feriado não é dia útil: sai do ritmo atual, do ritmo necessário, da projeção e

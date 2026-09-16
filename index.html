@@ -187,6 +187,91 @@ body:not(.tv) .barra{margin-top:26px}
 .banner{width:100%;margin:0 0 14px;border:1px solid rgba(255,205,28,.4);background:linear-gradient(90deg,rgba(255,205,28,.2),rgba(255,205,28,.05));color:var(--amarelo);border-radius:12px;padding:13px 18px;font:inherit;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-align:left}
 .banner:hover{background:rgba(255,205,28,.24)}
 
+/* ---------- acabamento: o material dos cartões ----------
+   O painel era chapado — cartão, borda de 1px e mais nada. Aqui ele ganha a
+   matéria que faz uma tela parecer instrumento: luz vinda de cima, sombra por
+   baixo e um fio de brilho na aresta superior. Tudo somado ao mesmo token de
+   cor, então o contraste do texto não muda. */
+.kpi,.painel,.projecao,.dia{
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,0) 44%),var(--card);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 18px 38px -28px rgba(0,0,0,.95);
+}
+.kpi,.painel,.projecao{position:relative}
+/* o fio não vai de ponta a ponta: recuado e esmaecido nas pontas, acompanha o
+   canto arredondado sem precisar de overflow:hidden — que cortaria a dica do
+   gráfico ao passar o mouse */
+.kpi::after,.painel::after,.projecao::after{
+  content:"";position:absolute;top:0;left:12px;right:12px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2) 20%,rgba(255,255,255,.05) 60%,transparent);
+}
+.kpi.destaque::after{background:linear-gradient(90deg,transparent,rgba(255,205,28,.6) 20%,rgba(255,205,28,.12) 60%,transparent)}
+.kpi.destaque{box-shadow:inset 0 1px 0 rgba(255,205,28,.25),0 18px 38px -28px rgba(0,0,0,.95)}
+
+/* malha fina ao fundo, no limite do perceptível: dá textura de instrumento sem
+   disputar com o texto. Some na TV — grade de 1px a quatro metros vira moiré. */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:54px 54px;
+  -webkit-mask-image:radial-gradient(130% 95% at 50% 0%,#000 28%,transparent 76%);
+  mask-image:radial-gradient(130% 95% at 50% 0%,#000 28%,transparent 76%);
+}
+body.tv::before{display:none}
+
+/* a barra do mês vira instrumento: décimos marcados no trilho, para o olho ter
+   régua, e o preenchimento aceso */
+body:not(.tv) .track{
+  background:
+    repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),rgba(255,255,255,.11) calc(10% - 1px) 10%),
+    rgba(255,255,255,.05);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.4);
+}
+body:not(.tv) .fill{box-shadow:0 0 18px rgba(255,205,28,.32),inset 0 1px 0 rgba(255,255,255,.3)}
+body:not(.tv) .marca{box-shadow:0 0 10px rgba(255,255,255,.4)}
+body:not(.tv) .big{text-shadow:0 0 70px rgba(255,205,28,.22)}
+/* o ponto da tarja pulsa como um LED de estado — no computador, onde alguém
+   está perto. Na TV ficaria piscando a noite inteira para ninguém. */
+@media (prefers-reduced-motion:no-preference){
+  body:not(.tv) .pill::before{animation:led 2.6s ease-in-out infinite}
+}
+@keyframes led{0%,100%{opacity:1;box-shadow:0 0 7px currentColor}50%{opacity:.45;box-shadow:0 0 0 currentColor}}
+
+/* ---------- gráfico do mês, dia a dia ----------
+   Série única, então nenhuma legenda: o subtítulo diz o que está plotado. A
+   coluna é fina e sobra ar na faixa, o topo é arredondado e a base quadrada na
+   linha de base. A vista em tabela da mesma informação é a tela de Histórico. */
+.g-plot{position:relative;display:flex;align-items:flex-end;gap:2px;height:118px;margin-top:26px}
+/* linha de referência: fio sólido, nunca tracejado — tracejo é ruído e aqui a
+   legenda já diz o que a linha marca */
+.g-alvo{position:absolute;left:0;right:0;height:1px;background:rgba(255,255,255,.26);pointer-events:none}
+.g-band{position:relative;flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:4px}
+.g-band:focus-visible{outline:2px solid var(--amarelo);outline-offset:2px}
+.g-bar{width:min(14px,100%);border-radius:4px 4px 0 0;background:var(--amarelo);transition:height .5s cubic-bezier(.2,.7,.3,1)}
+/* dia útil que passou sem nada e dia que ainda não chegou não são a mesma
+   coisa: o primeiro é um zero, o segundo é uma coluna que ainda vai existir */
+.g-bar.zero{min-height:2px;background:rgba(255,255,255,.16)}
+.g-bar.futuro{min-height:2px;background:rgba(255,255,255,.12)}
+.g-band.hoje .g-bar{box-shadow:0 0 14px rgba(255,205,28,.5)}
+.g-max{position:absolute;left:50%;transform:translateX(-50%);font-size:.62rem;font-weight:700;color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.g-band::after{
+  content:attr(data-dica);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  white-space:nowrap;background:#04151d;border:1px solid var(--line-forte);border-radius:8px;
+  padding:6px 9px;font-size:.72rem;color:var(--ink);opacity:0;pointer-events:none;
+  transition:opacity .12s;z-index:6;font-variant-numeric:tabular-nums;
+}
+.g-band:hover::after,.g-band:focus-visible::after{opacity:1}
+/* a dica nasce centrada na coluna; nas pontas isso a jogava para fora da tela
+   e alargava a página inteira no celular — 533px de conteúdo em 477 de tela.
+   Nas três de cada ponta ela ancora pela borda. A linha de referência é o
+   último filho justamente para não entrar nesta contagem. */
+.g-band:nth-child(-n+3)::after{left:0;transform:none}
+.g-band:nth-last-child(-n+4)::after{left:auto;right:0;transform:none}
+.g-eixo{display:flex;gap:2px;margin-top:8px;font-size:.58rem;letter-spacing:.06em;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.g-eixo span{flex:1;min-width:0;text-align:center}
+.g-eixo .hoje{color:var(--amarelo);font-weight:700}
+
 /* ---------- modo TV (?tv) ----------
    Tela de parede: ninguém clica, ninguém chega perto. Tudo é lido de 3 a 6
    metros, então os tamanhos saem de vw — a TV é 16:9 e a largura manda. */
@@ -296,6 +381,20 @@ body.tv{overflow:hidden}
 .tv .party-title{font-size:max(48px,calc(10*var(--u)))}
 /* rótulo fino sobre fundo escuro perde peso aparente: sobe de 600 para 700 */
 .tv .rot,.tv-lista h3{font-weight:700}
+
+/* ---------- acabamento da TV ----------
+   A 4 metros um fio de 1px não existe, então aqui o ganho tem de ser de massa:
+   um degradê curto no cartão e o preenchimento da barra aceso. Nada que mexa no
+   contraste para o qual o modo TV foi calibrado — o cartão continua chapado na
+   parte de baixo, onde o texto mora. */
+.tv-lista,.tv-lado .bloco{
+  background:linear-gradient(180deg,#143d53,var(--card) 62%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 22px 46px -32px #000;
+}
+.tv-lado .bloco.destaque{background:linear-gradient(160deg,rgba(255,205,28,.18),rgba(255,205,28,.03))}
+.tv .track{box-shadow:inset 0 1px 3px rgba(0,0,0,.45)}
+.tv .fill{box-shadow:0 0 calc(1.8*var(--u)) rgba(255,205,28,.5)}
+.tv .marca{box-shadow:0 0 calc(.9*var(--u)) rgba(255,255,255,.5)}
 
 /* ---------- festa ---------- */
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:78;display:none}
@@ -669,7 +768,7 @@ body.festa #fx{display:block}
     h.push(projecaoHTML(d));
 
     h.push('<div class="colunas">' + lancamentosHTML(d)
-      + '<div style="display:flex;flex-direction:column;gap:12px">' + metasHTML(d) + '</div></div>');
+      + '<div style="display:flex;flex-direction:column;gap:12px">' + metasHTML(d) + graficoMesHTML(d) + '</div></div>');
 
     h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
       + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' (seg–sex, sem feriados)</span>'
@@ -975,6 +1074,49 @@ body.festa #fx{display:block}
       + '<p class="meta-atual">' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' no mês, sem feriados &middot; '
       + brl(d.uteisTotal > 0 ? d.metaMes/d.uteisTotal : 0) + ' por dia se a meta fosse dividida por igual.</p>'
       + '<p class="aviso' + (avisoMetaOk ? " ok" : "") + '" role="status">' + esc(avisoMeta) + '</p></form></div>';
+  }
+
+  /* Gráfico do mês: uma coluna por dia útil, o recebimento do dia na altura.
+     Série única — nenhuma legenda, o subtítulo diz o que está plotado — e uma
+     linha de referência na meta dividida por igual pelos dias úteis. O valor
+     aparece escrito só no maior dia: número em cima de toda coluna vira ruído
+     e ninguém lê. O resto sai na dica ao passar o mouse, e a mesma informação
+     em tabela é a tela de Histórico, então nada fica preso na dica.
+     Só no computador: a grade da TV foi medida para caber sem rolagem. */
+  function graficoMesHTML(d){
+    var ultimo = diasNoMes(d.mes), porDia = {}, dias = [], i;
+    d.doMes.forEach(function(l){ porDia[l.dia] = (porDia[l.dia] || 0) + l.valor; });
+    for(i = 1; i <= ultimo; i++){
+      if(!ehUtil(d.mes, i)) continue;
+      var k = d.mes + "-" + pad(i);
+      dias.push({ n:i, dia:k, v:porDia[k] || 0, hoje:k === d.hoje, futuro:k > d.hoje });
+    }
+    if(!dias.length) return "";
+    var alvo = d.uteisTotal > 0 ? d.metaMes / d.uteisTotal : 0;
+    var maior = dias.reduce(function(a, x){ return x.v > a ? x.v : a; }, 0);
+    var escala = Math.max(maior, alvo);
+    if(!(escala > 0)) return "";
+    var diaMaior = maior > 0 ? dias.filter(function(x){ return x.v === maior; })[0].dia : "";
+
+    return '<div class="painel"><h3>Dia a dia</h3>'
+      + '<p class="legenda">Cada coluna é um dia útil de ' + esc(nomeMes(d.mes))
+      + '. A linha marca ' + brl(alvo) + ' por dia, que é a meta dividida por igual.</p>'
+      + '<div class="g-plot">'
+      + dias.map(function(x){
+          var pct = Math.max(x.v/escala*100, 0);
+          var dica = diaCurto(x.dia) + " · " + (x.v > 0 ? brlc(x.v) : (x.futuro ? "ainda não chegou" : "nada"));
+          return '<div class="g-band' + (x.hoje ? " hoje" : "") + '" tabindex="0"'
+            + ' data-dica="' + esc(dica) + '" aria-label="' + esc(dica) + '">'
+            + (x.dia === diaMaior ? '<span class="g-max" style="bottom:calc(' + pct.toFixed(2) + '% + 5px)">' + brl(x.v) + '</span>' : '')
+            + '<i class="g-bar' + (x.v > 0 ? "" : (x.futuro ? " futuro" : " zero")) + '" style="height:' + pct.toFixed(2) + '%"></i>'
+            + '</div>';
+        }).join("")
+      /* por último de propósito: fora do fluxo, não desloca nada, e deixa a
+         contagem de :nth-child bater com as colunas */
+      + '<div class="g-alvo" style="bottom:' + (alvo/escala*100).toFixed(2) + '%"></div>'
+      + '</div><div class="g-eixo">'
+      + dias.map(function(x){ return '<span' + (x.hoje ? ' class="hoje"' : '') + '>' + pad(x.n) + '</span>'; }).join("")
+      + '</div></div>';
   }
 
   /* Só leitura: a receita vem da planilha financeira e não se lança, corrige
