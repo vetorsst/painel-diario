@@ -31,8 +31,9 @@ venda — é a régua:
   alguns minutos, então uma alteração recém-salva pode demorar a aparecer mesmo
   clicando — o botão pede uma URL diferente a cada vez para tentar furar isso,
   mas nem sempre funciona.
-- **Meta e custo do mês** — os únicos campos que ainda precisam de gente. Da
-  meta saem o ritmo necessário e a meta do dia; do custo, o lucro projetado.
+- **Meta, custo e a entrar** — os únicos campos que ainda precisam de gente. Da
+  meta saem o ritmo necessário e a meta do dia; do custo, o lucro projetado; e
+  o previsto a entrar pode ser digitado à mão, no lugar da carteira.
 - **Histórico** — todos os dias, com busca por cliente ou valor e exportação em
   CSV. É onde se confere o mês fechado.
 
@@ -70,7 +71,7 @@ termina se o ritmo atual se mantiver até o último dia útil:
 | | |
 | --- | --- |
 | **Faturamento projetado** | o realizado mais o ritmo atual vezes os dias úteis que faltam depois de hoje; a nota diz quanto isso representa da meta |
-| **A entrar até o fim do mês** | a soma da [carteira](#a-carteira-o-que-ainda-vai-entrar) que vence dentro do mês — só aparece com a aba publicada |
+| **A entrar até o fim do mês** | o valor digitado no quadro "Meta do mês" ou, na falta dele, a soma da [carteira](#a-carteira-o-que-ainda-vai-entrar) que vence dentro do mês |
 | **Custo do mês** | o custo total do mês, informado no quadro "Meta do mês" |
 | **Resultado projetado** | o lucro: faturamento projetado menos o custo do mês, com a margem sobre o faturamento |
 
@@ -260,12 +261,21 @@ alerta em vez de aplicar. Um CSV cortado no meio do download, ou a `=QUERY`
 virando `#REF!`, devolve um resultado válido e curto — e sem essa trava o mês
 inteiro evaporaria da tela sem ninguém perceber.
 
-### Meta e custo do mês
+### Meta, custo e a entrar
 
-O quadro "Meta do mês" tem dois campos. A **meta** passa a valer no lugar do
-`META_MES` da configuração, e dela saem o ritmo necessário, quanto falta e a
-meta de hoje. O **custo** passa a valer no lugar do `CUSTO_MES`, e dele sai o
-lucro projetado; deixado em branco, vale o da configuração.
+O quadro "Meta do mês" tem três campos:
+
+| Campo | O que faz |
+| --- | --- |
+| **Meta do mês** | passa a valer no lugar do `META_MES` da configuração; dela saem o ritmo necessário, quanto falta e a meta de hoje |
+| **Custo do mês** | passa a valer no lugar do `CUSTO_MES`; dele sai o lucro projetado. Em branco, vale o da configuração |
+| **A entrar no mês** | o previsto a entrar, digitado à mão. Em branco, vale a [carteira](#a-carteira-o-que-ainda-vai-entrar) da planilha |
+
+O **a entrar é guardado junto com o mês em que foi digitado**, e vale só nele.
+Meta e custo atravessam a virada do mês sem problema, porque são estáveis; a
+carteira não é. O número de setembro valendo em outubro inflaria a previsão em
+silêncio, e um campo preenchido não levanta suspeita de ninguém. Virado o mês,
+o campo volta a pedir o valor.
 
 O que se salva no quadro fica guardado naquele navegador. A TV, que é só
 leitura, usa o que estiver na configuração — é lá que o custo precisa estar
@@ -281,6 +291,11 @@ já está emitido e ainda não entrou, com data de vencimento. A URL vai em
 As duas leituras são independentes de propósito. A carteira falhar não derruba
 o realizado, que é o número que manda na tela — nesse caso o quadro só não
 mostra a coluna, e o rodapé diz o motivo.
+
+Publicar a aba é opcional: o mesmo número pode ser **digitado à mão** no campo
+"A entrar no mês", no quadro "Meta do mês". Com os dois preenchidos, o digitado
+manda — quem digitou sabe de alguma coisa que a planilha não sabe — e apagar o
+campo devolve a vez à carteira.
 
 ### O que entra na conta
 

@@ -517,11 +517,24 @@ body.festa #fx{display:block}
          de propósito: se fosse, o 0 de hoje ficaria no localStorage da TV e
          ganharia do custo que alguém puser na configuração depois */
       if(typeof s.custoMes !== "number" || !(s.custoMes >= 0)) s.custoMes = null;
+      s.aEntrar = limparAEntrar(s.aEntrar);
       /* formato antigo: meta diária fixa e metas por dia. A meta do dia agora
          sai da meta do mês, então esses campos deixam de ser lidos e gravados. */
       delete s.meta; delete s.metas;
       return s;
-    } catch(e){ return { metaMes: META_MES_PADRAO, custoMes: null, lancamentos: [] }; }
+    } catch(e){ return { metaMes: META_MES_PADRAO, custoMes: null, aEntrar: null, lancamentos: [] }; }
+  }
+  /* O previsto a entrar é guardado junto com o mês a que pertence. Meta e custo
+     atravessam a virada do mês sem problema — são estáveis —, mas "a entrar" é
+     a carteira de um mês só: o número de setembro valendo em outubro inflaria a
+     previsão em silêncio, e ninguém desconfiaria de um campo preenchido. Virou
+     o mês, o campo volta a pedir o valor. */
+  function limparAEntrar(a){
+    return a && typeof a.valor === "number" && a.valor >= 0 && /^\d{4}-\d{2}$/.test(String(a.mes))
+      ? { mes: String(a.mes), valor: a.valor } : null;
+  }
+  function aEntrarInformado(mes){
+    return estado.aEntrar && estado.aEntrar.mes === mes ? estado.aEntrar.valor : null;
   }
   /* ====== tempo (America/Sao_Paulo) ====== */
   var FMT = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
@@ -686,10 +699,13 @@ body.festa #fx{display:block}
     /* preserva o que a pessoa está digitando entre renders (o painel se redesenha sozinho) */
     var foco = document.activeElement && document.activeElement.id, sel = null, vals = {};
     try { if(foco) sel = document.activeElement.selectionStart; } catch(e){}
-    ["filtro","meta-mes","custo-mes"]
+    ["filtro","meta-mes","custo-mes","a-entrar"]
       .forEach(function(id){ var e = document.getElementById(id); if(e) vals[id] = e.value; });
     /* depois de salvar, os campos voltam a nascer do estado, já formatados */
-    if(recarregarMetas){ delete vals["meta-mes"]; delete vals["custo-mes"]; recarregarMetas = false; }
+    if(recarregarMetas){
+      delete vals["meta-mes"]; delete vals["custo-mes"]; delete vals["a-entrar"];
+      recarregarMetas = false;
+    }
 
     var d = calcular();
     /* a aba da TV atravessa a virada do mês sem nunca recarregar: sem isto, a
@@ -1039,7 +1055,7 @@ body.festa #fx{display:block}
        a lado de propósito — quando se afastam muito, é sinal de alguma coisa. */
     var car = carteiraDoMes(d);
     if(car && car.total > 0){
-      conta += ' &middot; com o que já está emitido, ' + brl(d.acumulado) + ' + ' + brl(car.total)
+      conta += ' &middot; com o previsto a entrar, ' + brl(d.acumulado) + ' + ' + brl(car.total)
         + ' = ' + brl(d.acumulado + car.total) + ' no mês';
     }
     return '<section class="projecao' + (car ? ' com-carteira' : '') + '">'
@@ -1050,10 +1066,12 @@ body.festa #fx{display:block}
       + (acima ? brl(d.contraMeta) + ' acima' : 'faltam ' + brl(-d.contraMeta)) + '</p></div>'
       + (car ? '<div class="proj-num"><p class="rot">A entrar até ' + car.ate + '</p>'
           + '<p class="val tab acc">' + brl(car.total) + '</p>'
-          + '<p class="nota">' + (car.qtd
-              ? plural(car.qtd, "título em aberto", "títulos em aberto")
-                + (car.vencido > 0 ? ' &middot; ' + brl(car.vencido) + ' já vencidos' : '')
-              : 'nada em aberto vencendo neste mês') + '</p></div>' : '')
+          + '<p class="nota">' + (car.mao
+              ? 'informado à mão no quadro Meta do mês'
+              : (car.qtd
+                  ? plural(car.qtd, "título em aberto", "títulos em aberto")
+                    + (car.vencido > 0 ? ' &middot; ' + brl(car.vencido) + ' já vencidos' : '')
+                  : 'nada em aberto vencendo neste mês')) + '</p></div>' : '')
       + '<div class="proj-num"><p class="rot">Custo do mês</p>'
       + '<p class="val tab">' + (d.custoMes > 0 ? brl(d.custoMes) : '—') + '</p>'
       + '<p class="nota">' + (d.custoMes > 0 ? 'o mês inteiro, de uma vez' : 'informe no quadro Meta do mês') + '</p></div>'
@@ -1086,14 +1104,20 @@ body.festa #fx{display:block}
   function metasHTML(d){
     if(somenteLeitura) return "";
     var custoProprio = typeof estado.custoMes === "number", custoConfig = +CONFIG.CUSTO_MES || 0;
+    var maoValor = aEntrarInformado(d.mes);
     return '<div class="painel"><h3>Meta do mês</h3>'
-      + '<p class="legenda">Vale para ' + esc(nomeMes(d.mes)) + '. O ritmo necessário sai da meta; o lucro projetado, do custo.</p>'
+      + '<p class="legenda">Vale para ' + esc(nomeMes(d.mes))
+      + '. Da meta sai o ritmo necessário; do custo, o lucro projetado. O previsto a entrar vale só neste mês.</p>'
       + '<form class="lanc metas-form" id="form-metas">'
       + '<div class="campo"><label class="rot" for="meta-mes" style="display:block;margin-bottom:6px">Meta do mês (R$)</label>'
       + '<input id="meta-mes" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(d.metaMes)) + '" aria-label="Meta do mês em reais"></div>'
       + '<div class="campo"><label class="rot" for="custo-mes" style="display:block;margin-bottom:6px">Custo do mês (R$)</label>'
       + '<input id="custo-mes" inputmode="decimal" autocomplete="off" value="' + (custoProprio ? esc(numeroBR(estado.custoMes)) : '') + '"'
       + ' placeholder="' + (custoConfig > 0 ? 'em branco: ' + esc(numeroBR(custoConfig)) + ', da configuração' : 'não informado') + '" aria-label="Custo do mês em reais"></div>'
+      + '<div class="campo"><label class="rot" for="a-entrar" style="display:block;margin-bottom:6px">A entrar no mês (R$)</label>'
+      + '<input id="a-entrar" inputmode="decimal" autocomplete="off" value="' + (maoValor !== null ? esc(numeroBR(maoValor)) : '') + '"'
+      + ' placeholder="' + (CONFIG.CSV_A_RECEBER ? 'em branco: o que a carteira da planilha disser' : 'não informado')
+      + '" aria-label="Valor previsto a entrar no mês, em reais"></div>'
       + '<button class="btn" type="submit">Salvar</button>'
       + '<p class="meta-atual">' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' no mês, sem feriados &middot; '
       + brl(d.uteisTotal > 0 ? d.metaMes/d.uteisTotal : 0) + ' por dia se a meta fosse dividida por igual.</p>'
@@ -1282,10 +1306,18 @@ body.festa #fx{display:block}
         if(c !== null && (!isFinite(c) || c < 0)){
           avisoMeta = "O custo precisa ser um valor em reais, ou ficar em branco."; avisoMetaOk = false; render(); return;
         }
+        /* previsto a entrar em branco devolve a vez à carteira da planilha */
+        var ae = String(document.getElementById("a-entrar").value).trim();
+        var a = ae === "" ? null : paraNumero(ae);
+        if(a !== null && (!isFinite(a) || a < 0)){
+          avisoMeta = "O previsto a entrar precisa ser um valor em reais, ou ficar em branco."; avisoMetaOk = false; render(); return;
+        }
         /* meta nova: a festa pode valer de novo se o mês passar a estar batido */
         festaVista = false;
         festaMes = ""; try { localStorage.removeItem("festa-vista"); } catch(e){}
-        salvarMetas(Math.round(m*100)/100, c === null ? null : Math.round(c*100)/100, "Meta e custo salvos.");
+        salvarMetas(Math.round(m*100)/100, c === null ? null : Math.round(c*100)/100,
+          a === null ? null : { mes: mesDe(hojeSP()), valor: Math.round(a*100)/100 },
+          "Números do mês salvos.");
       });
     }
     /* relê a planilha sem recarregar a página: o F5 joga fora o estado da tela
@@ -1409,6 +1441,10 @@ body.festa #fx{display:block}
         var mudou = false;
         if(j && typeof j.metaMes === "number" && j.metaMes > 0 && j.metaMes !== estado.metaMes){ estado.metaMes = j.metaMes; mudou = true; }
         if(j && (typeof j.custoMes === "number" || j.custoMes === null) && j.custoMes !== estado.custoMes){ estado.custoMes = j.custoMes; mudou = true; }
+        if(j && "aEntrar" in j){
+          var ae = limparAEntrar(j.aEntrar);
+          if(JSON.stringify(ae) !== JSON.stringify(estado.aEntrar)){ estado.aEntrar = ae; mudou = true; }
+        }
         if(mudou){ gravarLocal(); render(); }
         ultimaSync = Date.now(); syncOk = true;
       })
@@ -1418,7 +1454,7 @@ body.festa #fx{display:block}
     return fetch(CONFIG.API_URL, {
       method: "POST",
       headers: cabecalhos(),
-      body: JSON.stringify({ metaMes: estado.metaMes, custoMes: estado.custoMes })
+      body: JSON.stringify({ metaMes: estado.metaMes, custoMes: estado.custoMes, aEntrar: estado.aEntrar })
     }).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
       ultimaSync = Date.now(); syncOk = true;
@@ -1450,11 +1486,11 @@ body.festa #fx{display:block}
       if(avisoMeta){ avisoMeta = ""; render(); }
     }, 5000);
   }
-  function salvarMetas(metaMes, custoMes, ok){
-    var anterior = estado.metaMes, custoAnterior = estado.custoMes;
-    estado.metaMes = metaMes; estado.custoMes = custoMes;
+  function salvarMetas(metaMes, custoMes, aEntrar, ok){
+    var anterior = estado.metaMes, custoAnterior = estado.custoMes, entrarAnterior = estado.aEntrar;
+    estado.metaMes = metaMes; estado.custoMes = custoMes; estado.aEntrar = aEntrar;
     if(!gravarLocal() && !CONFIG.API_URL){
-      estado.metaMes = anterior; estado.custoMes = custoAnterior;
+      estado.metaMes = anterior; estado.custoMes = custoAnterior; estado.aEntrar = entrarAnterior;
       avisoMeta = "Não deu para salvar neste navegador."; avisoMetaOk = false; render();
       return;
     }
@@ -1694,6 +1730,11 @@ body.festa #fx{display:block}
      mas vai contado à parte na nota — promessa vencida não vale o mesmo que
      promessa no prazo, e quem olha precisa saber a diferença. */
   function carteiraDoMes(d){
+    var ate = pad(diasNoMes(d.mes)) + "/" + d.mes.slice(5,7);
+    /* o que foi digitado manda na aba: quem preencheu à mão sabe de alguma
+       coisa que a planilha não sabe, e o campo em branco devolve a vez a ela */
+    var mao = aEntrarInformado(d.mes);
+    if(mao !== null) return { total:mao, qtd:0, vencido:0, qtdVencida:0, mao:true, ate:ate };
     if(!carOk) return null;
     var fim = d.mes + "-" + pad(diasNoMes(d.mes));
     var total = 0, qtd = 0, vencido = 0, qtdVencida = 0;
@@ -1702,8 +1743,7 @@ body.festa #fx{display:block}
       total += x.valor; qtd++;
       if(x.dia < d.hoje){ vencido += x.valor; qtdVencida++; }
     });
-    return { total:total, qtd:qtd, vencido:vencido, qtdVencida:qtdVencida,
-             ate: pad(diasNoMes(d.mes)) + "/" + d.mes.slice(5,7) };
+    return { total:total, qtd:qtd, vencido:vencido, qtdVencida:qtdVencida, mao:false, ate:ate };
   }
   function buscarAReceber(){
     if(!CONFIG.CSV_A_RECEBER) return Promise.resolve();
@@ -1843,6 +1883,7 @@ body.festa #fx{display:block}
       .filter(function(l){ return l && l.origem === "csv"; });
     if(typeof salvo.metaMes === "number" && salvo.metaMes > 0) estado.metaMes = salvo.metaMes;
     if(typeof salvo.custoMes === "number" && salvo.custoMes >= 0) estado.custoMes = salvo.custoMes;
+    if(limparAEntrar(salvo.aEntrar)) estado.aEntrar = limparAEntrar(salvo.aEntrar);
   }
   if(modoTV) document.body.classList.add("tv");
   festaVista = !!festaMes && festaMes === mesDe(hojeSP());
