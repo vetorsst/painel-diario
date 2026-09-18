@@ -104,7 +104,10 @@ body:not(.tv) .barra{margin-top:26px}
 .proj-cab{grid-column:1/-1}
 .projecao h3{margin:0 0 2px;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
 .projecao .legenda{margin:0;font-size:.72rem;color:var(--ink-3)}
+/* com a carteira lida são quatro números, não três */
+.projecao.com-carteira{grid-template-columns:repeat(4,minmax(0,1fr))}
 .proj-num .val{margin:8px 0 0;font-size:clamp(1.35rem,2.6vw,2rem);font-weight:800;letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums}
+.proj-num .val.acc{color:var(--amarelo)}
 .proj-num .val.pos{color:var(--ok)}
 .proj-num .val.neg{color:var(--alerta)}
 .proj-num .nota{margin:7px 0 0;font-size:.72rem;color:var(--ink-3)}
@@ -419,10 +422,11 @@ body.festa #fx{display:block}
   .colunas{grid-template-columns:1fr}
   .kpis{grid-template-columns:repeat(2,1fr)}
   .resumo{grid-template-columns:repeat(2,1fr)}
+  .projecao.com-carteira{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:560px){
   .kpis{grid-template-columns:1fr 1fr;gap:8px}
-  .projecao{grid-template-columns:1fr}
+  .projecao,.projecao.com-carteira{grid-template-columns:1fr}
   .hero-dir{align-items:flex-start;text-align:left}
   .ticks span:nth-child(even){visibility:hidden}
   .resumo{grid-template-columns:1fr 1fr;gap:8px}
@@ -457,7 +461,11 @@ body.festa #fx{display:block}
      CSV_RECEITAS   (opcional) URL do CSV publicado da conciliação bancária.
                     Preenchido -> as receitas entram sozinhas, com o nome de
                     quem pagou, e ninguém precisa lançar uma a uma.
-     CSV_SEGUNDOS   de quanto em quanto tempo relê a planilha
+     CSV_A_RECEBER  (opcional) URL do CSV publicado da carteira: o que já está
+                    emitido e ainda não caiu, com data de vencimento. A
+                    conciliação só sabe de dinheiro que entrou — sem esta aba o
+                    painel não tem como dizer quanto ainda vem.
+     CSV_SEGUNDOS   de quanto em quanto tempo relê as planilhas
 
      Contrato da API (dois métodos na mesma URL):
        GET  -> {"metaMes":250000,"lancamentos":[ ... ]}   (ou só o array)
@@ -473,6 +481,7 @@ body.festa #fx{display:block}
     API_TOKEN: "",
     SYNC_SEGUNDOS: 15,
     CSV_RECEITAS: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQUoDMOQjexi5qaS6f9GhYnmZebauOguIJoym1n9TdS3ITBAwdyEcCAnOKbSUJLsQ5nFdQocDAtSxOP/pub?gid=818195436&single=true&output=csv",
+    CSV_A_RECEBER: "",
     CSV_SEGUNDOS: 300
   };
   /* ====== estado ====== */
@@ -772,7 +781,8 @@ body.festa #fx{display:block}
 
     h.push('<footer class="rodape"><span>Meta de ' + brl(d.metaMes) + ' em ' + esc(nomeMes(d.mes))
       + ' &middot; ' + plural(d.uteisTotal, "dia útil", "dias úteis") + ' (seg–sex, sem feriados)</span>'
-      + '<span>' + [statusArmazenamento(), statusPlanilha().replace(/^ &middot; /, "")].filter(Boolean).join(" &middot; ") + '</span></footer>');
+      + '<span>' + [statusArmazenamento(), statusPlanilha().replace(/^ &middot; /, ""),
+                    statusCarteira().replace(/^ &middot; /, "")].filter(Boolean).join(" &middot; ") + '</span></footer>');
     h.push('</div>');
     return h.join("");
   }
@@ -1024,12 +1034,26 @@ body.festa #fx{display:block}
       conta += ' &middot; ' + brl(d.projecao) + ' − ' + brl(d.custoMes) + ' de custo = '
         + (d.lucro < 0 ? '− ' : '') + brl(Math.abs(d.lucro)) + ' de resultado';
     }
-    return '<section class="projecao">'
+    /* a carteira é a outra resposta para "onde o mês termina": a primeira é
+       estimativa pelo ritmo, esta é o que já está emitido. As duas ficam lado
+       a lado de propósito — quando se afastam muito, é sinal de alguma coisa. */
+    var car = carteiraDoMes(d);
+    if(car && car.total > 0){
+      conta += ' &middot; com o que já está emitido, ' + brl(d.acumulado) + ' + ' + brl(car.total)
+        + ' = ' + brl(d.acumulado + car.total) + ' no mês';
+    }
+    return '<section class="projecao' + (car ? ' com-carteira' : '') + '">'
       + '<div class="proj-cab"><h3>Projeção do mês</h3><p class="legenda">mantido o ritmo atual até o último dia útil</p></div>'
       + '<div class="proj-num"><p class="rot">Faturamento projetado</p>'
       + '<p class="val tab">' + brl(d.projecao) + '</p>'
       + '<p class="nota">' + (d.projecao / d.metaMes * 100).toFixed(0) + '% da meta &middot; '
       + (acima ? brl(d.contraMeta) + ' acima' : 'faltam ' + brl(-d.contraMeta)) + '</p></div>'
+      + (car ? '<div class="proj-num"><p class="rot">A entrar até ' + car.ate + '</p>'
+          + '<p class="val tab acc">' + brl(car.total) + '</p>'
+          + '<p class="nota">' + (car.qtd
+              ? plural(car.qtd, "título em aberto", "títulos em aberto")
+                + (car.vencido > 0 ? ' &middot; ' + brl(car.vencido) + ' já vencidos' : '')
+              : 'nada em aberto vencendo neste mês') + '</p></div>' : '')
       + '<div class="proj-num"><p class="rot">Custo do mês</p>'
       + '<p class="val tab">' + (d.custoMes > 0 ? brl(d.custoMes) : '—') + '</p>'
       + '<p class="nota">' + (d.custoMes > 0 ? 'o mês inteiro, de uma vez' : 'informe no quadro Meta do mês') + '</p></div>'
@@ -1620,14 +1644,105 @@ body.festa #fx{display:block}
     return " &middot; " + plural(csvQtd, "receita lida", "receitas lidas")
       + " da planilha às " + pad(p.h) + ":" + pad(p.m);
   }
+  /* ====== a receber (a carteira) ======
+     Segunda aba publicada, lida à parte da primeira. A conciliação só sabe de
+     dinheiro que já caiu; quanto ainda vem é outra lista — o que está emitido
+     e ainda não entrou, com data de vencimento.
+
+     As duas leituras são independentes de propósito: a carteira falhar não
+     pode derrubar o realizado, que é o número que manda na tela. E ela não vai
+     para o localStorage: carteira velha guardada seria uma promessa de dinheiro
+     que talvez já tenha caído — se não foi lida agora, o painel não a mostra. */
+  var carStatus = "", carOk = false, carUltima = 0, carQtd = 0, carLista = [];
+  /* status que dizem "não conte mais": ou o título caiu — e aí ele já está na
+     conciliação, e somar dos dois lados dobraria a receita — ou ele morreu */
+  var BAIXADOS = ["pago","paga","recebido","recebida","baixado","baixada",
+                  "liquidado","liquidada","quitado","quitada","cancelado","cancelada"];
+  function aReceberDoCSV(txt){
+    var linhas = csvLinhas(txt);
+    if(linhas.length < 2) return null;
+    var col = {};
+    linhas[0].forEach(function(nome, i){ var k = chaveCol(nome); if(col[k] === undefined) col[k] = i; });
+    function primeira(nomes){
+      for(var i = 0; i < nomes.length; i++) if(col[nomes[i]] !== undefined) return col[nomes[i]];
+      return undefined;
+    }
+    /* a coluna da data pode se chamar vencimento, data de vencimento ou data */
+    var iData = primeira(["vencimento","datadevencimento","datavencimento","data"]);
+    var iValor = primeira(["valor","valorareceber","valordotitulo"]);
+    if(iData === undefined || iValor === undefined) return null;
+    var iNome = primeira(["nome","cliente","sacado","razaosocial"]);
+    var iDesc = primeira(["descricao","historico","documento"]);
+    var iStatus = primeira(["status","situacao"]);
+    function cel(r, i){ return i === undefined ? "" : String(r[i] || "").trim(); }
+
+    var out = [];
+    for(var i = 1; i < linhas.length; i++){
+      var r = linhas[i];
+      if(iStatus !== undefined && BAIXADOS.indexOf(chaveCol(cel(r, iStatus))) > -1) continue;
+      var v = valorPlanilha(cel(r, iValor));
+      if(!isFinite(v) || v <= 0) continue;
+      var dia = diaPlanilha(cel(r, iData));
+      if(!dia) continue;
+      out.push({ dia:dia, valor:Math.round(v*100)/100,
+                 cliente:cel(r, iNome).slice(0,60), desc:cel(r, iDesc).slice(0,60) });
+    }
+    return out;
+  }
+  /* Só o que vence até o fim do mês: é o que ainda pode fazer a meta bater. O
+     que venceu e não caiu continua sendo dinheiro a entrar e entra no total,
+     mas vai contado à parte na nota — promessa vencida não vale o mesmo que
+     promessa no prazo, e quem olha precisa saber a diferença. */
+  function carteiraDoMes(d){
+    if(!carOk) return null;
+    var fim = d.mes + "-" + pad(diasNoMes(d.mes));
+    var total = 0, qtd = 0, vencido = 0, qtdVencida = 0;
+    carLista.forEach(function(x){
+      if(x.dia > fim) return;
+      total += x.valor; qtd++;
+      if(x.dia < d.hoje){ vencido += x.valor; qtdVencida++; }
+    });
+    return { total:total, qtd:qtd, vencido:vencido, qtdVencida:qtdVencida,
+             ate: pad(diasNoMes(d.mes)) + "/" + d.mes.slice(5,7) };
+  }
+  function buscarAReceber(){
+    if(!CONFIG.CSV_A_RECEBER) return Promise.resolve();
+    var u = CONFIG.CSV_A_RECEBER;
+    return fetch(u + (u.indexOf("?") > -1 ? "&" : "?") + "_=" + Date.now(), { cache: "no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+      .then(function(t){
+        var lista = aReceberDoCSV(t);
+        if(!lista) throw new Error("faltam as colunas de vencimento e valor");
+        carLista = lista; carQtd = lista.length;
+        carOk = true; carUltima = Date.now(); carStatus = "";
+        render();
+      })
+      .catch(function(e){
+        carOk = false;
+        carStatus = String((e && e.message) || e);
+        render();
+      });
+  }
+  function statusCarteira(){
+    if(!CONFIG.CSV_A_RECEBER) return "";
+    if(!carOk) return " &middot; carteira não lida" + (carStatus ? " (" + esc(carStatus) + ")" : "");
+    var p = partesSP(new Date(carUltima));
+    /* "lidos", e não "em aberto no mês": este número é quanto veio da aba, e o
+       do quadro é só o que vence até o fim do mês — dois números diferentes
+       com o mesmo nome fariam parecer erro */
+    return " &middot; " + plural(carQtd, "título lido", "títulos lidos")
+      + " da carteira às " + pad(p.h) + ":" + pad(p.m);
+  }
+
   function iniciarPlanilha(){
-    if(!CONFIG.CSV_RECEITAS) return;
-    buscarCSV();
-    setInterval(buscarCSV, Math.max(CONFIG.CSV_SEGUNDOS || 300, 30) * 1000);
+    if(!CONFIG.CSV_RECEITAS && !CONFIG.CSV_A_RECEBER) return;
+    function ler(){ buscarCSV(); buscarAReceber(); }
+    ler();
+    setInterval(ler, Math.max(CONFIG.CSV_SEGUNDOS || 300, 30) * 1000);
     /* o Chrome estrangula o timer de aba que não está à frente: ao voltar a
        aparecer, relê em vez de confiar no que ficou congelado na tela */
     document.addEventListener("visibilitychange", function(){
-      if(document.visibilityState === "visible") buscarCSV();
+      if(document.visibilityState === "visible") ler();
     });
   }
   /* A TV passa semanas na mesma aba. Sem uma recarga marcada, versão nova do

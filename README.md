@@ -70,6 +70,7 @@ termina se o ritmo atual se mantiver até o último dia útil:
 | | |
 | --- | --- |
 | **Faturamento projetado** | o realizado mais o ritmo atual vezes os dias úteis que faltam depois de hoje; a nota diz quanto isso representa da meta |
+| **A entrar até o fim do mês** | a soma da [carteira](#a-carteira-o-que-ainda-vai-entrar) que vence dentro do mês — só aparece com a aba publicada |
 | **Custo do mês** | o custo total do mês, informado no quadro "Meta do mês" |
 | **Resultado projetado** | o lucro: faturamento projetado menos o custo do mês, com a margem sobre o faturamento |
 
@@ -270,6 +271,69 @@ O que se salva no quadro fica guardado naquele navegador. A TV, que é só
 leitura, usa o que estiver na configuração — é lá que o custo precisa estar
 para o lucro aparecer na parede.
 
+## A carteira: o que ainda vai entrar
+
+A conciliação bancária só sabe de dinheiro que **já caiu**. Para o painel dizer
+quanto ainda vem, ele lê uma segunda aba publicada: a carteira, ou seja, o que
+já está emitido e ainda não entrou, com data de vencimento. A URL vai em
+`CSV_A_RECEBER`.
+
+As duas leituras são independentes de propósito. A carteira falhar não derruba
+o realizado, que é o número que manda na tela — nesse caso o quadro só não
+mostra a coluna, e o rodapé diz o motivo.
+
+### O que entra na conta
+
+Conta o que vence **até o último dia do mês corrente**: é o que ainda pode
+fazer a meta bater. O que vence depois fica de fora. O que já venceu e não caiu
+continua sendo dinheiro a entrar, então entra no total — mas a nota diz quanto
+é, porque promessa vencida não vale o mesmo que promessa no prazo.
+
+Uma linha sai da conta quando a coluna de status diz que ela morreu ou já caiu:
+`pago`, `recebido`, `baixado`, `liquidado`, `quitado`, `cancelado`. **Isso
+importa**: um título que já caiu está na conciliação, e contar dos dois lados
+dobraria a receita. Se a aba não tiver coluna de status, publique só o que
+está em aberto.
+
+### Colunas que o painel procura
+
+Pelo nome do cabeçalho, em qualquer ordem, com ou sem acento:
+
+| Coluna | Aceita também | Obrigatória |
+| --- | --- | --- |
+| `VENCIMENTO` | `DATA DE VENCIMENTO`, `DATA` | sim |
+| `VALOR` | `VALOR A RECEBER` | sim |
+| `NOME` | `CLIENTE`, `SACADO`, `RAZÃO SOCIAL` | não |
+| `DESCRIÇÃO` | `HISTÓRICO`, `DOCUMENTO` | não |
+| `STATUS` | `SITUAÇÃO` | não, mas recomendada |
+
+Data em `DD/MM/AAAA` ou `AAAA-MM-DD`; valor em `1.060,00` ou `1060.00`;
+separador vírgula ou ponto e vírgula. Valor zerado ou negativo é ignorado. Se
+faltar vencimento ou valor, o painel avisa no rodapé e não mostra a coluna, em
+vez de inventar um número.
+
+### Publicando a aba
+
+Igual ao que já foi feito com as receitas, e pelo mesmo motivo: o que vai para
+um link público é **uma aba derivada**, nunca o documento inteiro.
+
+1. Na planilha, crie uma aba `carteira`.
+2. Em `carteira!A1`, cole uma fórmula que traga só o que está em aberto —
+   trocando `contas` pelo nome da aba onde a carteira mora e as letras pelas
+   colunas certas:
+
+   ```
+   =QUERY(contas!A:F;"select A,B,C,D where E<>'Pago' and E<>'Cancelado'";1)
+   ```
+
+3. **Arquivo → Compartilhar → Publicar na web**, escolha **a aba `carteira`** e
+   o formato **.csv**.
+4. Cole o link em `CSV_A_RECEBER`, no início da tag `<script>`.
+
+O número fica só no computador. Na TV não entrou porque a grade de três blocos
+foi medida para caber numa tela sem rolagem, e um quarto bloco cortaria as
+notas dos outros.
+
 ## Configuração
 
 A configuração fica no início da tag `<script>` do arquivo, em `var CONFIG`:
@@ -283,7 +347,8 @@ A configuração fica no início da tag `<script>` do arquivo, em `var CONFIG`:
 | `API_TOKEN` | Opcional, enviado como `Authorization: Bearer ...`. |
 | `SYNC_SEGUNDOS` | Intervalo de sincronização com a API (padrão: `15`). |
 | `CSV_RECEITAS` | URL do CSV publicado da conciliação bancária. É a única fonte de receita do painel: vazio, o painel não tem o que mostrar. |
-| `CSV_SEGUNDOS` | Intervalo de leitura da planilha (padrão: `300`). |
+| `CSV_A_RECEBER` | URL do CSV publicado da [carteira](#a-carteira-o-que-ainda-vai-entrar) — o que está emitido e ainda não caiu. Vazio: o painel não mostra o "a entrar". |
+| `CSV_SEGUNDOS` | Intervalo de leitura das planilhas (padrão: `300`). |
 
 ### Contrato da API
 
