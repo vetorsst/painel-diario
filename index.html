@@ -437,7 +437,7 @@ body.festa #fx{display:block}
 <body>
 <div id="app"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
-<script type="application/json" id="estado">{"metaMes":250000,"lancamentos":[]}</script>
+<script type="application/json" id="estado">{"lancamentos":[]}</script>
 <script id="app-script">
 (function(){
   "use strict";
@@ -446,11 +446,15 @@ body.festa #fx{display:block}
   /* ============================================================
      CONFIGURAÇÃO
      ------------------------------------------------------------
-     META_MES       meta do mês em reais. Dá para trocar pelo painel, no
-                    quadro "Meta do mês" — o que for salvo ali manda nisto.
-     CUSTO_MES      custo total do mês em reais; dele sai o lucro projetado.
-                    0 = sem custo informado, e o lucro não aparece. Também dá
-                    para trocar no quadro "Meta do mês". A TV só lê daqui.
+     META_MES       meta do mês em reais: um número só, ou um por mês, como
+                    {"2026-10": 218196, "2026-11": 221629}. Mês sem valor
+                    herda o do último mês anterior que tiver. Dá para trocar
+                    pelo painel, no quadro "Meta do mês" — o que for salvo ali
+                    manda nisto, só no mês em que foi salvo.
+     CUSTO_MES      custo total do mês em reais, no mesmo formato da meta;
+                    dele sai o lucro projetado. 0 = sem custo informado, e o
+                    lucro não aparece. Também dá para trocar no quadro "Meta
+                    do mês". A TV só lê daqui.
      FERIADOS_EXTRAS  dias sem expediente além dos nacionais, carnaval e
                     Corpus Christi, como ["2026-11-30"]
      API_URL        (opcional) endpoint que guarda o estado.
@@ -468,14 +472,18 @@ body.festa #fx{display:block}
      CSV_SEGUNDOS   de quanto em quanto tempo relê as planilhas
 
      Contrato da API (dois métodos na mesma URL):
-       GET  -> {"metaMes":250000,"lancamentos":[ ... ]}   (ou só o array)
-       POST -> recebe {"metaMes":250000,"lancamentos":[ ... ]} e grava tudo
-     Cada lançamento: {id, ts, dia:"AAAA-MM-DD", hora, min, valor, vendedor, cliente}
-     (basta devolver id/ts/valor — dia, hora e min são deduzidos do ts)
+       GET  -> {"metaMes":{"mes":"2026-10","valor":218196},"custoMes":null,"aEntrar":null}
+       POST -> recebe o mesmo corpo e grava
+     Cada campo é {mes:"AAAA-MM", valor} ou null (= vale a configuração).
+     Receita não passa pela API: vem só da planilha.
      ============================================================ */
+  /* Meta e custo de out–dez/2026 saem do Plano de Caixa e Recorrência
+     (DRE Projetado, cenário Meta 4MM): meta = receita bruta; custo = impostos
+     + custos diretos + despesas operacionais, ou seja, a receita bruta menos
+     o lucro líquido projetado. Setembro fica no 250.000 que o painel usava. */
   var CONFIG = {
-    META_MES: 250000,
-    CUSTO_MES: 0,
+    META_MES: { "2026-09": 250000, "2026-10": 218196, "2026-11": 221629, "2026-12": 223754 },
+    CUSTO_MES: { "2026-09": 0, "2026-10": 197852, "2026-11": 198694, "2026-12": 199215 },
     FERIADOS_EXTRAS: [],
     API_URL: "",
     API_TOKEN: "",
@@ -485,7 +493,6 @@ body.festa #fx{display:block}
     CSV_SEGUNDOS: 300
   };
   /* ====== estado ====== */
-  var META_MES_PADRAO = CONFIG.META_MES || 250000;
   var estado = lerEstado();
   var somenteLeitura = false, avisoOk = false;
   var festaVista = false, tela = "painel", filtro = "", diasAbertos = {}, avisoHist = "";
@@ -512,30 +519,47 @@ body.festa #fx{display:block}
       /* ocultos eram as linhas da planilha apagadas pelo painel, que não se
          apaga mais: o campo deixa de ser lido e some da próxima gravação */
       delete s.ocultos;
-      if(typeof s.metaMes !== "number" || !(s.metaMes > 0)) s.metaMes = META_MES_PADRAO;
-      /* custo nulo = vale o da configuração. O padrão não é gravado no estado,
-         de propósito: se fosse, o 0 de hoje ficaria no localStorage da TV e
-         ganharia do custo que alguém puser na configuração depois */
-      if(typeof s.custoMes !== "number" || !(s.custoMes >= 0)) s.custoMes = null;
-      s.aEntrar = limparAEntrar(s.aEntrar);
+      /* nulo = vale o da configuração. O padrão não é gravado no estado, de
+         propósito: se fosse, ficaria no localStorage da TV e ganharia do que
+         alguém puser na configuração depois. Era o que acontecia com a meta:
+         o 250.000 se gravava a cada leitura da planilha, e a TV nunca mais
+         olhava para o META_MES. */
+      s.metaMes = limparDoMes(s.metaMes);
+      s.custoMes = limparDoMes(s.custoMes);
+      s.aEntrar = limparDoMes(s.aEntrar);
       /* formato antigo: meta diária fixa e metas por dia. A meta do dia agora
          sai da meta do mês, então esses campos deixam de ser lidos e gravados. */
       delete s.meta; delete s.metas;
       return s;
-    } catch(e){ return { metaMes: META_MES_PADRAO, custoMes: null, aEntrar: null, lancamentos: [] }; }
+    } catch(e){ return { metaMes: null, custoMes: null, aEntrar: null, lancamentos: [] }; }
   }
-  /* O previsto a entrar é guardado junto com o mês a que pertence. Meta e custo
-     atravessam a virada do mês sem problema — são estáveis —, mas "a entrar" é
-     a carteira de um mês só: o número de setembro valendo em outubro inflaria a
-     previsão em silêncio, e ninguém desconfiaria de um campo preenchido. Virou
-     o mês, o campo volta a pedir o valor. */
-  function limparAEntrar(a){
+  /* Meta, custo e previsto a entrar digitados no painel são guardados junto
+     com o mês a que pertencem. O plano muda mês a mês, e a carteira é de um mês
+     só: o número de setembro valendo em outubro mudaria a régua em silêncio, e
+     ninguém desconfiaria de um campo preenchido. Virou o mês, volta a valer a
+     configuração. O formato antigo — um número solto — não passa daqui. */
+  function limparDoMes(a){
     return a && typeof a.valor === "number" && a.valor >= 0 && /^\d{4}-\d{2}$/.test(String(a.mes))
       ? { mes: String(a.mes), valor: a.valor } : null;
   }
-  function aEntrarInformado(mes){
-    return estado.aEntrar && estado.aEntrar.mes === mes ? estado.aEntrar.valor : null;
+  function informadoNoMes(a, mes){
+    return a && a.mes === mes ? a.valor : null;
   }
+  function aEntrarInformado(mes){ return informadoNoMes(estado.aEntrar, mes); }
+  /* número só vale para todo mês; por mês, o mês sem valor herda o do último
+     mês anterior que tiver, para a TV não ficar sem meta na virada */
+  function configDoMes(cfg, mes){
+    if(typeof cfg === "number") return cfg;
+    if(!cfg || typeof cfg !== "object") return 0;
+    var ks = Object.keys(cfg).filter(function(k){ return k <= mes; }).sort();
+    return ks.length ? (+cfg[ks[ks.length-1]] || 0) : 0;
+  }
+  function metaConfig(mes){ return configDoMes(CONFIG.META_MES, mes) || 250000; }
+  function metaDoMes(mes){
+    var v = informadoNoMes(estado.metaMes, mes);
+    return v > 0 ? v : metaConfig(mes);
+  }
+  function custoConfig(mes){ return configDoMes(CONFIG.CUSTO_MES, mes); }
   /* ====== tempo (America/Sao_Paulo) ====== */
   var FMT = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
   function partesSP(d){
@@ -637,7 +661,7 @@ body.festa #fx{display:block}
     var acumulado = doMes.reduce(function(a,l){ return a + l.valor; }, 0);
     var hojeTotal = doDia.reduce(function(a,l){ return a + l.valor; }, 0);
 
-    var metaMes = estado.metaMes;
+    var metaMes = metaDoMes(mes);
     var falta = Math.max(metaMes - acumulado, 0);
     var batida = acumulado >= metaMes;
 
@@ -671,7 +695,7 @@ body.festa #fx{display:block}
        mês. O custo não tem ritmo — é o valor do mês inteiro, de uma vez. Sem
        custo informado não há lucro a mostrar, e o painel diz isso em vez de
        exibir o faturamento inteiro como se fosse lucro. */
-    var custoMes = custoDoMes();
+    var custoMes = custoDoMes(mes);
     var lucro = custoMes > 0 ? projecao - custoMes : null;
 
     var situacao;
@@ -1087,9 +1111,10 @@ body.festa #fx{display:block}
       + '</section>';
   }
 
-  /* custo nulo = vale o da configuração; um número = alguém salvou no painel */
-  function custoDoMes(){
-    return typeof estado.custoMes === "number" && estado.custoMes >= 0 ? estado.custoMes : (+CONFIG.CUSTO_MES || 0);
+  /* custo nulo = vale o da configuração; com valor = alguém salvou no painel */
+  function custoDoMes(mes){
+    var v = informadoNoMes(estado.custoMes, mes);
+    return v !== null ? v : custoConfig(mes);
   }
   /* nota do bloco do mês na TV, sempre numa linha: com custo, a projeção e o
      lucro; sem custo, o percentual da meta e a projeção */
@@ -1103,17 +1128,17 @@ body.festa #fx{display:block}
 
   function metasHTML(d){
     if(somenteLeitura) return "";
-    var custoProprio = typeof estado.custoMes === "number", custoConfig = +CONFIG.CUSTO_MES || 0;
+    var custoProprio = informadoNoMes(estado.custoMes, d.mes), custoCfg = custoConfig(d.mes);
     var maoValor = aEntrarInformado(d.mes);
     return '<div class="painel"><h3>Meta do mês</h3>'
       + '<p class="legenda">Vale para ' + esc(nomeMes(d.mes))
-      + '. Da meta sai o ritmo necessário; do custo, o lucro projetado. O previsto a entrar vale só neste mês.</p>'
+      + '. Da meta sai o ritmo necessário; do custo, o lucro projetado. O que se salvar aqui vale só neste mês; virado o mês, volta a valer a configuração.</p>'
       + '<form class="lanc metas-form" id="form-metas">'
       + '<div class="campo"><label class="rot" for="meta-mes" style="display:block;margin-bottom:6px">Meta do mês (R$)</label>'
       + '<input id="meta-mes" inputmode="decimal" autocomplete="off" value="' + esc(numeroBR(d.metaMes)) + '" aria-label="Meta do mês em reais"></div>'
       + '<div class="campo"><label class="rot" for="custo-mes" style="display:block;margin-bottom:6px">Custo do mês (R$)</label>'
-      + '<input id="custo-mes" inputmode="decimal" autocomplete="off" value="' + (custoProprio ? esc(numeroBR(estado.custoMes)) : '') + '"'
-      + ' placeholder="' + (custoConfig > 0 ? 'em branco: ' + esc(numeroBR(custoConfig)) + ', da configuração' : 'não informado') + '" aria-label="Custo do mês em reais"></div>'
+      + '<input id="custo-mes" inputmode="decimal" autocomplete="off" value="' + (custoProprio !== null ? esc(numeroBR(custoProprio)) : '') + '"'
+      + ' placeholder="' + (custoCfg > 0 ? 'em branco: ' + esc(numeroBR(custoCfg)) + ', da configuração' : 'não informado') + '" aria-label="Custo do mês em reais"></div>'
       + '<div class="campo"><label class="rot" for="a-entrar" style="display:block;margin-bottom:6px">A entrar no mês (R$)</label>'
       + '<input id="a-entrar" inputmode="decimal" autocomplete="off" value="' + (maoValor !== null ? esc(numeroBR(maoValor)) : '') + '"'
       + ' placeholder="' + (CONFIG.CSV_A_RECEBER ? 'em branco: o que a carteira da planilha disser' : 'não informado')
@@ -1315,8 +1340,13 @@ body.festa #fx{display:block}
         /* meta nova: a festa pode valer de novo se o mês passar a estar batido */
         festaVista = false;
         festaMes = ""; try { localStorage.removeItem("festa-vista"); } catch(e){}
-        salvarMetas(Math.round(m*100)/100, c === null ? null : Math.round(c*100)/100,
-          a === null ? null : { mes: mesDe(hojeSP()), valor: Math.round(a*100)/100 },
+        /* meta igual à da configuração não vira meta própria: assim, se a
+           configuração mudar no meio do mês, o painel acompanha */
+        var mes = mesDe(hojeSP());
+        m = Math.round(m*100)/100;
+        salvarMetas(m === metaConfig(mes) ? null : { mes: mes, valor: m },
+          c === null ? null : { mes: mes, valor: Math.round(c*100)/100 },
+          a === null ? null : { mes: mes, valor: Math.round(a*100)/100 },
           "Números do mês salvos.");
       });
     }
@@ -1439,12 +1469,11 @@ body.festa #fx{display:block}
         /* a API sincroniza só o que ainda é digitado — meta e custo. Receita
            vem da planilha e de mais lugar nenhum, nem de um servidor. */
         var mudou = false;
-        if(j && typeof j.metaMes === "number" && j.metaMes > 0 && j.metaMes !== estado.metaMes){ estado.metaMes = j.metaMes; mudou = true; }
-        if(j && (typeof j.custoMes === "number" || j.custoMes === null) && j.custoMes !== estado.custoMes){ estado.custoMes = j.custoMes; mudou = true; }
-        if(j && "aEntrar" in j){
-          var ae = limparAEntrar(j.aEntrar);
-          if(JSON.stringify(ae) !== JSON.stringify(estado.aEntrar)){ estado.aEntrar = ae; mudou = true; }
-        }
+        ["metaMes","custoMes","aEntrar"].forEach(function(k){
+          if(!j || !(k in j)) return;
+          var v = limparDoMes(j[k]);
+          if(JSON.stringify(v) !== JSON.stringify(estado[k])){ estado[k] = v; mudou = true; }
+        });
         if(mudou){ gravarLocal(); render(); }
         ultimaSync = Date.now(); syncOk = true;
       })
@@ -1881,9 +1910,9 @@ body.festa #fx{display:block}
        primeira leitura da planilha repõe o que tiver sido apagado. */
     estado.lancamentos = salvo.lancamentos.map(normalizar)
       .filter(function(l){ return l && l.origem === "csv"; });
-    if(typeof salvo.metaMes === "number" && salvo.metaMes > 0) estado.metaMes = salvo.metaMes;
-    if(typeof salvo.custoMes === "number" && salvo.custoMes >= 0) estado.custoMes = salvo.custoMes;
-    if(limparAEntrar(salvo.aEntrar)) estado.aEntrar = limparAEntrar(salvo.aEntrar);
+    estado.metaMes = limparDoMes(salvo.metaMes);
+    estado.custoMes = limparDoMes(salvo.custoMes);
+    estado.aEntrar = limparDoMes(salvo.aEntrar);
   }
   if(modoTV) document.body.classList.add("tv");
   festaVista = !!festaMes && festaMes === mesDe(hojeSP());

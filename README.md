@@ -271,15 +271,23 @@ O quadro "Meta do mês" tem três campos:
 | **Custo do mês** | passa a valer no lugar do `CUSTO_MES`; dele sai o lucro projetado. Em branco, vale o da configuração |
 | **A entrar no mês** | o previsto a entrar, digitado à mão. Em branco, vale a [carteira](#a-carteira-o-que-ainda-vai-entrar) da planilha |
 
-O **a entrar é guardado junto com o mês em que foi digitado**, e vale só nele.
-Meta e custo atravessam a virada do mês sem problema, porque são estáveis; a
-carteira não é. O número de setembro valendo em outubro inflaria a previsão em
+**Tudo o que se salva no quadro é guardado junto com o mês em que foi
+digitado**, e vale só nele. O plano muda de um mês para o outro, e a carteira é
+de um mês só: o número de setembro valendo em outubro mudaria a régua em
 silêncio, e um campo preenchido não levanta suspeita de ninguém. Virado o mês,
-o campo volta a pedir o valor.
+volta a valer a configuração. Salvar a meta igual à da configuração não cria
+meta própria — assim, se a configuração mudar no meio do mês, o painel
+acompanha.
 
 O que se salva no quadro fica guardado naquele navegador. A TV, que é só
-leitura, usa o que estiver na configuração — é lá que o custo precisa estar
-para o lucro aparecer na parede.
+leitura, usa o que estiver na configuração — é lá que meta e custo precisam
+estar para aparecerem na parede.
+
+Até outubro de 2026 a meta não seguia essa regra: o painel gravava a meta
+padrão no navegador a cada leitura da planilha, e dali em diante o valor
+gravado ganhava da configuração. A TV ficou presa nos R$ 250.000 de setembro,
+qualquer que fosse o `META_MES`. O formato antigo — um número solto, sem mês —
+agora é descartado ao abrir.
 
 ## A carteira: o que ainda vai entrar
 
@@ -355,8 +363,8 @@ A configuração fica no início da tag `<script>` do arquivo, em `var CONFIG`:
 
 | Chave | O que faz |
 | --- | --- |
-| `META_MES` | Meta do mês, em reais (padrão: `250000`). O que for salvo no painel manda nisto. |
-| `CUSTO_MES` | Custo total do mês, em reais (padrão: `0`, sem custo). Dele sai o lucro projetado. O que for salvo no painel manda nisto. |
+| `META_MES` | Meta do mês, em reais: um número só, ou um por mês, como `{"2026-10": 218196, "2026-11": 221629}`. Mês sem valor herda o do último mês anterior que tiver; sem nada, `250000`. O que for salvo no painel manda nisto, só naquele mês. |
+| `CUSTO_MES` | Custo total do mês, em reais, no mesmo formato da meta (sem nada: `0`, sem custo). Dele sai o lucro projetado. O que for salvo no painel manda nisto, só naquele mês. |
 | `FERIADOS_EXTRAS` | Dias sem expediente além dos feriados nacionais, carnaval e Corpus Christi, como `["2026-11-30"]`. |
 | `API_URL` | Endpoint que sincroniza **meta e custo** entre navegadores. Vazio: cada navegador guarda os seus no `localStorage`. Receita nunca passa por aqui. |
 | `API_TOKEN` | Opcional, enviado como `Authorization: Bearer ...`. |
@@ -372,10 +380,11 @@ ela: vem da planilha financeira e de mais lugar nenhum, nem de um servidor.
 
 Dois métodos na mesma URL:
 
-- `GET` devolve `{"metaMes":250000,"custoMes":150000}`.
+- `GET` devolve `{"metaMes":{"mes":"2026-10","valor":218196},"custoMes":null,"aEntrar":null}`.
 - `POST` recebe o mesmo corpo e grava.
 
-`custoMes` pode vir `null`, e aí vale o `CUSTO_MES` da configuração.
+Cada campo é `{mes, valor}` ou `null`. `null`, ou um valor de outro mês, faz
+valer o que estiver na configuração.
 
 > Não versione tokens: deixe `API_TOKEN` vazio no arquivo publicado.
 
